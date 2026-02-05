@@ -1,15 +1,19 @@
 # TODO: ling-open-studio (InclusionAI Demo)
 
 ## 第一阶段：本地环境跑通 (Local Setup) <!-- id: 0 -->
-- [ ] **环境配置**：创建 `.env.local` 并配置必要的 API Key (`LANGCHAIN_API_KEY` 等) <!-- id: 1 -->
-- [ ] **依赖安装**：运行 `pnpm install` 确保所有库正确安装 <!-- id: 2 -->
-- [ ] **启动开发服务器**：运行 `pnpm dev` 并在浏览器验证初始页面渲染 <!-- id: 3 -->
+- [x] **环境配置**：创建 `.env.local` 并配置必要的 API Key (`LANGCHAIN_API_KEY` 等) <!-- id: 1 -->
+- [x] **依赖安装**：运行 `pnpm install` 确保所有库正确安装 <!-- id: 2 -->
+- [x] **启动开发服务器**：运行 `pnpm dev` 并在浏览器验证初始页面渲染 <!-- id: 3 -->
 
 ## 第二阶段：Hugging Face 部署流水线 (Deployment Pipeline) <!-- id: 4 -->
 - [ ] **配置 Standalone 模式**：在 `next.config.ts` 中开启 `output: 'standalone'` <!-- id: 5 -->
-- [ ] **创建部署脚本**：参考 `osw-studio` 实现 `Dockerfile` 和 `server.js` (适配 HF 的 7860 端口) <!-- id: 6 -->
-- [ ] **构建产物验证**：在本地运行 `pnpm build` 并尝试用 Docker 运行构建后的产物 <!-- id: 7 -->
-- [ ] **HF Space 部署**：在 Hugging Face 创建 Space，配置 Secrets，手动或通过 CI 推送代码并跑通 <!-- id: 8 -->
+- [ ] **创建部署 Dockerfile**：新建 `Dockerfile.hf`，编写基于 copy 模式的运行配置 (适配 7860 端口, 非 root 用户) <!-- id: 6 -->
+- [ ] **本地构建验证**： <!-- id: 7 -->
+    - 执行 `pnpm build`
+    - 整理 standalone 产物 (复制 public, .next/static)
+    - 使用 `docker build -f Dockerfile.hf` 验证镜像能否启动
+- [ ] **GitHub Actions 配置**：编写 `.github/workflows/deploy.yml` 实现自动构建并推送到 HF Space <!-- id: 8 -->
+- [ ] **HF Space 初始化**：(用户操作) 在 Hugging Face 创建 Space 并配置 Secrets <!-- id: 20 -->
 
 ## 第三阶段：视觉规范与基础设施 (Infrastructure & Design) <!-- id: 9 -->
 - [ ] **集成设计系统**：配置 Tailwind 4，引入 `InclusionAI` 的色彩、字体和组件样式 <!-- id: 10 -->
