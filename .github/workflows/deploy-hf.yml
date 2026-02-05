@@ -39,8 +39,9 @@ jobs:
         run: |
           mkdir -p deploy_package
           
-          # 1. Dockerfile
+          # 1. Dockerfile & HF Metadata
           cp Dockerfile.hf deploy_package/Dockerfile
+          cp README.hf.md deploy_package/README.md
           
           # 2. Public assets
           cp -r public deploy_package/public
@@ -50,8 +51,26 @@ jobs:
           cp -r .next/static deploy_package/.next/static
           
           # 4. Standalone server & node_modules
-          # Copy contents of standalone to root of deploy_package
-          cp -R .next/standalone/* deploy_package/
+          # Copy contents of standalone to root of deploy_package (including hidden files)
+          cp -R .next/standalone/. deploy_package/
+
+          # --- Cleanup Step: Remove unnecessary heavy files ---
+          echo "Cleaning up unnecessary files..."
+          # 彻底移除 sharp 及其二进制文件 (因 next.config.ts 已开启 unoptimized: true)
+          rm -rf deploy_package/node_modules/sharp
+          rm -rf deploy_package/node_modules/@img
+          
+          rm -rf deploy_package/node_modules/typescript
+          rm -rf deploy_package/node_modules/@types
+          rm -rf deploy_package/node_modules/@biomejs
+          rm -rf deploy_package/node_modules/eslint
+          rm -rf deploy_package/node_modules/prettier
+          # Remove platform-specific binaries not needed for Linux
+          rm -rf deploy_package/node_modules/@swc/core-darwin-*
+          rm -rf deploy_package/node_modules/@swc/core-win32-*
+          # Remove source maps to save space
+          find deploy_package -name "*.map" -type f -delete
+          # ----------------------------------------------------
           
           echo "Deployment package prepared at ./deploy_package"
           ls -F deploy_package/
