@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>InclusionAI Demo</title>
+    
+    <!-- Google Fonts: Playfair Display (Serif) and Inter (Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              serif: ['"Playfair Display"', 'serif'],
+              sans: ['"Inter"', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                bg: '#F8F9FB', // Ice Gray background
+                dark: '#1A1A1A', // Near Black
+                gray: '#6B7280', // Cool Gray
+                border: '#E5E7EB', 
+                // Palette
+                cyan: '#06b6d4', // Cyan 500 (Primary Tech)
+                blue: '#3b82f6', // Blue 500 (Primary Action)
+                slate: '#5C8D9E', // Muted Slate (Insight/Creative)
+                error: '#D44C66', // Muted Red (Warning/Error)
+                // Pastel tints
+                'cyan-light': '#ecfeff',
+                'blue-light': '#eff6ff', 
+                'slate-light': '#f0f9ff',
+              }
+            },
+            backgroundImage: {
+              // Reverted to Fresh Intelligence Gradient (Cyan to Blue)
+              'gradient-accent': 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+              'gradient-soft': 'linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Custom scrollbar to match the clean aesthetic */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #E5E7EB;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #D1D5DB;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-brand-bg text-brand-dark antialiased overflow-hidden">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
