@@ -1,0 +1,75 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Configure pnpm (Hoisted)
+        run: |
+          echo "node-linker=hoisted" >> .npmrc
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js App
+        run: pnpm build
+
+      - name: Prepare Deployment Artifacts
+        run: |
+          mkdir -p deploy_package
+          
+          # 1. Dockerfile
+          cp Dockerfile.hf deploy_package/Dockerfile
+          
+          # 2. Public assets
+          cp -r public deploy_package/public
+          
+          # 3. Static assets (.next/static)
+          mkdir -p deploy_package/.next
+          cp -r .next/static deploy_package/.next/static
+          
+          # 4. Standalone server & node_modules
+          # Copy contents of standalone to root of deploy_package
+          cp -R .next/standalone/* deploy_package/
+          
+          echo "Deployment package prepared at ./deploy_package"
+          ls -F deploy_package/
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          # 格式: username/space-name
+          HF_SPACE: ${{ secrets.HF_SPACE_NAME }}
+        run: |
+          cd deploy_package
+          git init
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          
+          # 强制添加所有文件（即使被 .gitignore 忽略）
+          git add .
+          git commit -m "Deploy from GitHub Actions: ${{ github.sha }}"
+          
+          # 强制推送到 HF Space
+          git push --force https://oauth2:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE main

@@ -8,7 +8,7 @@
 ## 第二阶段：Hugging Face 部署流水线 (Deployment Pipeline) <!-- id: 4 -->
 - [ ] **配置 Standalone 模式**：在 `next.config.ts` 中开启 `output: 'standalone'` <!-- id: 5 -->
 - [ ] **创建部署 Dockerfile**：新建 `Dockerfile.hf`，编写基于 copy 模式的运行配置 (适配 7860 端口, 非 root 用户) <!-- id: 6 -->
-- [ ] **本地构建验证**： <!-- id: 7 -->
+- [x] **本地构建验证**： <!-- id: 7 -->
     - 执行 `pnpm build`
     - 整理 standalone 产物 (复制 public, .next/static)
     - 使用 `docker build -f Dockerfile.hf` 验证镜像能否启动

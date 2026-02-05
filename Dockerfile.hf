@@ -11,11 +11,12 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-# 复制构建产物 (由 CI 准备好)
+# 显式复制运行所需的各部分 (从 tmp/deploy 目录中)
 COPY --chown=appuser:appgroup public ./public
-COPY --chown=appuser:appgroup .next/static ./.next/static
-# 复制 standalone 目录的内容到 /app
-COPY --chown=appuser:appgroup standalone/ ./
+COPY --chown=appuser:appgroup .next ./.next
+COPY --chown=appuser:appgroup node_modules ./node_modules
+COPY --chown=appuser:appgroup server.js ./
+COPY --chown=appuser:appgroup package.json ./
 
 # 切换用户
 USER appuser
