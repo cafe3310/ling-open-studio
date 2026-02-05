@@ -63,7 +63,7 @@ jobs:
           HF_SPACE: ${{ secrets.HF_SPACE_NAME }}
         run: |
           cd deploy_package
-          git init
+          git init -b main
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           
