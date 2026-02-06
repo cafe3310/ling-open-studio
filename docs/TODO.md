@@ -33,6 +33,13 @@
     - 更新后端以支持动态模型选择与 System Prompt 注入
 - [ ] **消息状态行 (Message Status Line)**： (由于元数据透传技术限制，暂时回退) <!-- id: 22 -->
     - 在消息顶部增加显示 `[model_name] [latency]` 的状态行
+- [x] **思考过程 (Reasoning) 支持**： <!-- id: 23 -->
+    - 实现 `ReasoningSplitter` 解析 `<think>` 标签
+    - 集成 `assistant-ui` 的 `Reasoning` 组件展示思考流
+- [ ] **Chat 线程自动命名 (Auto-Naming)**： <!-- id: 24 -->
+    - 实现 `chat_name_generator` Graph (Ling-Mini)
+    - 实现 `/api/naming` 接口
+    - 前端集成：首轮对话后触发，显示 "Naming..." 并更新标题
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - 实现代码生成对话区与预览组件
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->

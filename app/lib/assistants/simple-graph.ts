@@ -19,8 +19,8 @@ async function callModel(state: typeof GraphState.State, config: RunnableConfig)
   const temperature = modelConfig?.temperature ?? 0.7;
   const systemPrompt = modelConfig?.systemPrompt;
 
-  console.log(`Calling model ${modelId} for session:`, state.session_id);
-  
+  console.log(`Calling model ${modelId} temp ${temperature} for session:`, state.session_id);
+
   const model = createChatModel(modelId as any, { temperature });
 
   const messages = [...state.messages];
@@ -35,13 +35,13 @@ async function callModel(state: typeof GraphState.State, config: RunnableConfig)
   const response = await model.invoke(messages);
 
   console.log("Model response:", response.content.toString().substring(0, 50), "...");
-  
+
   const chunk = new AIMessageChunk({
     content: response.content,
     id: response.id || uuidv4(),
     name: "agent",
   });
-  
+
   return { messages: [chunk] };
 }
 
