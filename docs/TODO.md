@@ -15,20 +15,22 @@
 - [x] **GitHub Actions 配置**：编写 `.github/workflows/deploy.yml` 实现自动构建并推送到 HF Space <!-- id: 8 -->
 - [x] **HF Space 初始化**：(用户操作) 在 Hugging Face 创建 Space 并配置 Secrets <!-- id: 20 -->
 
-## 第三阶段：视觉规范与基础设施 (Infrastructure & Design) <!-- id: 9 -->
-- [ ] **集成设计系统**：配置 Tailwind 4，引入 `InclusionAI` 的色彩、字体和组件样式 <!-- id: 10 -->
-- [ ] **重构全局布局 (Layout)**：实现支持双侧边栏的响应式布局框架 <!-- id: 11 -->
-- [ ] **LangGraph 后端接入**：在 `/api/graph/[_path]` 路由中实现与 LangGraph 的状态同步逻辑 <!-- id: 12 -->
-- [ ] **重构全局布局 (Layout)**：实现支持双侧边栏的响应式布局框架 <!-- id: 11 -->
-- [ ] **LangGraph 后端接入**：在 `/api/graph/[_path]` 路由中实现与 LangGraph 的状态同步逻辑 <!-- id: 12 -->
+## 第三阶段：核心架构与 LangGraph 对接 (Core Architecture & LangGraph) <!-- id: 9 -->
+- [ ] **多 Tab 切换架构实现**： <!-- id: 10 -->
+    - 在主界面实现 Chat, Web, Write 三个 Tab 的切换逻辑
+    - 除 Chat Tab 外，其余 Tab 暂时留空（显示 Placeholder）
+- [ ] **LangGraph Chat 对接**： <!-- id: 12 -->
+    - 参考 `ling-model-judge` 实现简单的 LangGraph 适配器
+    - 在第一个 Tab (Chat) 中跑通基于 LangGraph 的基础对话流程
+- [ ] **视觉系统集成 (Open Intelligence)**： <!-- id: 11 -->
+    - 在功能跑通后，引入 `brand-bg`, `brand-dark` 等色彩定义
+    - 配置 Playfair Display 等字体并应用到全局 Layout
 
-## 第四阶段：核心功能模块实现 (Feature Implementation) <!-- id: 13 -->
-- [ ] **Model Chat (基础对话)**： <!-- id: 14 -->
-    - 实现历史记录列表、消息流式展示、模型参数调节面板
-- [ ] **Model Web (网页生成)**： <!-- id: 15 -->
-    - 实现代码生成对话区、实时 HTML/React 预览组件
-- [ ] **Model Write (辅助写作)**： <!-- id: 16 -->
-    - 集成编辑器、实现后台实体提取任务、开发灵感推荐卡片组件
+## 第四阶段：功能细节完善 (Feature Refinement) <!-- id: 13 -->
+- [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
+    - 实现代码生成对话区与预览组件
+- [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
+    - 集成编辑器与灵感推荐卡片
 
 ## 第五阶段：优化与交付 (Polishing) <!-- id: 17 -->
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
