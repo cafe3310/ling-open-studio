@@ -1,6 +1,7 @@
 import { simpleGraph } from "@/app/lib/assistants/simple-graph";
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
+import { ReasoningSplitter } from "@/app/lib/assistants/reasoning-splitter";
 
 export async function POST(req: Request) {
   const { messages, config } = await req.json();
@@ -23,7 +24,9 @@ export async function POST(req: Request) {
     }
   );
 
+  const splitter = new ReasoningSplitter();
+
   return createUIMessageStreamResponse({ 
-    stream: toUIMessageStream(stream as any),
+    stream: toUIMessageStream(splitter.transform(stream as any)),
   });
 }
