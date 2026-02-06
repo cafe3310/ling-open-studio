@@ -27,6 +27,12 @@
     - 配置 Playfair Display 等字体并应用到全局 Layout
 
 ## 第四阶段：功能细节完善 (Feature Refinement) <!-- id: 13 -->
+- [ ] **模型参数绑定 (Model Config Binding)**： <!-- id: 21 -->
+    - 创建 Zustand Store 管理模型参数
+    - 实现 Model Config 面板的参数绑定与首条消息后禁用逻辑
+    - 更新后端以支持动态模型选择与 System Prompt 注入
+- [ ] **消息状态行 (Message Status Line)**： <!-- id: 22 -->
+    - 在消息顶部增加显示 `[model_name] [latency]` 的状态行
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - 实现代码生成对话区与预览组件
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
