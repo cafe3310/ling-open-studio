@@ -3,7 +3,7 @@ import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  const { messages, config } = await req.json();
   // Convert AI SDK messages to LangChain format
   const langchainMessages = await toBaseMessages(messages);
   // Use a unique ID for the session/thread, similar to model-judger
@@ -15,12 +15,15 @@ export async function POST(req: Request) {
       session_id: sessionId,
     },
     {
-      configurable: { thread_id: sessionId },
+      configurable: { 
+        thread_id: sessionId,
+        modelConfig: config,
+      },
       streamMode: ["messages"],
     }
   );
 
   return createUIMessageStreamResponse({ 
-    stream: toUIMessageStream(stream),
+    stream: toUIMessageStream(stream as any),
   });
 }

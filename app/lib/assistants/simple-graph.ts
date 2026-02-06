@@ -1,10 +1,7 @@
-import { StateGraph, Annotation } from "@langchain/langgraph";
-import { AIMessageChunk, BaseMessage } from "@langchain/core/messages";
-import { createChatModel } from "@/app/lib/model";
+import { StateGraph, Annotation, RunnableConfig } from "@langchain/langgraph";
+import { AIMessageChunk, BaseMessage, SystemMessage } from "@langchain/core/messages";
+import { createChatModel, MODEL_CONFIG } from "@/app/lib/model";
 import { v4 as uuidv4 } from "uuid";
-
-// Initialize the model for this specific assistant
-const assistantModel = createChatModel("Ling_1T", { temperature: 0.1 });
 
 // Define a custom state similar to model-judger
 export const GraphState = Annotation.Root({
@@ -16,10 +13,27 @@ export const GraphState = Annotation.Root({
 });
 
 // Define the function that calls the model
-async function callModel(state: typeof GraphState.State) {
-  console.log("Calling model for session:", state.session_id);
+async function callModel(state: typeof GraphState.State, config: RunnableConfig) {
+  const modelConfig = config.configurable?.modelConfig;
+  const modelId = modelConfig?.modelId || "Ling_1T";
+  const temperature = modelConfig?.temperature ?? 0.7;
+  const systemPrompt = modelConfig?.systemPrompt;
+
+  console.log(`Calling model ${modelId} for session:`, state.session_id);
   
-  const response = await assistantModel.invoke(state.messages);
+  const model = createChatModel(modelId as any, { temperature });
+
+  const messages = [...state.messages];
+  if (systemPrompt) {
+    // Check if there's already a system message, if not add it
+    const hasSystemMessage = messages.some(m => m._getType() === "system");
+    if (!hasSystemMessage) {
+      messages.unshift(new SystemMessage(systemPrompt));
+    }
+  }
+
+  const response = await model.invoke(messages);
+
   console.log("Model response:", response.content.toString().substring(0, 50), "...");
   
   const chunk = new AIMessageChunk({

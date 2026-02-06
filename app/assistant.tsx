@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import {
   useChatRuntime,
@@ -16,14 +16,23 @@ import { ThreadListSidebar } from "@/components/assistant-ui/threadlist-sidebar"
 import { Separator } from "@/components/ui/separator";
 import { TopNavigation, Tab } from "@/components/top-navigation";
 import { ModelConfig } from "@/components/model-config";
+import { useModelStore } from "@/lib/store";
 
 export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
+  const { modelId, systemPrompt, temperature } = useModelStore();
 
   const runtime = useChatRuntime({
-    transport: new AssistantChatTransport({
+    transport: useMemo(() => new AssistantChatTransport({
       api: "/api/chat",
-    }),
+      body: {
+        config: {
+          modelId,
+          systemPrompt,
+          temperature,
+        }
+      }
+    }), [modelId, systemPrompt, temperature]),
   });
 
   return (
