@@ -16,13 +16,13 @@
 - [x] **HF Space 初始化**：(用户操作) 在 Hugging Face 创建 Space 并配置 Secrets <!-- id: 20 -->
 
 ## 第三阶段：核心架构与 LangGraph 对接 (Core Architecture & LangGraph) <!-- id: 9 -->
-- [ ] **多 Tab 切换架构实现**： <!-- id: 10 -->
+- [x] **多 Tab 切换架构实现**： <!-- id: 10 -->
     - 在主界面实现 Chat, Web, Write 三个 Tab 的切换逻辑
     - 除 Chat Tab 外，其余 Tab 暂时留空（显示 Placeholder）
-- [ ] **LangGraph Chat 对接**： <!-- id: 12 -->
+- [x] **LangGraph Chat 对接**： <!-- id: 12 -->
     - 参考 `ling-model-judge` 实现简单的 LangGraph 适配器
     - 在第一个 Tab (Chat) 中跑通基于 LangGraph 的基础对话流程
-- [ ] **视觉系统集成 (Open Intelligence)**： <!-- id: 11 -->
+- [x] **视觉系统集成 (Open Intelligence)**： <!-- id: 11 -->
     - 在功能跑通后，引入 `brand-bg`, `brand-dark` 等色彩定义
     - 配置 Playfair Display 等字体并应用到全局 Layout
 

@@ -50,7 +50,6 @@ Inbox 目录
 ```env
 LANGCHAIN_API_KEY=your_langchain_api_key
 LANGGRAPH_API_URL=your_langgraph_api_url
-NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_assistant_id_or_graph_id
 ```
 
 ### 脚本命令
