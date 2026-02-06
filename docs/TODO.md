@@ -36,7 +36,7 @@
 - [x] **思考过程 (Reasoning) 支持**： <!-- id: 23 -->
     - 实现 `ReasoningSplitter` 解析 `<think>` 标签
     - 集成 `assistant-ui` 的 `Reasoning` 组件展示思考流
-- [ ] **Chat 线程自动命名 (Auto-Naming)**： <!-- id: 24 -->
+- [x] **Chat 线程自动命名 (Auto-Naming)**： <!-- id: 24 -->
     - 实现 `chat_name_generator` Graph (Ling-Mini)
     - 实现 `/api/naming` 接口
     - 前端集成：首轮对话后触发，显示 "Naming..." 并更新标题

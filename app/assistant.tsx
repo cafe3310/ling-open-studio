@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { TopNavigation, Tab } from "@/components/top-navigation";
 import { ModelConfig } from "@/components/model-config";
 import { useModelStore } from "@/lib/store";
+import { ThreadTitleAutomator } from "@/components/thread-title-automator";
 
 export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
@@ -42,6 +43,7 @@ export const Assistant = () => {
       <main className="flex-1 overflow-hidden relative">
         {activeTab === 'chat' && (
           <AssistantRuntimeProvider runtime={runtime}>
+            <ThreadTitleAutomator />
             <SidebarProvider className="h-full w-full" style={{ minHeight: '0' }}>
               <div className="flex h-full w-full overflow-hidden">
                 <ThreadListSidebar />
