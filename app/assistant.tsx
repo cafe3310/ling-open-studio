@@ -15,6 +15,7 @@ import {
 import { ThreadListSidebar } from "@/components/assistant-ui/threadlist-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { TopNavigation, Tab } from "@/components/top-navigation";
+import { ModelConfig } from "@/components/model-config";
 
 export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
@@ -26,25 +27,26 @@ export const Assistant = () => {
   });
 
   return (
-    <div className="flex flex-col h-dvh w-full bg-background">
+    <div className="flex flex-col h-dvh w-full bg-brand-bg">
       <TopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="flex-1 overflow-hidden relative">
         {activeTab === 'chat' && (
           <AssistantRuntimeProvider runtime={runtime}>
             <SidebarProvider className="h-full w-full" style={{ minHeight: '0' }}>
-              <div className="flex h-full w-full">
+              <div className="flex h-full w-full overflow-hidden">
                 <ThreadListSidebar />
-                <SidebarInset className="h-full flex flex-col">
-                  <header className="flex h-12 shrink-0 items-center gap-2 px-4 border-b">
+                <SidebarInset className="h-full flex flex-col bg-white overflow-hidden relative">
+                  <header className="flex h-12 shrink-0 items-center gap-2 px-4 border-b border-brand-border">
                     <SidebarTrigger />
                     <Separator orientation="vertical" className="mr-2 h-4" />
-                    <span className="text-sm font-medium">Chat Session</span>
+                    <span className="text-sm font-medium font-sans text-brand-dark">Chat Session</span>
                   </header>
                   <div className="flex-1 overflow-hidden">
                     <Thread />
                   </div>
                 </SidebarInset>
+                <ModelConfig />
               </div>
             </SidebarProvider>
           </AssistantRuntimeProvider>
