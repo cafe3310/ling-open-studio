@@ -85,7 +85,7 @@ export const Assistant = () => {
         )}
 
         {activeTab === 'filesystem' && (
-          <FilesystemTab threadId={threadId} />
+          <FilesystemTab threadId="global" />
         )}
       </main>
     </div>

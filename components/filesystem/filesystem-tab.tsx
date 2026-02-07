@@ -41,6 +41,7 @@ interface FilesystemTabProps {
 }
 
 export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
+  console.log('[FilesystemTab] Render. threadId:', threadId);
   const { files, isLoading, refresh, writeFile, readFile, deleteFile, deleteDir, renameFile } = useVFS(threadId);
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set(['/workspace', '/system']));
@@ -89,12 +90,23 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
   };
 
   const handleCreateItem = async () => {
-    if (!newItemName || !threadId) return;
+    console.log('[FilesystemTab] handleCreateItem triggered');
+    console.log(' - newItemName:', newItemName);
+    console.log(' - threadId:', threadId);
+    console.log(' - newItemType:', newItemType);
+    console.log(' - newItemParentPath:', newItemParentPath);
+
+    if (!newItemName || !threadId) {
+      console.warn('[FilesystemTab] Cannot create item: missing name or threadId');
+      return;
+    }
     
     // Normalize path
     let parent = newItemParentPath;
     if (parent.endsWith('/')) parent = parent.slice(0, -1);
     const fullPath = `${parent}/${newItemName}`;
+
+    console.log(`[FilesystemTab] Creating ${newItemType}: ${fullPath}`);
 
     try {
       if (newItemType === 'folder') {
@@ -103,6 +115,7 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
       } else {
         await writeFile(fullPath, '', 'user');
       }
+      console.log('[FilesystemTab] Item created successfully');
       setIsNewItemDialogOpen(false);
       setNewItemName('');
       refresh();
