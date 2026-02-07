@@ -53,6 +53,12 @@
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
     - 集成编辑器与灵感推荐卡片
 
-## 第五阶段：优化与交付 (Polishing) <!-- id: 17 -->
+## Debug & Tracing
+- [ ] 实现 `lib/model-tracer.ts` 封装模型调用日志输出
+- [ ] 在 `assistants/general-chat/graph.ts` 中应用 `tracedInvoke`
+- [ ] 验证服务端控制台原始上下文日志输出
+- [ ] (后续) 集成 `dispatchCustomEvent` 将日志传输至前端 ContextViewer
+
+## 核心功能 (ModelWeb) <!-- id: 17 -->
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
 - [ ] **最终测试**：进行全流程的功能回归测试 <!-- id: 19 -->

@@ -3,6 +3,7 @@ import { RunnableConfig } from "@langchain/core/runnables";
 import { AIMessageChunk, BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { createChatModel, MODEL_CONFIG } from "@/lib/model";
 import { v4 as uuidv4 } from "uuid";
+import { tracedInvoke } from "@/lib/model-tracer";
 
 // Define a custom state similar to model-judger
 export const GraphState = Annotation.Root({
@@ -33,9 +34,10 @@ async function callModel(state: typeof GraphState.State, config: RunnableConfig)
     }
   }
 
-  const response = await model.invoke(messages);
-
-  console.log("Model response:", response.content.toString().substring(0, 50), "...");
+  const response = await tracedInvoke(model, messages, { 
+    nodeName: "agent",
+    modelId: modelId
+  });
 
   const chunk = new AIMessageChunk({
     content: response.content,
