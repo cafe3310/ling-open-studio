@@ -59,6 +59,11 @@ export function useVFS(threadId: string | undefined) {
     return await vfs.deleteFile(threadId, path, source);
   }, [threadId]);
 
+  const deleteDir = useCallback(async (path: string, source?: 'agent' | 'user') => {
+    if (!threadId) return;
+    return await vfs.deleteDir(threadId, path, source);
+  }, [threadId]);
+
   const renameFile = useCallback(async (oldPath: string, newPath: string, source?: 'agent' | 'user') => {
     if (!threadId) return;
     return await vfs.renameFile(threadId, oldPath, newPath, source);
@@ -72,6 +77,7 @@ export function useVFS(threadId: string | undefined) {
     writeFile,
     readFile,
     deleteFile,
+    deleteDir,
     renameFile,
   };
 }
