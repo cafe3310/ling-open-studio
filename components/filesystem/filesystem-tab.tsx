@@ -62,6 +62,8 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ path: string; type: 'file' | 'folder' } | null>(null);
 
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // 种子测试数据
@@ -432,17 +434,16 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
-                    // Info dialog could go here
-                }}>
+                <Button variant="ghost" size="sm" className="gap-2 h-8" onClick={() => setIsInfoDialogOpen(true)}>
                   <Info className="w-4 h-4" />
+                  <span>Details</span>
                 </Button>
                 
                 {!selectedFile.isReadOnly && (
                     <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8" 
+                        size="sm" 
+                        className="gap-2 h-8" 
                         onClick={() => {
                             setItemToRename({ path: selectedFile.path, name: selectedFile.name });
                             setRenameNewName(selectedFile.name);
@@ -450,36 +451,40 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
                         }}
                     >
                         <Pencil className="w-4 h-4" />
+                        <span>Rename</span>
                     </Button>
                 )}
 
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownload}>
+                <Button variant="ghost" size="sm" className="gap-2 h-8" onClick={handleDownload}>
                     <Download className="w-4 h-4" />
+                    <span>Download</span>
                 </Button>
 
                 {!selectedFile.isReadOnly && (
                   <Button 
                     variant="default" 
                     size="sm" 
-                    className="gap-2"
+                    className="gap-2 h-8"
                     onClick={handleSave}
                     disabled={!isDirty}
                   >
-                    <Save className="w-4 h-4" /> Save
+                    <Save className="w-4 h-4" /> 
+                    <span>Save</span>
                   </Button>
                 )}
                 
                 {!selectedFile.isReadOnly && (
                     <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        size="sm" 
+                        className="gap-2 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => {
                             setItemToDelete({ path: selectedFile.path, type: 'file' });
                             setIsDeleteDialogOpen(true);
                         }}
                     >
                     <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
                     </Button>
                 )}
               </div>
@@ -622,6 +627,77 @@ export const FilesystemTab: React.FC<FilesystemTabProps> = ({ threadId }) => {
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
                     <Button variant="destructive" onClick={handleDeleteItem}>Delete</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        {/* File Info Dialog */}
+        <Dialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Info className="w-5 h-5 text-brand-blue" />
+                        File Details
+                    </DialogTitle>
+                </DialogHeader>
+                
+                {selectedFile && (
+                    <div className="grid gap-4 py-4 text-sm">
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Name</span>
+                            <span className="col-span-2 text-brand-dark break-all">{selectedFile.name}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Full Path</span>
+                            <span className="col-span-2 text-brand-dark break-all font-mono text-[11px]">{selectedFile.path}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Type</span>
+                            <span className="col-span-2 flex items-center gap-2">
+                                <span className="capitalize">{selectedFile.type}</span>
+                                <span className="text-xs text-brand-gray">({selectedFile.mimeType})</span>
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Size</span>
+                            <span className="col-span-2 text-brand-dark">
+                                {(selectedFile.size / 1024).toFixed(2)} KB ({selectedFile.size} bytes)
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Modified By</span>
+                            <span className="col-span-2 flex items-center gap-1">
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-bold uppercase",
+                                    selectedFile.metadata.lastModifiedBy === 'agent' 
+                                        ? "bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20"
+                                        : "bg-brand-blue/10 text-brand-blue border border-brand-blue/20"
+                                )}>
+                                    {selectedFile.metadata.lastModifiedBy}
+                                </span>
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Created</span>
+                            <span className="col-span-2 text-brand-dark">
+                                {new Date(selectedFile.createdAt).toLocaleString()}
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1 border-b border-slate-100">
+                            <span className="text-brand-gray font-medium">Last Updated</span>
+                            <span className="col-span-2 text-brand-dark">
+                                {new Date(selectedFile.updatedAt).toLocaleString()}
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 py-1">
+                            <span className="text-brand-gray font-medium">File ID</span>
+                            <span className="col-span-2 text-[10px] font-mono text-brand-gray">{selectedFile.id}</span>
+                        </div>
+                    </div>
+                )}
+                
+                <DialogFooter>
+                    <Button onClick={() => setIsInfoDialogOpen(false)}>Close</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
