@@ -40,12 +40,16 @@
     - 实现 `chat_name_generator` Graph (Ling-Mini)
     - 实现 `/api/naming` 接口
     - 前端集成：首轮对话后触发，显示 "Naming..." 并更新标题
-- [ ] **浏览器端虚拟文件系统 (Browser VFS)**： <!-- id: 25 -->
-    - 实现 `lib/vfs/database.ts` (IndexedDB 包装)
-    - 实现 `lib/vfs/index.ts` (VFS 核心逻辑)
-    - 提供 `useVFS` Hook 供前端使用
+- [x] **浏览器端虚拟文件系统 (Browser VFS)**： <!-- id: 25 -->
+    - [x] 实现 `lib/vfs/database.ts` (IndexedDB 包装)
+    - [x] 实现 `lib/vfs/index.ts` (VFS 核心逻辑)
+    - [x] 提供 `useVFS` Hook 供前端使用
+    - [x] **Filesystem UI 交互功能**：实现文件/文件夹增删改查、上传下载及详情查看
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
-    - 实现代码生成对话区与预览组件
+    - [x] **静态 UI 框架**：实现 Chat/Preview/Config 三栏布局与交互
+    - [ ] **Agent Tooling**：封装 VFS 操作为 LangChain Tools (`vfs_write_file` 等)
+    - [ ] **Graph 逻辑**：实现 `WebGenGraph` (Initial Gen & Refine)
+    - [ ] **全链路集成**：对接 Graph 与 UI，实现端到端生成预览
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
     - 集成编辑器与灵感推荐卡片
 
