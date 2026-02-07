@@ -18,6 +18,7 @@ import { TopNavigation, Tab } from "@/components/top-navigation";
 import { ModelConfig } from "@/components/model-config";
 import { useModelStore } from "@/lib/store";
 import { ThreadTitleAutomator } from "@/components/thread-title-automator";
+import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
 
 export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
@@ -35,6 +36,8 @@ export const Assistant = () => {
       }
     }), [modelId, systemPrompt, temperature]),
   });
+
+  const threadId = runtime.threadId;
 
   return (
     <div className="flex flex-col h-dvh w-full bg-brand-bg">
@@ -79,6 +82,10 @@ export const Assistant = () => {
               <p className="text-sm">Writing assistant workspace coming soon.</p>
             </div>
           </div>
+        )}
+
+        {activeTab === 'filesystem' && (
+          <FilesystemTab threadId={threadId} />
         )}
       </main>
     </div>

@@ -21,10 +21,13 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async init(): Promise<void> {
+    console.log('[VFS] Initializing database...');
     await this.db.init();
+    console.log('[VFS] Database initialized.');
   }
 
   private notify(threadId: string) {
+    console.log(`[VFS] Notifying listeners for thread: ${threadId}`);
     const threadListeners = this.listeners.get(threadId);
     if (threadListeners) {
       threadListeners.forEach(cb => cb());
@@ -35,6 +38,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
     const normalized = normalizePath(path);
     // Agent 只能写入 /workspace/
     if (source === 'agent' && !normalized.startsWith('/workspace/')) {
+      console.error(`[VFS] Permission Denied: Agent attempted to write to ${normalized}`);
       throw new PermissionError(`Agent is not allowed to write to: ${normalized}`);
     }
   }
@@ -46,6 +50,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
     source: 'agent' | 'user' = 'agent'
   ): Promise<VirtualFile> {
     const normalizedPath = normalizePath(path);
+    console.log(`[VFS] Writing file: ${normalizedPath} (source: ${source}, thread: ${threadId})`);
     this.checkPermission(normalizedPath, source);
 
     const fileName = getFileName(normalizedPath);
@@ -78,8 +83,10 @@ export class VirtualFileSystem implements IVirtualFileSystem {
 
   async readFile(threadId: string, path: string): Promise<VirtualFile> {
     const normalizedPath = normalizePath(path);
+    console.log(`[VFS] Reading file: ${normalizedPath} (thread: ${threadId})`);
     const file = await this.db.getByPath(threadId, normalizedPath);
     if (!file) {
+      console.warn(`[VFS] File not found: ${normalizedPath}`);
       throw new Error(`File not found: ${normalizedPath}`);
     }
     return file;
@@ -93,6 +100,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
 
   async deleteFile(threadId: string, path: string, source: 'agent' | 'user' = 'user'): Promise<void> {
     const normalizedPath = normalizePath(path);
+    console.log(`[VFS] Deleting file: ${normalizedPath} (source: ${source})`);
     this.checkPermission(normalizedPath, source);
 
     const file = await this.db.getByPath(threadId, normalizedPath);
@@ -110,6 +118,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   ): Promise<VirtualFile> {
     const normalizedOld = normalizePath(oldPath);
     const normalizedNew = normalizePath(newPath);
+    console.log(`[VFS] Renaming: ${normalizedOld} -> ${normalizedNew}`);
     
     this.checkPermission(normalizedOld, source);
     this.checkPermission(normalizedNew, source);

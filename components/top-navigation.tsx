@@ -1,9 +1,9 @@
 import React from 'react';
-import { MessageSquare, Code, PenTool, Layout, Box } from 'lucide-react';
+import { MessageSquare, Code, PenTool, Layout, Box, HardDrive } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type Tab = 'chat' | 'web' | 'write';
+export type Tab = 'chat' | 'web' | 'write' | 'filesystem';
 
 interface TopNavigationProps {
   activeTab: Tab;
@@ -15,6 +15,7 @@ export function TopNavigation({ activeTab, onTabChange }: TopNavigationProps) {
     { id: 'chat', label: 'Model Chat', icon: MessageSquare },
     { id: 'web', label: 'Model Web', icon: Code },
     { id: 'write', label: 'Model Write', icon: PenTool },
+    { id: 'filesystem', label: 'Agent Filesystem', icon: HardDrive },
   ];
 
   return (
