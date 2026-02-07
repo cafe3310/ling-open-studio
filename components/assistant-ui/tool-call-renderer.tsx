@@ -20,7 +20,7 @@ export const ToolCallRenderer = () => {
   const runtime = useThreadRuntime();
 
   // 1. Get running status and current message info
-  const isRunning = useMessage((m) => m.status.type === "running");
+  const isRunning = useMessage((m) => m.status?.type === "running");
   const role = useMessage((m) => m.role);
   const messageId = useMessage((m) => m.id);
 
