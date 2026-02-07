@@ -112,7 +112,7 @@ export const ToolCallRenderer = () => {
     setStatus("running");
     try {
       const results = await Promise.all(toolCalls.map(async (call) => {
-        const executor = tools[call.toolName as ClientToolName];
+        const executor = (tools as any)[call.toolName];
         if (!executor) {
           console.error(`[ToolCallRenderer] Executor not found for: ${call.toolName}`);
           return { id: call.callId, result: `Error: Tool ${call.toolName} not found on client.` };

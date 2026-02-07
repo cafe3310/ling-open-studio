@@ -69,6 +69,11 @@ export function useVFS(threadId: string | undefined) {
     return await vfs.renameFile(threadId, oldPath, newPath, source);
   }, [threadId]);
 
+  const listDir = useCallback(async (path: string = '/') => {
+    if (!threadId) return [];
+    return await vfs.listDir(threadId, path);
+  }, [threadId]);
+
   return {
     files,
     isLoading,
@@ -79,5 +84,6 @@ export function useVFS(threadId: string | undefined) {
     deleteFile,
     deleteDir,
     renameFile,
+    listDir,
   };
 }

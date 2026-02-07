@@ -39,8 +39,14 @@ import {
 } from "lucide-react";
 import type { FC } from "react";
 
+interface ThreadSuggestion {
+  readonly title: string;
+  readonly label: string;
+  readonly prompt: string;
+}
+
 interface ThreadProps {
-  suggestions?: typeof SUGGESTIONS;
+  suggestions?: readonly ThreadSuggestion[];
 }
 
 export const Thread: FC<ThreadProps> = ({ suggestions }) => {

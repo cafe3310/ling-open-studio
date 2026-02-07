@@ -56,7 +56,6 @@ export const StudioShell = () => {
         }
       }
     }), [modelId, temperature, toolParadigm]),
-    tools: vfsTools,
   });
 
   const activeRuntime = activeTab === 'web' ? webRuntime : chatRuntime;

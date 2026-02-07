@@ -27,8 +27,8 @@ export const useVFSTools = () => {
 
   const vfs_list_dir = useCallback(async ({ path }: { path: string }) => {
     try {
-      const items = await vfs.readDir(path);
-      return items.map(i => `${i.type === 'dir' ? '[DIR]' : '[FILE]'} ${i.name}`).join("\n");
+      const items = await vfs.listDir(path);
+      return items.map(i => `${i.name}`).join("\n");
     } catch (error: any) {
       return `Error listing directory: ${error.message}`;
     }
