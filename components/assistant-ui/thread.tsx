@@ -34,7 +34,11 @@ import {
 } from "lucide-react";
 import type { FC } from "react";
 
-export const Thread: FC = () => {
+interface ThreadProps {
+  suggestions?: typeof SUGGESTIONS;
+}
+
+export const Thread: FC<ThreadProps> = ({ suggestions }) => {
   return (
     <ThreadPrimitive.Root
       className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
@@ -47,7 +51,7 @@ export const Thread: FC = () => {
         className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth px-4 pt-4"
       >
         <AssistantIf condition={({ thread }) => thread.isEmpty}>
-          <ThreadWelcome />
+          <ThreadWelcome suggestions={suggestions} />
         </AssistantIf>
 
         <ThreadPrimitive.Messages
@@ -81,7 +85,7 @@ const ThreadScrollToBottom: FC = () => {
   );
 };
 
-const ThreadWelcome: FC = () => {
+const ThreadWelcome: FC<ThreadProps> = ({ suggestions }) => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-(--thread-max-width) grow flex-col">
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
@@ -94,7 +98,7 @@ const ThreadWelcome: FC = () => {
           </p>
         </div>
       </div>
-      <ThreadSuggestions />
+      <ThreadSuggestions suggestions={suggestions} />
     </div>
   );
 };
@@ -112,10 +116,10 @@ const SUGGESTIONS = [
   },
 ] as const;
 
-const ThreadSuggestions: FC = () => {
+const ThreadSuggestions: FC<ThreadProps> = ({ suggestions = SUGGESTIONS }) => {
   return (
     <div className="aui-thread-welcome-suggestions grid w-full @md:grid-cols-2 gap-2 pb-4">
-      {SUGGESTIONS.map((suggestion, index) => (
+      {suggestions.map((suggestion, index) => (
         <div
           key={suggestion.prompt}
           className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200"

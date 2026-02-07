@@ -25,7 +25,7 @@ export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
   const { modelId, systemPrompt, temperature } = useModelStore();
 
-  const runtime = useChatRuntime({
+  const chatRuntime = useChatRuntime({
     transport: useMemo(() => new AssistantChatTransport({
       api: "/api/chat",
       body: {
@@ -38,36 +38,54 @@ export const Assistant = () => {
     }), [modelId, systemPrompt, temperature]),
   });
 
+  const webRuntime = useChatRuntime({
+    transport: useMemo(() => new AssistantChatTransport({
+      api: "/api/chat",
+      body: {
+        config: {
+          modelId,
+          systemPrompt: "You are an expert web developer. Focus on creating beautiful, functional web pages using HTML and Tailwind CSS.",
+          temperature,
+          mode: 'web-gen'
+        }
+      }
+    }), [modelId, temperature]),
+  });
+
+  const activeRuntime = activeTab === 'web' ? webRuntime : chatRuntime;
+
   return (
     <div className="flex flex-col h-dvh w-full bg-brand-bg">
       <TopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="flex-1 overflow-hidden relative">
-        {activeTab === 'chat' && (
-          <AssistantRuntimeProvider runtime={runtime}>
-            <ThreadTitleAutomator />
-            <SidebarProvider className="h-full w-full" style={{ minHeight: '0' }}>
-              <div className="flex h-full w-full overflow-hidden">
-                <ThreadListSidebar />
-                <SidebarInset className="h-full flex flex-col bg-white overflow-hidden relative">
-                  <header className="flex h-12 shrink-0 items-center gap-2 px-4 border-b border-brand-border">
-                    <SidebarTrigger />
-                    <Separator orientation="vertical" className="mr-2 h-4" />
-                    <span className="text-sm font-medium font-sans text-brand-dark">Chat Session</span>
-                  </header>
-                  <div className="flex-1 overflow-hidden">
-                    <Thread />
-                  </div>
-                </SidebarInset>
-                <ModelConfig />
-              </div>
-            </SidebarProvider>
-          </AssistantRuntimeProvider>
-        )}
+        <AssistantRuntimeProvider runtime={activeRuntime}>
+          {activeTab === 'chat' && (
+            <>
+              <ThreadTitleAutomator />
+              <SidebarProvider className="h-full w-full" style={{ minHeight: '0' }}>
+                <div className="flex h-full w-full overflow-hidden">
+                  <ThreadListSidebar />
+                  <SidebarInset className="h-full flex flex-col bg-white overflow-hidden relative">
+                    <header className="flex h-12 shrink-0 items-center gap-2 px-4 border-b border-brand-border">
+                      <SidebarTrigger />
+                      <Separator orientation="vertical" className="mr-2 h-4" />
+                      <span className="text-sm font-medium font-sans text-brand-dark">Chat Session</span>
+                    </header>
+                    <div className="flex-1 overflow-hidden">
+                      <Thread />
+                    </div>
+                  </SidebarInset>
+                  <ModelConfig />
+                </div>
+              </SidebarProvider>
+            </>
+          )}
 
-        {activeTab === 'web' && (
-          <WebTab />
-        )}
+          {activeTab === 'web' && (
+            <WebTab />
+          )}
+        </AssistantRuntimeProvider>
 
         {activeTab === 'write' && (
           <div className="flex items-center justify-center h-full text-muted-foreground bg-muted/20">

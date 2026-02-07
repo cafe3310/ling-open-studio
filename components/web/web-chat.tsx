@@ -4,6 +4,29 @@ import React from 'react';
 import { Thread } from "@/components/assistant-ui/thread";
 import { Sparkles, Terminal } from 'lucide-react';
 
+const WEB_SUGGESTIONS = [
+  {
+    title: "Startup Landing Page",
+    label: "with hero and features",
+    prompt: "Create a modern landing page for a tech startup. Include a hero section with a call to action and a features grid.",
+  },
+  {
+    title: "Coffee Shop Website",
+    label: "warm and inviting style",
+    prompt: "Generate a beautiful website for a local coffee shop called 'Bean & Leaf'. Use a warm color palette and include a menu section.",
+  },
+  {
+    title: "Personal Portfolio",
+    label: "minimalist dark theme",
+    prompt: "Build a minimalist personal portfolio website with a dark theme. Include sections for projects, skills, and a contact form.",
+  },
+  {
+    title: "E-commerce Product Page",
+    label: "clean and functional",
+    prompt: "Design a clean product detail page for an e-commerce site. Include an image gallery, price, and add-to-cart button.",
+  },
+];
+
 export const WebChat: React.FC = () => {
   return (
     <aside className="w-80 border-r border-brand-border bg-white flex flex-col h-full overflow-hidden">
@@ -41,7 +64,7 @@ export const WebChat: React.FC = () => {
             font-size: 1rem;
           }
         `}</style>
-        <Thread />
+        <Thread suggestions={WEB_SUGGESTIONS} />
       </div>
     </aside>
   );
