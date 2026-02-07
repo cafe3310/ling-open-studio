@@ -20,10 +20,12 @@ import { useModelStore } from "@/lib/store";
 import { ThreadTitleAutomator } from "./thread-title-automator";
 import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
 import { WebTab } from "@/components/web/web-tab";
+import { useVFSTools } from "@/lib/vfs/tools-implementation";
 
 export const StudioShell = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
   const { modelId, systemPrompt, temperature } = useModelStore();
+  const vfsTools = useVFSTools();
 
   const chatRuntime = useChatRuntime({
     transport: useMemo(() => new AssistantChatTransport({
@@ -50,6 +52,7 @@ export const StudioShell = () => {
         }
       }
     }), [modelId, temperature]),
+    tools: vfsTools,
   });
 
   const activeRuntime = activeTab === 'web' ? webRuntime : chatRuntime;

@@ -1,6 +1,5 @@
 import { simpleGraph } from "./general-chat/graph";
-// Import other graphs as they are implemented
-// import { webGenGraph } from "./web-architect/initial-gen";
+import { webGenGraph } from "./web-architect/graph";
 
 export type AssistantMode = 'chat' | 'web-gen';
 
@@ -18,7 +17,7 @@ const registry: Record<AssistantMode, AssistantEntry> = {
   },
   'web-gen': {
     id: 'web-architect',
-    graph: simpleGraph, // Temporary fallback until webGenGraph is implemented
+    graph: webGenGraph,
     description: 'Specialized web application generator'
   }
 };

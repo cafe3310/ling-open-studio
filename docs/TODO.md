@@ -47,8 +47,8 @@
     - [x] **Filesystem UI 交互功能**：实现文件/文件夹增删改查、上传下载及详情查看
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - [x] **静态 UI 框架**：实现 Chat/Preview/Config 三栏布局与交互
-    - [ ] **Agent Tooling**：封装 VFS 操作为 LangChain Tools (`vfs_write_file` 等)
-    - [ ] **Graph 逻辑**：实现 `WebGenGraph` (Initial Gen & Refine)
+    - [x] **Agent Tooling**：封装 VFS 操作为 LangChain Tools (`vfs_write_file` 等)
+    - [x] **Graph 逻辑**：实现 `WebGenGraph` (Initial Gen & Refine)
     - [ ] **全链路集成**：对接 Graph 与 UI，实现端到端生成预览
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
     - 集成编辑器与灵感推荐卡片
