@@ -18,7 +18,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InclusionAI Demo",
+  title: "Ling OpenStudio",
   description: "A showcase of ling-series LLM capabilities.",
 };
 

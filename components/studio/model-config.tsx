@@ -182,7 +182,7 @@ export function ModelConfig() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-[10px] uppercase font-bold text-brand-gray mb-1.5 ml-0.5">Paradigm</label>
+              <label className="block text-[10px] uppercase font-bold text-brand-gray mb-1.5 ml-0.5">Tool Calling Format</label>
               <div className="relative">
                 <select
                   className={cn(
@@ -201,24 +201,6 @@ export function ModelConfig() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Performance Stats */}
-          <div className="pt-4 border-t border-brand-border">
-            <div className="flex items-center gap-2 text-sm text-brand-dark mb-3 font-semibold">
-              <Cpu className="w-4 h-4 text-brand-cyan" />
-              <span>Performance Stats</span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs">
-                <span className="text-brand-gray">Latency</span>
-                <span className="font-mono text-brand-dark">--ms</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-brand-gray">Tokens/sec</span>
-                <span className="font-mono text-brand-dark">--</span>
               </div>
             </div>
           </div>

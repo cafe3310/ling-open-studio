@@ -24,7 +24,7 @@ export function TopNavigation({ activeTab, onTabChange }: TopNavigationProps) {
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-blue flex items-center justify-center text-white">
           <Box className="w-5 h-5" />
         </div>
-        <span className="font-serif font-bold text-lg tracking-tight text-brand-dark">InclusionAI</span>
+        <span className="font-serif font-bold text-lg tracking-tight text-brand-dark">Ling OpenStudio</span>
       </div>
 
       <nav className="flex items-center gap-1 bg-brand-bg p-1 rounded-lg border border-brand-border">
