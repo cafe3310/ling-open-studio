@@ -19,6 +19,7 @@ import { ModelConfig } from "@/components/model-config";
 import { useModelStore } from "@/lib/store";
 import { ThreadTitleAutomator } from "@/components/thread-title-automator";
 import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
+import { WebTab } from "@/components/web/web-tab";
 
 export const Assistant = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
@@ -65,12 +66,7 @@ export const Assistant = () => {
         )}
 
         {activeTab === 'web' && (
-          <div className="flex items-center justify-center h-full text-muted-foreground bg-muted/20">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Model Web</h3>
-              <p className="text-sm">Web generation workspace coming soon.</p>
-            </div>
-          </div>
+          <WebTab />
         )}
 
         {activeTab === 'write' && (
