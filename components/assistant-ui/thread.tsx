@@ -9,6 +9,9 @@ import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolCallRenderer } from "@/components/assistant-ui/tool-call-renderer";
 import { Button } from "@/components/ui/button";
+import { useModelStore } from "@/lib/store";
+import { ToolCtxJson } from "@/lib/tools/ctx-json";
+import { ToolCtxXml } from "@/lib/tools/ctx-xml";
 import { cn } from "@/lib/utils";
 import {
   ActionBarMorePrimitive,
@@ -19,6 +22,7 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useMessage,
 } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
@@ -288,6 +292,20 @@ const AssistantActionBar: FC = () => {
 };
 
 const UserMessage: FC = () => {
+  const { toolParadigm } = useModelStore();
+  const content = useMessage((m) => {
+    if (typeof m.content === 'string') return m.content;
+    return m.content.filter(p => p.type === 'text').map(p => (p as any).text).join("");
+  });
+
+  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
+  const parsed = strategy.parseResult(content);
+
+  // Hide message if it's purely a tool result with no other text
+  if (parsed && parsed.strippedText.length === 0) {
+    return null;
+  }
+
   return (
     <MessagePrimitive.Root
       className="aui-user-message-root fade-in slide-in-from-bottom-1 mx-auto grid w-full max-w-(--thread-max-width) animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 px-2 py-3 duration-150 [&:where(>*)]:col-start-2"

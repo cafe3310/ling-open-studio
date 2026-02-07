@@ -73,35 +73,54 @@ You have access to a set of client-side tools. To use a tool, you must output a 
     return "User rejected the tool execution request.";
   },
 
-  parseResponse: (response, tools) => {
-    console.log("[ToolCtxJson] Parsing response:", response.substring(0, 100) + "...");
+  parseResponse: (content) => {
     try {
-      // Basic attempt to find the JSON structure
-      const match = response.match(/\{[\s\S]*"tool_calls"[\s\S]*\}/);
-      console.log("[ToolCtxJson] Regex match result:", match ? "Found" : "Not Found");
-      
+      const pattern = /\{[\s\S]*"tool_calls"[\s\S]*\}/;
+      const match = content.match(pattern);
       if (!match) return null;
 
       const json = JSON.parse(match[0]);
-      console.log("[ToolCtxJson] Parsed JSON tool_calls count:", json.tool_calls?.length);
+      if (!json.tool_calls || !Array.isArray(json.tool_calls)) return null;
 
-      if (json.tool_calls && Array.isArray(json.tool_calls)) {
-        return json.tool_calls.map((call: any) => {
-          let args = call.function.arguments;
-          // Handle double-encoded JSON strings often produced by LLMs
-          if (typeof args === 'string') {
-             try { args = JSON.parse(args); } catch {}
-          }
-          return {
-            toolName: call.function.name,
-            args: args,
-            callId: call.id || `call_${Date.now()}`
-          };
-        });
-      }
-      return null;
+      const calls = json.tool_calls.map((call: any) => {
+        let args = call.function.arguments;
+        if (typeof args === 'string') {
+          try { args = JSON.parse(args); } catch {}
+        }
+        return {
+          toolName: call.function.name,
+          args: args,
+          callId: call.id || `call_${Date.now()}`
+        };
+      });
+
+      return {
+        calls,
+        strippedText: content.replace(pattern, "").trim()
+      };
     } catch (e) {
-      console.error("[ToolCtxJson] Parse error:", e);
+      return null;
+    }
+  },
+
+  parseResult: (content) => {
+    try {
+      const pattern = /\{[\s\S]*"tool_call_result"[\s\S]*\}/;
+      const match = content.match(pattern);
+      if (!match) return null;
+
+      const json = JSON.parse(match[0]);
+      if (!json.tool_call_result) return null;
+
+      const res = json.tool_call_result;
+      return {
+        results: [{
+          callId: res.toolCallId,
+          result: res.result
+        }],
+        strippedText: content.replace(pattern, "").trim()
+      };
+    } catch (e) {
       return null;
     }
   }

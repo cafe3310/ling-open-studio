@@ -9,27 +9,54 @@ export interface ToolDef {
 }
 
 /**
+ * Structured tool call extracted from text
+ */
+export interface ToolCall {
+  toolName: string;
+  args: any;
+  callId: string;
+}
+
+/**
+ * Result of parsing an assistant message
+ */
+export interface ToolParsedResponse {
+  calls: ToolCall[];
+  strippedText: string; // Content with tool blocks removed
+}
+
+/**
+ * Structured tool result extracted from text
+ */
+export interface ToolResult {
+  callId: string;
+  result: any;
+}
+
+/**
+ * Result of parsing a user result message
+ */
+export interface ToolParsedResult {
+  results: ToolResult[];
+  strippedText: string; // Content with tool result blocks removed
+}
+
+/**
  * Tool Context Strategy Definition
- * 
- * Defines how tools are presented to the model, how responses are parsed, 
- * and how results are fed back.
  */
 export interface ToolContextDef {
   /**
    * Descriptive fragment about the concept of tool use.
-   * Injected into system prompt.
    */
   conceptFragment: string;
 
   /**
    * Example fragment showing how to call a tool.
-   * Injected into system prompt.
    */
   exampleFragment: string;
 
   /**
    * Example fragment showing what a tool return looks like.
-   * Injected into system prompt.
    */
   returnExampleFragment: string;
 
@@ -45,21 +72,23 @@ export interface ToolContextDef {
 
   /**
    * Function to format a tool execution result into a user message content.
-   * This facilitates the "User-Mediated" loop.
    */
   formatToolResult: (toolCallId: string, result: any) => string;
 
   /**
    * Function to modify a response that contains a tool call but was rejected by the user.
-   * e.g., turning a JSON tool call into a text explanation "I cannot run this tool."
    */
   handleUserRejection: (responseWithTool: string) => string;
 
   /**
-   * Function to parse the model's response and extract tool calls.
-   * Returns null if no tool call is found.
+   * Parses the assistant's response for tool calls.
    */
-  parseResponse: (response: string, tools: ToolDef[]) => { toolName: string; args: any; callId: string }[] | null;
+  parseResponse: (content: string) => ToolParsedResponse | null;
+
+  /**
+   * Parses the user's message for tool results.
+   */
+  parseResult: (content: string) => ToolParsedResult | null;
 }
 
 /**

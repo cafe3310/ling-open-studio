@@ -70,36 +70,58 @@ You can invoke tools by wrapping your request in \
     return "User rejected the tool execution request.";
   },
 
-  parseResponse: (response, tools) => {
-    console.log("[ToolCtxXml] Parsing response:", response.substring(0, 100) + "...");
-    // Regex to capture content inside <tool_code> tags
-    const regex = /<tool_code>([\s\S]*?)<\/tool_code>/g;
-    const matches = [...response.matchAll(regex)];
-    
-    console.log("[ToolCtxXml] Regex matches found:", matches.length);
-
+  parseResponse: (content) => {
+    const pattern = /<tool_code>([\s\S]*?)<\/tool_code>/g;
+    const matches = [...content.matchAll(pattern)];
     if (matches.length === 0) return null;
 
-    const parsedCalls = [];
+    const calls = [];
     for (const match of matches) {
       try {
-        const content = match[1].trim();
-        console.log("[ToolCtxXml] Processing match content:", content.substring(0, 50) + "...");
-        
-        // Assuming content is JSON as per protocol
-        const json = JSON.parse(content);
+        const json = JSON.parse(match[1].trim());
         if (json.name && json.arguments) {
-          parsedCalls.push({
+          calls.push({
             toolName: json.name,
             args: json.arguments,
-            callId: `call_${json.name}_${Date.now()}` // XML usually doesn't strictly enforce IDs in call
+            callId: `call_${json.name}_${Date.now()}`
           });
         }
-      } catch (e) {
-        console.error("[ToolCtxXml] Error parsing XML tool content:", e);
-      }
+      } catch (e) {}
     }
-    
-    return parsedCalls.length > 0 ? parsedCalls : null;
+
+    if (calls.length === 0) return null;
+
+    return {
+      calls,
+      strippedText: content.replace(pattern, "").trim()
+    };
+  },
+
+  parseResult: (content) => {
+    const pattern = /<tool_result>([\s\S]*?)<\/tool_result>/g;
+    const matches = [...content.matchAll(pattern)];
+    if (matches.length === 0) return null;
+
+    const results = [];
+    for (const match of matches) {
+      try {
+        const inner = match[1].trim();
+        const idMatch = inner.match(/<id>(.*?)<\/id>/);
+        const contentMatch = inner.match(/<content>([\s\S]*?)<\/content>/);
+        if (idMatch && contentMatch) {
+          results.push({
+            callId: idMatch[1].trim(),
+            result: contentMatch[1].trim()
+          });
+        }
+      } catch (e) {}
+    }
+
+    if (results.length === 0) return null;
+
+    return {
+      results,
+      strippedText: content.replace(pattern, "").trim()
+    };
   }
 };

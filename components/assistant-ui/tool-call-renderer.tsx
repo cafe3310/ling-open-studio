@@ -41,45 +41,54 @@ export const ToolCallRenderer = () => {
     return "";
   });
 
-  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
-  const toolCalls = !isRunning ? strategy.parseResponse(content, ALL_TOOLS) : null;
-
-  // Determine if this block has already been executed by checking thread history
-  // We look for any USER message that comes AFTER this assistant message
-  // and contains a matching toolCallId in its content.
-  const isAlreadyExecuted = React.useMemo(() => {
-    if (!toolCalls) return false;
-
-    // Find the index of the current message
-    const currentIndex = threadMessages.findIndex(m => m.id === messageId);
-    if (currentIndex === -1) return false;
-
-    // Search in subsequent messages
-    const subsequentMessages = threadMessages.slice(currentIndex + 1);
-
-    return toolCalls.every(call => {
-      return subsequentMessages.some(msg =>
-        msg.role === 'user' &&
-        JSON.stringify(msg.content).includes(call.callId) // Simple but effective check
-      );
-    });
-  }, [toolCalls, threadMessages, messageId]);
-
-  const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
-
-  // Sync local status with history check
-  React.useEffect(() => {
-    if (isAlreadyExecuted) {
-      if (status !== 'success') setStatus('success');
-    } else {
-      // If history says it's not executed, but we are 'success', it means 
-      // the history was likely cleared (e.g. regeneration). We should reset to idle.
-      // But we shouldn't interrupt 'running' or 'error' states initiated by user interaction 
-      // unless the component is being recycled for a new message.
-      if (status === 'success') setStatus('idle');
-    }
-  }, [isAlreadyExecuted, status]);
-
+    const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
+    const parsedResponse = !isRunning ? strategy.parseResponse(content) : null;
+    const toolCalls = parsedResponse?.calls || null;
+  
+    // Determine if this block has already been executed by checking thread history
+    // and extract the result data if found.
+    const executionInfo = React.useMemo(() => {
+      if (!toolCalls) return { isExecuted: false, results: {} as Record<string, any> };
+      
+      const currentIndex = threadMessages.findIndex(m => m.id === messageId);
+      if (currentIndex === -1) return { isExecuted: false, results: {} };
+  
+      const subsequentMessages = threadMessages.slice(currentIndex + 1);
+      const results: Record<string, any> = {};
+      
+      const allFound = toolCalls.every(call => {
+        // Use parseResult to find tool result in any subsequent user message
+        for (const msg of subsequentMessages) {
+          if (msg.role !== 'user') continue;
+          const msgText = Array.isArray(msg.content) 
+            ? msg.content.map((p: any) => p.text).join("") 
+            : String(msg.content);
+          
+          const parsed = strategy.parseResult(msgText);
+          if (parsed) {
+            const match = parsed.results.find(r => r.callId === call.callId);
+            if (match) {
+              results[call.callId] = match.result;
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+  
+      return { isExecuted: allFound, results };
+    }, [toolCalls, threadMessages, messageId, strategy]);  
+    const isAlreadyExecuted = executionInfo.isExecuted;
+    const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
+    
+    // Sync local status with history check
+    React.useEffect(() => {
+      if (isAlreadyExecuted) {
+        if (status !== 'success') setStatus('success');
+      } else {
+        if (status === 'success') setStatus('idle');
+      }
+    }, [isAlreadyExecuted, status]);
   const [errorMessage, setErrorMessage] = useState("");
 
   // Safety check: Assistant messages only
@@ -122,67 +131,94 @@ export const ToolCallRenderer = () => {
     }
   };
 
-  return (
-    <Card className="my-4 border-brand-border/50 bg-brand-bg/10 overflow-hidden">
-      <div className="bg-brand-bg/20 px-4 py-2 border-b border-brand-border/30 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Code className="w-4 h-4 text-brand-blue" />
-          <span className="text-xs font-bold uppercase tracking-wider text-brand-dark/70">
-            Tool Call Request
-          </span>
+    const showResults = status === 'success' && Object.keys(executionInfo.results).length > 0;
+  
+    return (
+      <Card className={cn(
+        "my-4 border-brand-border/50 bg-brand-bg/5 overflow-hidden transition-all duration-300",
+        showResults ? "max-w-4xl" : "max-w-xl"
+      )}>
+        <div className="bg-brand-bg/10 px-4 py-2 border-b border-brand-border/20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Code className="w-4 h-4 text-brand-blue" />
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-dark/70">
+              {showResults ? "Tool Transaction" : "Tool Call Request"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+             {status === 'running' && <Loader2 className="w-3 h-3 animate-spin text-brand-blue" />}
+             {status === 'success' && <CheckCircle2 className="w-3 h-3 text-green-600" />}
+             {status === 'error' && <XCircle className="w-3 h-3 text-red-600" />}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-           {status === 'running' && <Loader2 className="w-3 h-3 animate-spin text-brand-blue" />}
-           {status === 'success' && <CheckCircle2 className="w-3 h-3 text-green-600" />}
-           {status === 'error' && <XCircle className="w-3 h-3 text-red-600" />}
-        </div>
-      </div>
-
-      <div className="p-4 space-y-3">
-        {toolCalls.map((call, idx) => (
-          <div key={idx} className="bg-white/50 rounded p-2 border border-brand-border/20">
-            <div className="text-[10px] font-mono font-bold text-brand-blue mb-1 uppercase tracking-tighter">
-              {call.toolName}
+  
+        <div className="p-4">
+          <div className={cn(
+            "grid gap-4",
+            showResults ? "grid-cols-2" : "grid-cols-1"
+          )}>
+            {/* LEFT COLUMN: REQUESTS */}
+            <div className="space-y-3">
+              {showResults && (
+                <div className="text-[10px] uppercase font-bold text-brand-gray/60 mb-1">Request</div>
+              )}
+              {toolCalls.map((call, idx) => (
+                <div key={idx} className="bg-white/80 rounded p-2 border border-brand-border/20 shadow-sm">
+                  <div className="text-[10px] font-mono font-bold text-brand-blue mb-1 uppercase tracking-tighter">
+                    {call.toolName}
+                  </div>
+                  <pre className="text-[11px] font-mono text-brand-dark/80 whitespace-pre-wrap break-all bg-brand-bg/5 p-1.5 rounded">
+                    {JSON.stringify(call.args, null, 2)}
+                  </pre>
+                </div>
+              ))}
             </div>
-            <pre className="text-[11px] font-mono text-brand-dark/80 whitespace-pre-wrap break-all bg-brand-bg/5 p-1.5 rounded">
-              {JSON.stringify(call.args, null, 2)}
-            </pre>
-          </div>
-        ))}
-
-        {status === 'error' && (
-          <div className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-100">
-            {errorMessage}
-          </div>
-        )}
-
-        <div className="flex justify-end pt-1">
-          <Button
-            size="sm"
-            variant={status === 'success' ? 'ghost' : 'default'}
-            disabled={status === 'running' || status === 'success'}
-            onClick={handleExecute}
-            className={cn(
-              "h-8 px-3 text-xs gap-1.5 transition-all",
-              status === 'success' && "text-green-600"
+  
+            {/* RIGHT COLUMN: RESULTS */}
+            {showResults && (
+              <div className="space-y-3 border-l border-brand-border/20 pl-4">
+                <div className="text-[10px] uppercase font-bold text-brand-gray/60 mb-1">Result</div>
+                {toolCalls.map((call, idx) => (
+                  <div key={idx} className="bg-green-50/50 rounded p-2 border border-green-100/50 shadow-sm min-h-[60px]">
+                    <div className="text-[10px] font-mono font-bold text-green-700 mb-1 uppercase tracking-tighter">
+                      Output
+                    </div>
+                    <pre className="text-[11px] font-mono text-brand-dark/90 whitespace-pre-wrap break-all bg-white/50 p-1.5 rounded">
+                      {typeof executionInfo.results[call.callId] === 'object' 
+                        ? JSON.stringify(executionInfo.results[call.callId], null, 2)
+                        : String(executionInfo.results[call.callId])}
+                    </pre>
+                  </div>
+                ))}
+              </div>
             )}
-          >
-            {status === 'running' ? (
-              <>Executing...</>
-            ) : status === 'success' ? (
-              <>
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                Executed
-              </>
-            ) : (
-              <>
-                <Play className="w-3 h-3 fill-current" />
-                Run Tool Call
-              </>
-            )}
-          </Button>
+          </div>
+  
+          {status === 'error' && (
+            <div className="mt-3 text-xs text-red-600 bg-red-50 p-2 rounded border border-red-100">
+              {errorMessage}
+            </div>
+          )}
+  
+          {status !== 'success' && (
+            <div className="flex justify-end pt-3 mt-1 border-t border-brand-border/10">
+              <Button 
+                size="sm" 
+                disabled={status === 'running'}
+                onClick={handleExecute}
+                className="h-8 px-3 text-xs gap-1.5 transition-all"
+              >
+                {status === 'running' ? (
+                  <>Executing...</>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 fill-current" />
+                    Run Tool Call
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
-      </div>
-    </Card>
-  );
-};
+      </Card>
+    );};
