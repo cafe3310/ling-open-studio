@@ -60,11 +60,15 @@
 - [ ] ~~集成 `dispatchCustomEvent` 将日志传输至前端 ContextViewer~~ (已放弃，转向工具调用)
 
 ## 工具调用 (Tool Calling)
-- [ ] 扩展 `lib/store.ts` 增加 `enabledTools` 状态
-- [ ] 修改 `ModelConfig` UI，增加工具开关 Checkbox
-- [ ] 实现 `browser_js_eval` 工具定义与客户端执行逻辑
-- [ ] 修改 `assistants/general-chat/graph.ts` 支持动态工具加载
-- [ ] 实现基础 Tool Strategy (Native Tool Calling)
+- [x] 扩展 `lib/store.ts` 增加 `enabledTools` 和 `toolParadigm` 状态
+- [x] 修改 `ModelConfig` UI，增加工具开关与范式选择
+- [x] 重构工具定义为简化结构 (`lib/tools/index.ts`)
+- [x] 实现 `ToolContextDef` 范式策略 (JSON/XML)
+- [x] 在 `app/api/chat/route.ts` 中集成 `ToolContextBuilder` 动态注入系统提示词
+- [ ] 实现前端 `ToolCallRenderer` 拦截并渲染 JSON/XML 调用块
+- [ ] 实现 `browser_js_eval` 工具在前端的执行逻辑
+- [ ] 实现 VFS 工具 (list/read/write) 在前端的执行逻辑
+- [ ] 实现半自动 Loop 结果回填逻辑 (将结果作为 User 消息发送)
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->

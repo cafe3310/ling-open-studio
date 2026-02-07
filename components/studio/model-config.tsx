@@ -16,13 +16,25 @@ export function ModelConfig() {
     modelId, 
     systemPrompt, 
     temperature, 
+    enabledTools,
+    toolParadigm,
     setModelId, 
     setSystemPrompt, 
-    setTemperature 
+    setTemperature,
+    setEnabledTools,
+    setToolParadigm
   } = useModelStore();
 
   const messages = useThread((state) => state.messages);
   const isStarted = messages.length > 0;
+
+  const toggleTool = (tool: string) => {
+    if (enabledTools.includes(tool)) {
+      setEnabledTools(enabledTools.filter((t) => t !== tool));
+    } else {
+      setEnabledTools([...enabledTools, tool]);
+    }
+  };
 
   const modelOptions = Object.entries(MODEL_CONFIG.models).map(([key, def]) => ({
     key,
@@ -37,7 +49,7 @@ export function ModelConfig() {
           Model Config
         </h2>
 
-        <div className="space-y-6 mt-2">
+        <div className="space-y-6 mt-2 pb-12">
           {/* Model Selection */}
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -128,6 +140,68 @@ export function ModelConfig() {
             <div className="flex justify-between text-[10px] text-brand-gray mt-1 uppercase tracking-tighter">
               <span>Precise</span>
               <span>Creative</span>
+            </div>
+          </div>
+
+          {/* Tool Calling */}
+          <div className="pt-4 border-t border-brand-border">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-brand-gray">
+                Tool Calling
+              </h3>
+            </div>
+            
+            <div className="space-y-3">
+              <label className={cn(
+                "flex items-center gap-2 cursor-pointer group",
+                isStarted && "opacity-50 cursor-not-allowed"
+              )}>
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 rounded border-brand-border text-brand-blue focus:ring-brand-blue/50"
+                  checked={enabledTools.includes('vfs')}
+                  onChange={() => toggleTool('vfs')}
+                  disabled={isStarted}
+                />
+                <span className="text-sm text-brand-dark group-hover:text-brand-blue transition-colors">VFS (File System)</span>
+              </label>
+
+              <label className={cn(
+                "flex items-center gap-2 cursor-pointer group",
+                isStarted && "opacity-50 cursor-not-allowed"
+              )}>
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 rounded border-brand-border text-brand-blue focus:ring-brand-blue/50"
+                  checked={enabledTools.includes('js')}
+                  onChange={() => toggleTool('js')}
+                  disabled={isStarted}
+                />
+                <span className="text-sm text-brand-dark group-hover:text-brand-blue transition-colors">JS (Browser Execution)</span>
+              </label>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-[10px] uppercase font-bold text-brand-gray mb-1.5 ml-0.5">Paradigm</label>
+              <div className="relative">
+                <select
+                  className={cn(
+                    "flex h-9 w-full appearance-none rounded-lg border border-brand-border bg-white px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-blue/50 transition-all font-sans pr-8 text-brand-dark",
+                    isStarted && "opacity-50 cursor-not-allowed bg-brand-bg/50"
+                  )}
+                  value={toolParadigm}
+                  onChange={(e) => setToolParadigm(e.target.value as any)}
+                  disabled={isStarted}
+                >
+                  <option value="json">JSON (Strict)</option>
+                  <option value="xml">XML (Tags)</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 

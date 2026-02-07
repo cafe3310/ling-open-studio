@@ -1,7 +1,6 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
-import { getVfsTools } from "@/lib/tools/factory";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 // Nodes implementation
@@ -30,7 +29,7 @@ Output your analysis in Markdown format.`),
  * Coder Node: Generates the actual code based on requirements.
  */
 async function coderNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig).bindTools(getVfsTools());
+  const model = createChatModel(config.configurable?.modelConfig);
   
   const systemPrompt = `You are a Senior Web Developer. 
 Based on the following requirements, generate the necessary web files.
@@ -39,7 +38,7 @@ Use HTML5 and Tailwind CSS (via CDN).
 Requirements:
 ${state.requirements}
 
-Use the tool 'vfs_write_file' to create the files. 
+Use the tool 'write_file' to create the files. 
 Always start with /workspace/webapp/ as the base directory.
 Usually you need at least an 'index.html' file.
 

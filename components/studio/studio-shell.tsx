@@ -24,7 +24,7 @@ import { useVFSTools } from "@/lib/vfs/tools-implementation";
 
 export const StudioShell = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
-  const { modelId, systemPrompt, temperature } = useModelStore();
+  const { modelId, systemPrompt, temperature, enabledTools, toolParadigm } = useModelStore();
   const vfsTools = useVFSTools();
 
   const chatRuntime = useChatRuntime({
@@ -35,9 +35,11 @@ export const StudioShell = () => {
           modelId,
           systemPrompt,
           temperature,
+          enabledTools,
+          toolParadigm,
         }
       }
-    }), [modelId, systemPrompt, temperature]),
+    }), [modelId, systemPrompt, temperature, enabledTools, toolParadigm]),
   });
 
   const webRuntime = useChatRuntime({
@@ -48,10 +50,12 @@ export const StudioShell = () => {
           modelId,
           systemPrompt: "You are an expert web developer. Focus on creating beautiful, functional web pages using HTML and Tailwind CSS.",
           temperature,
+          enabledTools: ['vfs', 'js'],
+          toolParadigm,
           mode: 'web-gen'
         }
       }
-    }), [modelId, temperature]),
+    }), [modelId, temperature, toolParadigm]),
     tools: vfsTools,
   });
 
