@@ -1,6 +1,6 @@
 import { StateGraph, Annotation } from "@langchain/langgraph";
 import { BaseMessage, SystemMessage } from "@langchain/core/messages";
-import { createChatModel } from "@/app/lib/model";
+import { createChatModel } from "@/lib/model";
 
 // Define the state for the naming graph
 export const NamingGraphState = Annotation.Root({

@@ -14,14 +14,14 @@ import {
 } from "@/components/ui/sidebar";
 import { ThreadListSidebar } from "@/components/assistant-ui/threadlist-sidebar";
 import { Separator } from "@/components/ui/separator";
-import { TopNavigation, Tab } from "@/components/top-navigation";
-import { ModelConfig } from "@/components/model-config";
+import { TopNavigation, Tab } from "./top-navigation";
+import { ModelConfig } from "./model-config";
 import { useModelStore } from "@/lib/store";
-import { ThreadTitleAutomator } from "@/components/thread-title-automator";
+import { ThreadTitleAutomator } from "./thread-title-automator";
 import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
 import { WebTab } from "@/components/web/web-tab";
 
-export const Assistant = () => {
+export const StudioShell = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
   const { modelId, systemPrompt, temperature } = useModelStore();
 

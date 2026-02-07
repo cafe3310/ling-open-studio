@@ -1,5 +1,5 @@
-import { Assistant } from "./assistant";
+import { StudioShell } from "@/components/studio/studio-shell";
 
 export default function Home() {
-  return <Assistant />;
+  return <StudioShell />;
 }

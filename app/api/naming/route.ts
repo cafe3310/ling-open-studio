@@ -1,4 +1,4 @@
-import { chatNameGenerator } from "@/app/lib/assistants/naming-graph";
+import { chatNameGenerator } from "@/assistants/naming/graph";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { NextResponse } from "next/server";
 

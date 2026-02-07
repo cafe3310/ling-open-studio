@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sliders, Cpu, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MODEL_CONFIG } from '@/app/lib/model';
+import { MODEL_CONFIG } from '@/lib/model';
 import { useModelStore } from '@/lib/store';
 import { useThread } from '@assistant-ui/react';
 import {
