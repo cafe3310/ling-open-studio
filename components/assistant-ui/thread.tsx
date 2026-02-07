@@ -7,6 +7,7 @@ import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { Reasoning, ReasoningGroup } from "@/components/assistant-ui/reasoning";
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { ToolCallRenderer } from "@/components/assistant-ui/tool-call-renderer";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -218,16 +219,16 @@ const AssistantMessage: FC = () => {
       data-role="assistant"
     >
       <div className="aui-assistant-message-content wrap-break-word px-2 text-foreground leading-relaxed">
-        <MessagePrimitive.Parts
-          components={{
-            Text: MarkdownText,
-            Reasoning,
-            ReasoningGroup,
-            tools: { Fallback: ToolFallback },
-          }}
-        />
-        <MessageError />
-      </div>
+                  <MessagePrimitive.Parts
+                    components={{
+                      Text: MarkdownText,
+                      Reasoning,
+                      ReasoningGroup,
+                      tools: { Fallback: ToolFallback },
+                    }}
+                  />
+                  <ToolCallRenderer />
+                  <MessageError />      </div>
 
       <div className="aui-assistant-message-footer mt-1 ml-2 flex">
         <BranchPicker />

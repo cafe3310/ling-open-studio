@@ -74,12 +74,17 @@ You have access to a set of client-side tools. To use a tool, you must output a 
   },
 
   parseResponse: (response, tools) => {
+    console.log("[ToolCtxJson] Parsing response:", response.substring(0, 100) + "...");
     try {
       // Basic attempt to find the JSON structure
       const match = response.match(/\{[\s\S]*"tool_calls"[\s\S]*\}/);
+      console.log("[ToolCtxJson] Regex match result:", match ? "Found" : "Not Found");
+      
       if (!match) return null;
 
       const json = JSON.parse(match[0]);
+      console.log("[ToolCtxJson] Parsed JSON tool_calls count:", json.tool_calls?.length);
+
       if (json.tool_calls && Array.isArray(json.tool_calls)) {
         return json.tool_calls.map((call: any) => {
           let args = call.function.arguments;
@@ -96,6 +101,7 @@ You have access to a set of client-side tools. To use a tool, you must output a 
       }
       return null;
     } catch (e) {
+      console.error("[ToolCtxJson] Parse error:", e);
       return null;
     }
   }

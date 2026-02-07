@@ -14,6 +14,7 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { cn } from "@/lib/utils";
+import { ToolCallRenderer } from "@/components/assistant-ui/tool-call-renderer";
 
 const MarkdownTextImpl = () => {
   return (

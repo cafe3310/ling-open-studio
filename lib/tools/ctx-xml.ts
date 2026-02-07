@@ -71,16 +71,21 @@ You can invoke tools by wrapping your request in \
   },
 
   parseResponse: (response, tools) => {
+    console.log("[ToolCtxXml] Parsing response:", response.substring(0, 100) + "...");
     // Regex to capture content inside <tool_code> tags
     const regex = /<tool_code>([\s\S]*?)<\/tool_code>/g;
     const matches = [...response.matchAll(regex)];
     
+    console.log("[ToolCtxXml] Regex matches found:", matches.length);
+
     if (matches.length === 0) return null;
 
     const parsedCalls = [];
     for (const match of matches) {
       try {
         const content = match[1].trim();
+        console.log("[ToolCtxXml] Processing match content:", content.substring(0, 50) + "...");
+        
         // Assuming content is JSON as per protocol
         const json = JSON.parse(content);
         if (json.name && json.arguments) {
@@ -91,7 +96,7 @@ You can invoke tools by wrapping your request in \
           });
         }
       } catch (e) {
-        // Continue if one fails
+        console.error("[ToolCtxXml] Error parsing XML tool content:", e);
       }
     }
     
