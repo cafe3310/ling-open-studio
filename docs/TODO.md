@@ -40,6 +40,10 @@
     - 实现 `chat_name_generator` Graph (Ling-Mini)
     - 实现 `/api/naming` 接口
     - 前端集成：首轮对话后触发，显示 "Naming..." 并更新标题
+- [ ] **浏览器端虚拟文件系统 (Browser VFS)**： <!-- id: 25 -->
+    - 实现 `lib/vfs/database.ts` (IndexedDB 包装)
+    - 实现 `lib/vfs/index.ts` (VFS 核心逻辑)
+    - 提供 `useVFS` Hook 供前端使用
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - 实现代码生成对话区与预览组件
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
