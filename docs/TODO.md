@@ -54,10 +54,17 @@
     - 集成编辑器与灵感推荐卡片
 
 ## Debug & Tracing
-- [ ] 实现 `lib/model-tracer.ts` 封装模型调用日志输出
-- [ ] 在 `assistants/general-chat/graph.ts` 中应用 `tracedInvoke`
-- [ ] 验证服务端控制台原始上下文日志输出
-- [ ] (后续) 集成 `dispatchCustomEvent` 将日志传输至前端 ContextViewer
+- [x] 实现 `lib/model-tracer.ts` 封装模型调用日志输出 (服务端已实现)
+- [x] 在 `assistants/general-chat/graph.ts` 中应用 `tracedInvoke`
+- [x] 验证服务端控制台原始上下文日志输出
+- [ ] ~~集成 `dispatchCustomEvent` 将日志传输至前端 ContextViewer~~ (已放弃，转向工具调用)
+
+## 工具调用 (Tool Calling)
+- [ ] 扩展 `lib/store.ts` 增加 `enabledTools` 状态
+- [ ] 修改 `ModelConfig` UI，增加工具开关 Checkbox
+- [ ] 实现 `browser_js_eval` 工具定义与客户端执行逻辑
+- [ ] 修改 `assistants/general-chat/graph.ts` 支持动态工具加载
+- [ ] 实现基础 Tool Strategy (Native Tool Calling)
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
