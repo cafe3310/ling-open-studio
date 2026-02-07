@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Tab, NavItem } from './types';
-import { MessageSquare, Code, PenTool, Layout, Box } from 'lucide-react';
+import { MessageSquare, Code, PenTool, Layout, Box, HardDrive } from 'lucide-react';
 import ChatPage from './pages/ChatPage';
 import WebPage from './pages/WebPage';
 import WritePage from './pages/WritePage';
+import FilesystemPage from './pages/FilesystemPage';
 import DesignSystemPage from './pages/DesignSystemPage';
 import { cn } from './components/DesignSystem';
 
@@ -15,6 +16,7 @@ const App: React.FC = () => {
     { id: Tab.MODEL_CHAT, label: 'Model Chat', icon: MessageSquare },
     { id: Tab.MODEL_WEB, label: 'Model Web', icon: Code },
     { id: Tab.MODEL_WRITE, label: 'Model Write', icon: PenTool },
+    { id: Tab.MODEL_FILESYSTEM, label: 'Filesystem', icon: HardDrive },
   ];
 
   const renderContent = () => {
@@ -25,6 +27,8 @@ const App: React.FC = () => {
         return <WebPage />;
       case Tab.MODEL_WRITE:
         return <WritePage />;
+      case Tab.MODEL_FILESYSTEM:
+        return <FilesystemPage />;
       case Tab.DESIGN_SYSTEM:
       default:
         return <DesignSystemPage />;

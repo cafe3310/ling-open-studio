@@ -5,6 +5,7 @@ export enum Tab {
   MODEL_CHAT = 'Model Chat',
   MODEL_WEB = 'Model Web',
   MODEL_WRITE = 'Model Write',
+  MODEL_FILESYSTEM = 'Agent Filesystem',
 }
 
 export interface NavItem {
