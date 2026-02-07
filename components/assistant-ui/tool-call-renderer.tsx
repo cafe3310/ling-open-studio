@@ -11,18 +11,22 @@ import { jsTools } from "@/lib/tools/tools-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useThreadRuntime, useMessage } from "@assistant-ui/react";
+import { useThreadRuntime, useMessage, useThread } from "@assistant-ui/react";
 
 const ALL_TOOLS = [...vfsTools, ...jsTools];
 
 export const ToolCallRenderer = () => {
   const { toolParadigm } = useModelStore();
   const runtime = useThreadRuntime();
-  
-  // 1. Get running status
+
+  // 1. Get running status and current message info
   const isRunning = useMessage((m) => m.status.type === 'running');
   const role = useMessage((m) => m.role);
-  
+  const messageId = useMessage((m) => m.id);
+
+  // Access full thread messages to check for existing results
+  const threadMessages = useThread((t) => t.messages);
+
   // 2. Safely extract content using a selector
   const content = useMessage((m) => {
     const c = m.content;
@@ -36,17 +40,50 @@ export const ToolCallRenderer = () => {
     }
     return "";
   });
-  
+
+  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
+  const toolCalls = !isRunning ? strategy.parseResponse(content, ALL_TOOLS) : null;
+
+  // Determine if this block has already been executed by checking thread history
+  // We look for any USER message that comes AFTER this assistant message
+  // and contains a matching toolCallId in its content.
+  const isAlreadyExecuted = React.useMemo(() => {
+    if (!toolCalls) return false;
+
+    // Find the index of the current message
+    const currentIndex = threadMessages.findIndex(m => m.id === messageId);
+    if (currentIndex === -1) return false;
+
+    // Search in subsequent messages
+    const subsequentMessages = threadMessages.slice(currentIndex + 1);
+
+    return toolCalls.every(call => {
+      return subsequentMessages.some(msg =>
+        msg.role === 'user' &&
+        JSON.stringify(msg.content).includes(call.callId) // Simple but effective check
+      );
+    });
+  }, [toolCalls, threadMessages, messageId]);
+
   const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
+
+  // Sync local status with history check
+  React.useEffect(() => {
+    if (isAlreadyExecuted) {
+      if (status !== 'success') setStatus('success');
+    } else {
+      // If history says it's not executed, but we are 'success', it means 
+      // the history was likely cleared (e.g. regeneration). We should reset to idle.
+      // But we shouldn't interrupt 'running' or 'error' states initiated by user interaction 
+      // unless the component is being recycled for a new message.
+      if (status === 'success') setStatus('idle');
+    }
+  }, [isAlreadyExecuted, status]);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   // Safety check: Assistant messages only
   if (role !== 'assistant' || !content) return null;
-
-  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
-  
-  // Only parse when finished
-  const toolCalls = !isRunning ? strategy.parseResponse(content, ALL_TOOLS) : null;
 
   if (isRunning || !toolCalls || toolCalls.length === 0) return null;
 
@@ -60,25 +97,23 @@ export const ToolCallRenderer = () => {
           console.error(`[ToolCallRenderer] Executor not found for: ${call.toolName}`);
           return { id: call.callId, result: `Error: Tool ${call.toolName} not found on client.` };
         }
-        
+
         console.log(`[ToolCallRenderer] Running ${call.toolName} (${call.callId})...`);
         const result = await executor(call.args);
         return { id: call.callId, result };
       }));
 
       console.log("[ToolCallRenderer] All executions finished. Results:", results);
+
+      // No need to update global store manually
+
       setStatus('success');
 
       // Back-fill results to the thread as a User message
       const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
-      
-      console.log("[ToolCallRenderer] Formatted result message content:\n", formattedResults);
-      
+
       console.log("[ToolCallRenderer] Calling runtime.append with string...");
-      // Try passing the string directly, which is often the most compatible way to append and trigger
       runtime.append(formattedResults);
-      
-      console.log("[ToolCallRenderer] runtime.append call completed.");
 
     } catch (e: any) {
       console.error("[ToolCallRenderer] FATAL ERROR during execution/append:", e);
@@ -122,8 +157,8 @@ export const ToolCallRenderer = () => {
         )}
 
         <div className="flex justify-end pt-1">
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant={status === 'success' ? 'ghost' : 'default'}
             disabled={status === 'running' || status === 'success'}
             onClick={handleExecute}
