@@ -1,4 +1,5 @@
-import { StateGraph, Annotation, RunnableConfig } from "@langchain/langgraph";
+import { StateGraph, Annotation } from "@langchain/langgraph";
+import { RunnableConfig } from "@langchain/core/runnables";
 import { AIMessageChunk, BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { createChatModel, MODEL_CONFIG } from "@/app/lib/model";
 import { v4 as uuidv4 } from "uuid";

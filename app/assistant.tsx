@@ -37,8 +37,6 @@ export const Assistant = () => {
     }), [modelId, systemPrompt, temperature]),
   });
 
-  const threadId = runtime.threadId;
-
   return (
     <div className="flex flex-col h-dvh w-full bg-brand-bg">
       <TopNavigation activeTab={activeTab} onTabChange={setActiveTab} />

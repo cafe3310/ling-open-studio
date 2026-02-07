@@ -102,9 +102,15 @@ export class ReasoningSplitter {
             content: content as any,
           });
           
-          // Also set contentBlocks in kwargs as toUIMessageStream specifically looks for it
-          (newMsg as any).kwargs = {
-            ...newMsg.kwargs,
+          /**
+           * HACK: @assistant-ui/react-langgraph's `toUIMessageStream` specifically looks for 
+           * `kwargs.contentBlocks` to render structured message parts (like reasoning/thought).
+           * Since AIMessageChunk doesn't officially expose 'kwargs' in its TS definition, 
+           * we cast to 'any' here to ensure the UI can properly extract and display the thinking process.
+           */
+          const msgWithKwargs = newMsg as any;
+          msgWithKwargs.kwargs = {
+            ...msgWithKwargs.kwargs,
             contentBlocks: content
           };
 
