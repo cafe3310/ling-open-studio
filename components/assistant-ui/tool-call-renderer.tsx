@@ -11,29 +11,37 @@ import { jsTools } from "@/lib/tools/tools-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useAssistantRuntime, useMessage } from "@assistant-ui/react";
+import { useThreadRuntime, useMessage } from "@assistant-ui/react";
 
 const ALL_TOOLS = [...vfsTools, ...jsTools];
 
 export const ToolCallRenderer = () => {
   const { toolParadigm } = useModelStore();
-  const runtime = useAssistantRuntime();
+  const runtime = useThreadRuntime();
   
-  // Directly get the message state
-  const message = useMessage();
-  const isRunning = message.status.type === 'running';
+  // 1. Get running status
+  const isRunning = useMessage((m) => m.status.type === 'running');
+  const role = useMessage((m) => m.role);
+  
+  // 2. Safely extract content using a selector
+  const content = useMessage((m) => {
+    const c = m.content;
+    if (!c) return "";
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) {
+      return c
+        .filter((part: any) => part.type === 'text')
+        .map((part: any) => part.text || "")
+        .join("\n");
+    }
+    return "";
+  });
   
   const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState("");
 
   // Safety check: Assistant messages only
-  if (message.role !== 'assistant' || !message.content) return null;
-
-  // Extract full text content from parts
-  const content = message.content
-    .filter((c: any) => c.type === 'text')
-    .map((c: any) => c.text || "")
-    .join("\n");
+  if (role !== 'assistant' || !content) return null;
 
   const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
   
@@ -43,27 +51,37 @@ export const ToolCallRenderer = () => {
   if (isRunning || !toolCalls || toolCalls.length === 0) return null;
 
   const handleExecute = async () => {
+    console.log("[ToolCallRenderer] Starting execution for tool calls:", toolCalls.length);
     setStatus('running');
     try {
       const results = await Promise.all(toolCalls.map(async (call) => {
         const executor = clientTools[call.toolName as ClientToolName];
-        if (!executor) return { id: call.callId, result: `Error: Tool ${call.toolName} not found on client.` };
+        if (!executor) {
+          console.error(`[ToolCallRenderer] Executor not found for: ${call.toolName}`);
+          return { id: call.callId, result: `Error: Tool ${call.toolName} not found on client.` };
+        }
         
+        console.log(`[ToolCallRenderer] Running ${call.toolName} (${call.callId})...`);
         const result = await executor(call.args);
         return { id: call.callId, result };
       }));
 
+      console.log("[ToolCallRenderer] All executions finished. Results:", results);
       setStatus('success');
 
       // Back-fill results to the thread as a User message
       const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
       
-      runtime.append({
-        role: "user",
-        content: formattedResults
-      });
+      console.log("[ToolCallRenderer] Formatted result message content:\n", formattedResults);
+      
+      console.log("[ToolCallRenderer] Calling runtime.append with string...");
+      // Try passing the string directly, which is often the most compatible way to append and trigger
+      runtime.append(formattedResults);
+      
+      console.log("[ToolCallRenderer] runtime.append call completed.");
 
     } catch (e: any) {
+      console.error("[ToolCallRenderer] FATAL ERROR during execution/append:", e);
       setStatus('error');
       setErrorMessage(e.message);
     }
