@@ -210,3 +210,7 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,jetbrains,nextjs,windows
 tmp/
+
+# Local Test Dirs
+tmp.*/
+

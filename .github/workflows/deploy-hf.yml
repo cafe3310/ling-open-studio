@@ -45,16 +45,16 @@ jobs:
           cp Dockerfile.hf ../../deploy_package/Dockerfile
           cp README.hf.md ../../deploy_package/README.md
           
-          # 2. Public assets
-          cp -r public ../../deploy_package/public
-          
-          # 3. Static assets (.next/static)
-          mkdir -p ../../deploy_package/.next
-          cp -r .next/static ../../deploy_package/.next/static
-          
-          # 4. Standalone server & node_modules
-          # Copy contents of standalone to root of deploy_package (including hidden files)
+          # 2. Standalone server & node_modules (保持 Monorepo 层级)
+          # 这会将整个 apps/ 结构和根目录 node_modules 复制过去
           cp -R .next/standalone/. ../../deploy_package/
+
+          # 3. Public & Static assets (必须放在 server.js 预期的相对路径下)
+          mkdir -p ../../deploy_package/apps/studio/public
+          cp -r public/. ../../deploy_package/apps/studio/public/
+          
+          mkdir -p ../../deploy_package/apps/studio/.next/static
+          cp -r .next/static/. ../../deploy_package/apps/studio/.next/static/
 
           # --- Cleanup Step: Remove unnecessary heavy files ---
           echo "Cleaning up unnecessary files..."
@@ -76,7 +76,8 @@ jobs:
           # ----------------------------------------------------
           
           echo "Deployment package prepared at ./deploy_package"
-          ls -F .
+          # 验证 server.js 位置
+          ls -F apps/studio/server.js
 
       - name: Push to Hugging Face Space
         env:

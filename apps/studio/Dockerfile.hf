@@ -6,17 +6,14 @@ ENV NODE_ENV=production \
     PORT=7860 \
     HOSTNAME="0.0.0.0"
 
-# 创建非 root 用户 (Hugging Face 推荐)
+# 创建非 root 用户
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-# 显式复制运行所需的各部分 (从 tmp/deploy 目录中)
-COPY --chown=appuser:appgroup public ./public
-COPY --chown=appuser:appgroup .next ./.next
-COPY --chown=appuser:appgroup node_modules ./node_modules
-COPY --chown=appuser:appgroup server.js ./
-COPY --chown=appuser:appgroup package.json ./
+# 复制整个由 GitHub Actions 组装好的目录结构
+# 包含 apps/studio/server.js, apps/studio/public, apps/studio/.next/static 以及 node_modules
+COPY --chown=appuser:appgroup . ./
 
 # 切换用户
 USER appuser
@@ -24,5 +21,5 @@ USER appuser
 # 暴露端口
 EXPOSE 7860
 
-# 启动命令
-CMD ["node", "server.js"]
+# 启动命令 - 指向子包内的 server.js
+CMD ["node", "apps/studio/server.js"]
