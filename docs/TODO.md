@@ -48,8 +48,15 @@
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - [x] **静态 UI 框架**：实现 Chat/Preview/Config 三栏布局与交互
     - [x] **Agent Tooling**：封装 VFS 操作为 LangChain Tools (`vfs_write_file` 等)
-    - [x] **Graph 逻辑**：实现 `WebGenGraph` (Initial Gen & Refine)
-    - [ ] **全链路集成**：对接 Graph 与 UI，实现端到端生成预览
+    - [ ] **上下文工程与 Boilerplates**：
+        - [ ] 创建 `lib/boilerplates/index.ts` 定义 HTML/React 模板
+        - [ ] 定义 `Aesthetic Definitions` 美学风格库
+    - [ ] **Graph 逻辑实现 (双 Graph 架构)**：
+        - [ ] 实现 `InitialGenGraph` (Idea Expander -> Style Director -> Code Generator)
+        - [ ] 实现 `RefineGraph` (Editor Node)
+    - [ ] **全链路集成**：
+        - [ ] 在 `WebPreview` 中实现基于 `useVFS` 的 `iframe` 实时渲染
+        - [ ] 实现 Graph 路由逻辑 (Initial vs Refine)
 - [ ] **Model Write (辅助写作) 内容填充**： <!-- id: 16 -->
     - 集成编辑器与灵感推荐卡片
 
