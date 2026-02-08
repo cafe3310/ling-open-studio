@@ -2,8 +2,7 @@ import { assistantRegistry, AssistantMode } from "@/assistants/registry";
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { ReasoningSplitter } from "@/lib/assistant-utils/reasoning-splitter";
-import { ToolCtxJson } from "@/lib/tools/ctx-json";
-import { ToolCtxXml } from "@/lib/tools/ctx-xml";
+import { getToolContextStrategy } from "@/lib/tools/registry";
 import { vfsTools } from "@/lib/tools/tools-vfs";
 import { jsTools } from "@/lib/tools/tools-js";
 import { ToolDef } from "@/lib/tools";
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
   console.log(`[API/Chat] Starting request in mode: ${mode}, tools: ${enabledTools}, paradigm: ${toolParadigm}`);
 
   // 1. Select Tool Strategy and Collection
-  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
+  const strategy = getToolContextStrategy(toolParadigm);
   const activeTools: ToolDef[] = [];
   if (enabledTools.includes('vfs')) activeTools.push(...vfsTools);
   if (enabledTools.includes('js')) activeTools.push(...jsTools);
@@ -43,18 +42,23 @@ export async function POST(req: Request) {
   // Resolve the appropriate assistant graph
   const assistant = assistantRegistry.get(mode);
   
-  // Use a unique ID for the session/thread
-  const sessionId = `session-${Date.now()}`;
+  // Use threadId if provided by assistant-ui, otherwise fallback to sessionId
+  const threadId = config.threadId || `session-${Date.now()}`;
   
   // Stream the graph run with multiple modes
   const fullStream = await assistant.graph.stream(
     {
       messages: langchainMessages,
-      session_id: sessionId,
+      taskId: threadId,
+      config: {
+        modelId: config.modelId,
+        designId: config.designId,
+        techStackId: config.techStackId,
+      }
     },
     {
       configurable: { 
-        thread_id: sessionId,
+        thread_id: threadId,
         modelConfig: config,
       },
       streamMode: ["messages", "custom"],

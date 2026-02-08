@@ -10,8 +10,7 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 import { ToolCallRenderer } from "@/components/assistant-ui/tool-call-renderer";
 import { Button } from "@/components/ui/button";
 import { useModelStore } from "@/lib/store";
-import { ToolCtxJson } from "@/lib/tools/ctx-json";
-import { ToolCtxXml } from "@/lib/tools/ctx-xml";
+import { getToolContextStrategy } from "@/lib/tools/registry";
 import { cn } from "@/lib/utils";
 import {
   ActionBarMorePrimitive,
@@ -22,7 +21,7 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
-  useMessage,
+  useAuiState,
 } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
@@ -299,12 +298,13 @@ const AssistantActionBar: FC = () => {
 
 const UserMessage: FC = () => {
   const { toolParadigm } = useModelStore();
-  const content = useMessage((m) => {
+  const content = useAuiState((s) => {
+    const m = s.message;
     if (typeof m.content === 'string') return m.content;
     return m.content.filter(p => p.type === 'text').map(p => (p as any).text).join("");
   });
 
-  const strategy = toolParadigm === 'xml' ? ToolCtxXml : ToolCtxJson;
+  const strategy = getToolContextStrategy(toolParadigm);
   const parsed = strategy.parseResult(content);
 
   // Hide message if it's purely a tool result with no other text

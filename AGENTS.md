@@ -29,6 +29,12 @@ Inbox 目录
 - `docs/inbox/` 目录作为用户提供文件（文档、图片等）的存放位置，供 Agent 读取和处理。
 - Agent 处理内容后应该将结果存放到 `docs/` 中并按项目文档命名格式重命名。
 
+## 项目资源与文档 (Resources)
+
+- **assistant-ui 文档**: [https://www.assistant-ui.com/docs/api-reference/overview](https://www.assistant-ui.com/docs/api-reference/overview)
+- **AI SDK 参考**: [https://ai-sdk.dev/docs/reference](https://ai-sdk.dev/docs/reference)
+- **LangGraph 文档**: [https://langchain-ai.github.io/langgraph/](https://langchain-ai.github.io/langgraph/)
+
 ### 技术栈
 
 *   **框架:** Next.js 16 (App Router) - Standalone 输出模式

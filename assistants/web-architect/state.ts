@@ -18,14 +18,28 @@ export const WebGenState = Annotation.Root({
   taskId: Annotation<string | undefined>(),
 
   /**
-   * The requirements extracted from user prompt.
+   * Node B output: The expanded product plan.
    */
-  requirements: Annotation<string | undefined>(),
+  product_plan: Annotation<string | undefined>(),
+
+  /**
+   * Node A output: The visual design specification.
+   */
+  visual_spec: Annotation<string | undefined>(),
+
+  /**
+   * Selected options (passed from frontend body.config)
+   */
+  config: Annotation<{
+    modelId: string;
+    designId?: string;
+    techStackId?: string;
+  } | undefined>(),
 
   /**
    * Current status of the generation.
    */
-  status: Annotation<'idle' | 'analyzing' | 'coding' | 'error'>(),
+  status: Annotation<'idle' | 'planning' | 'designing' | 'coding' | 'refining' | 'error'>(),
 });
 
 export type WebGenState = typeof WebGenState.State;

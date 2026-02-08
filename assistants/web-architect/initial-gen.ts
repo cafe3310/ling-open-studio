@@ -2,51 +2,129 @@ import { StateGraph, START, END } from "@langchain/langgraph";
 import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
-
-// Nodes implementation
+import { designs, techStacks } from "./prompts";
 
 /**
- * Analyst Node: Understands user intent and breaks it down into requirements.
+ * Node B (as per Design Doc): Idea Expander
+ * Expands user prompt into a structured Product Plan (PRD).
  */
-async function analystNode(state: WebGenState, config: any) {
+async function ideaExpanderNode(state: WebGenState, config: any) {
   const model = createChatModel(config.configurable?.modelConfig);
-  const userPrompt = state.messages[state.messages.length - 1].content;
+  const userPrompt = (state.messages[0]?.content as string) || "";
   
+  // Find selected tech stack for its specific guidance
+  const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
+
+  const templateB = `
+    You are a Product Manager at a high-end web studio. Your job is to expand a short user request into a comprehensive Product Requirements Document (PRD).
+
+    User Prompt: ${userPrompt}
+    Technical Constraints: ${selectedTechStack.description_expander}
+
+    You should output a markdown document with the following sections:
+    1. Page Concept: A 2-3 sentence overview of the site's purpose and "vibe".
+    2. Content Structure: Define the sections of the page (e.g., Hero, Projects, Services, Contact).
+    3. Detailed Copy: For each section, provide specific headlines and body text ideas.
+    4. Component Needs: List specific interactive or UI components needed.
+    5. Icon & Imagery Strategy: Suggest specific Lucide icon names and Unsplash search keywords.
+
+    Output ONLY the markdown content.
+  `.trim();
+
   const response = await model.invoke([
-    new SystemMessage(`You are a Web Requirements Analyst. 
-Analyze the user's request and provide a concise summary of what needs to be built.
-Output your analysis in Markdown format.`),
-    new HumanMessage(userPrompt as string)
+    new SystemMessage(templateB)
   ]);
 
   return { 
-    requirements: response.content as string,
-    status: 'analyzing' as const
+    product_plan: response.content as string,
+    status: 'planning' as const
   };
 }
 
 /**
- * Coder Node: Generates the actual code based on requirements.
+ * Node A (as per Design Doc): Style Director
+ * Translates the product idea into a visual spec (Markdown).
  */
-async function coderNode(state: WebGenState, config: any) {
+async function styleDirectorNode(state: WebGenState, config: any) {
   const model = createChatModel(config.configurable?.modelConfig);
+  const userPrompt = (state.messages[0]?.content as string) || "";
   
-  const systemPrompt = `You are a Senior Web Developer. 
-Based on the following requirements, generate the necessary web files.
-Use HTML5 and Tailwind CSS (via CDN).
+  // Find selected design aesthetic
+  const selectedDesign = designs.find(d => d.id === state.config?.designId) || designs[0];
 
-Requirements:
-${state.requirements}
+  const templateA = `
+    You are a Design Director. Your job is to translate the product idea into a coherent visual system.
 
-Use the tool 'write_file' to create the files. 
-Always start with /workspace/webapp/ as the base directory.
-Usually you need at least an 'index.html' file.
+    Design Guide: ${selectedDesign.description_general}
+    Colors: ${selectedDesign.description_color}
+    Shapes: ${selectedDesign.description_shape}
+    Fonts: ${selectedDesign.description_font}
+    User requirements: ${userPrompt}
 
-Explain your plan briefly, then call the tools.`;
+    You should output a markdown document with the following sections exactly:
+    1. Color Palette: Define background, foreground, primary accent colors in Hex.
+    2. Style Tokens: Define border radius, border styles, shadow styles using Tailwind classes.
+    3. Typography: Suggest font family and Google Fonts URL.
+    4. Layout Logic: Describe the overall layout style (e.g., grid, asymmetric, heavy typography).
+    5. Decorative Elements: Suggest any additional visual elements (border, shadow, icons, patterns).
+
+    Output ONLY the markdown content.
+  `.trim();
 
   const response = await model.invoke([
-    new SystemMessage(systemPrompt),
-    ...state.messages
+    new SystemMessage(templateA),
+    new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
+  ]);
+
+  return { 
+    visual_spec: response.content as string,
+    status: 'designing' as const
+  };
+}
+
+/**
+ * Node C (as per Design Doc): Code Generator
+ * Combines Plan and Style into a final implementation call.
+ */
+async function codeGeneratorNode(state: WebGenState, config: any) {
+  const model = createChatModel(config.configurable?.modelConfig);
+  const userPrompt = (state.messages[0]?.content as string) || "";
+  
+  const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
+
+  const templateC = `
+    You are a Senior Frontend Developer. Your mission is to implement a complete, beautiful, and functional website based on the provided Design Spec and Product Plan.
+
+    ### 1. PRODUCT PLAN (Requirements)
+    ${state.product_plan}
+
+    ### 2. VISUAL SPEC (Design)
+    ${state.visual_spec}
+
+    ### 3. TECHNICAL CONSTRAINTS
+    - Use the following Boilerplate EXACTLY. Do NOT remove CDN links or the Icon initialization script.
+    - Tech Stack Boilerplate:
+    ${selectedTechStack.boilerplate_code}
+    - Protocol: ${selectedTechStack.description_style}
+
+    ### 4. INSTRUCTIONS
+    - Write the final code to "/index.html" using the VFS protocol.
+    - Map the "Style Tokens" from the Visual Spec to Tailwind classes.
+    - Use the primary accent color for key elements like buttons and icons.
+    - Ensure the copy from the Product Plan is accurately reflected.
+    - Use Lucide icons correctly: <i data-lucide="icon-name"></i>.
+
+    ### PROTOCOL (CRITICAL)
+    Use the Delimited Blocks Protocol for file writing:
+    === write: [file_path] ===
+    [Full content here]
+
+    Output a brief reasoning message, then the code block.
+  `.trim();
+
+  const response = await model.invoke([
+    new SystemMessage(templateC),
+    new HumanMessage(`User Original Intent: ${userPrompt}`)
   ]);
 
   return { 
@@ -55,12 +133,14 @@ Explain your plan briefly, then call the tools.`;
   };
 }
 
-// Build Graph
+// Build Graph: B (Idea) -> A (Style) -> C (Code)
 const builder = new StateGraph(WebGenState)
-  .addNode("analyst", analystNode)
-  .addNode("coder", coderNode)
-  .addEdge(START, "analyst")
-  .addEdge("analyst", "coder")
-  .addEdge("coder", END);
+  .addNode("idea_expander", ideaExpanderNode)
+  .addNode("style_director", styleDirectorNode)
+  .addNode("code_generator", codeGeneratorNode)
+  .addEdge(START, "idea_expander")
+  .addEdge("idea_expander", "style_director")
+  .addEdge("style_director", "code_generator")
+  .addEdge("code_generator", END);
 
 export const initialGenGraph = builder.compile();

@@ -9,13 +9,10 @@ import { refineGenGraph } from "./refine-gen";
  */
 
 async function router(state: WebGenState) {
-  // If we only have one user message (excluding the current AIMessage if any), 
-  // it's likely an initial request.
-  // A better way is to check if we have any files in the taskId directory, 
-  // but we can't do that on the server easily without tool calls.
-  
-  // Simple heuristic: if messages length <= 1 (just the user's first prompt), use initial.
-  if (state.messages.length <= 1) {
+  // If config is present in the input but not yet in state, it will be handled by the first node.
+  // We determine initial vs refine based on whether we have previous messages 
+  // or if we've already generated a plan.
+  if (!state.product_plan && state.messages.length <= 1) {
     return "initial";
   }
   return "refine";

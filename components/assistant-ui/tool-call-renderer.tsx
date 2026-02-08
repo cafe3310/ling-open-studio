@@ -4,16 +4,13 @@ import React, { useState } from "react";
 import { Play, Code, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useModelStore } from "@/lib/store";
 import { createClientTools } from "@/lib/tools/client-executor";
-import { ToolCtxJson } from "@/lib/tools/ctx-json";
-import { ToolCtxXml } from "@/lib/tools/ctx-xml";
+import { getToolContextStrategy } from "@/lib/tools/registry";
 import { vfsTools } from "@/lib/tools/tools-vfs";
 import { jsTools } from "@/lib/tools/tools-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useThreadRuntime, useMessage, useThread } from "@assistant-ui/react";
-
-const ALL_TOOLS = [...vfsTools, ...jsTools];
 
 export const ToolCallRenderer = () => {
   const { toolParadigm } = useModelStore();
@@ -50,7 +47,7 @@ export const ToolCallRenderer = () => {
     return "";
   });
 
-  const strategy = toolParadigm === "xml" ? ToolCtxXml : ToolCtxJson;
+  const strategy = getToolContextStrategy(toolParadigm);
   const parsedResponse = !isRunning ? strategy.parseResponse(content) : null;
   const toolCalls = parsedResponse?.calls || null;
 

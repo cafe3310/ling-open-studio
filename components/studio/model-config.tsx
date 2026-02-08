@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ModelConfig() {
-  const { 
-    modelId, 
-    systemPrompt, 
-    temperature, 
+  const {
+    modelId,
+    systemPrompt,
+    temperature,
     enabledTools,
     toolParadigm,
-    setModelId, 
-    setSystemPrompt, 
+    setModelId,
+    setSystemPrompt,
     setTemperature,
     setEnabledTools,
     setToolParadigm
@@ -150,14 +150,14 @@ export function ModelConfig() {
                 Tool Calling
               </h3>
             </div>
-            
+
             <div className="space-y-3">
               <label className={cn(
                 "flex items-center gap-2 cursor-pointer group",
                 isStarted && "opacity-50 cursor-not-allowed"
               )}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="w-4 h-4 rounded border-brand-border text-brand-blue focus:ring-brand-blue/50"
                   checked={enabledTools.includes('vfs')}
                   onChange={() => toggleTool('vfs')}
@@ -170,8 +170,8 @@ export function ModelConfig() {
                 "flex items-center gap-2 cursor-pointer group",
                 isStarted && "opacity-50 cursor-not-allowed"
               )}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="w-4 h-4 rounded border-brand-border text-brand-blue focus:ring-brand-blue/50"
                   checked={enabledTools.includes('js')}
                   onChange={() => toggleTool('js')}
@@ -195,6 +195,7 @@ export function ModelConfig() {
                 >
                   <option value="json">JSON (Strict)</option>
                   <option value="xml">XML (Tags)</option>
+                  <option value="text">TEXT (Delimited Blocks)</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

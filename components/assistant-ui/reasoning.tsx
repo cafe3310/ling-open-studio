@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { BrainIcon, ChevronDownIcon } from "lucide-react";
 import {
   useScrollLock,
-  useAssistantState,
+  useAuiState,
   type ReasoningMessagePartComponent,
   type ReasoningGroupComponent,
 } from "@assistant-ui/react";
@@ -221,11 +221,11 @@ const ReasoningGroupImpl: ReasoningGroupComponent = ({
   startIndex,
   endIndex,
 }) => {
-  const isReasoningStreaming = useAssistantState(({ message }) => {
+  const isReasoningStreaming = useAuiState(({ message }) => {
     if (message.status?.type !== "running") return false;
-    const lastIndex = message.parts.length - 1;
+    const lastIndex = message.content.length - 1;
     if (lastIndex < 0) return false;
-    const lastType = message.parts[lastIndex]?.type;
+    const lastType = message.content[lastIndex]?.type;
     if (lastType !== "reasoning") return false;
     return lastIndex >= startIndex && lastIndex <= endIndex;
   });
