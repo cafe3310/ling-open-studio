@@ -70,22 +70,22 @@ OPENAI_API_BASE=your_api_endpoint
 
 ## 项目结构与关键文件
 
-本项目采用“以助手为中心”的垂直切分架构：
+本项目采用“以助手为中心”的垂直切分架构，所有源码位于 `src/` 目录下：
 
-*   **`app/`**: Next.js 路由层 (Server Components)。仅负责路由分发和基础布局。
+*   **`src/app/`**: Next.js 路由层 (Server Components)。仅负责路由分发和基础布局。
     *   `page.tsx`: 主入口，渲染 `StudioShell`。
     *   `layout.tsx`: 全局根布局。
-*   **`assistants/`**: 业务助手层 (Server Logic)。
+*   **`src/assistants/`**: 业务助手层 (Server Logic)。
     *   `registry.ts`: 助手注册表，根据请求模式路由到不同的 Graph。
     *   `general-chat/`: 通用对话助手逻辑。
     *   `web-architect/`: 网页生成助手逻辑。
     *   `naming/`: 标题自动命名逻辑。
-*   **`components/`**: UI 组件层 (Client Components)。
+*   **`src/components/`**: UI 组件层 (Client Components)。
     *   `studio/`: 全局 Studio 框架组件（`StudioShell`, `TopNavigation`, `ModelConfig`）。
     *   `web/`: Model Web 专属 UI 模块。
     *   `assistant-ui/`: 聊天界面基础组件。
     *   `filesystem/`: 虚拟文件系统可视化组件。
-*   **`lib/`**: 共享基础设施。
+*   **`src/lib/`**: 共享基础设施。
     *   `vfs/`: 浏览器端虚拟文件系统核心。
     *   `tools/`: Agent Tool 调用解析与 VFS 工具集。
     *   `assistant-utils/`: 推理过程解析等通用助手工具。

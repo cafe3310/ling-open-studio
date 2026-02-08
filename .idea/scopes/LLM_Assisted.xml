@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="LLM Assisted" pattern="file:app//*||file:assistants//*||file:components//*||file:docs//*||file:hooks//*||file:lib//*||file:public//*||file:package.json||file:*.md||file:.env.*" />
+  <scope name="LLM Assisted" pattern="file:src/app//*||file:src/assistants//*||file:src/components//*||file:docs//*||file:src/hooks//*||file:src/lib//*||file:public//*||file:package.json||file:*.md||file:.env.*" />
 </component>
