@@ -33,47 +33,50 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Next.js App
+        working-directory: apps/studio
         run: pnpm build
 
       - name: Prepare Deployment Artifacts
+        working-directory: apps/studio
         run: |
-          mkdir -p deploy_package
+          mkdir -p ../../deploy_package
           
           # 1. Dockerfile & HF Metadata
-          cp Dockerfile.hf deploy_package/Dockerfile
-          cp README.hf.md deploy_package/README.md
+          cp Dockerfile.hf ../../deploy_package/Dockerfile
+          cp README.hf.md ../../deploy_package/README.md
           
           # 2. Public assets
-          cp -r public deploy_package/public
+          cp -r public ../../deploy_package/public
           
           # 3. Static assets (.next/static)
-          mkdir -p deploy_package/.next
-          cp -r .next/static deploy_package/.next/static
+          mkdir -p ../../deploy_package/.next
+          cp -r .next/static ../../deploy_package/.next/static
           
           # 4. Standalone server & node_modules
           # Copy contents of standalone to root of deploy_package (including hidden files)
-          cp -R .next/standalone/. deploy_package/
+          cp -R .next/standalone/. ../../deploy_package/
 
           # --- Cleanup Step: Remove unnecessary heavy files ---
           echo "Cleaning up unnecessary files..."
+          cd ../../deploy_package
           # 彻底移除 sharp 及其二进制文件 (因 next.config.ts 已开启 unoptimized: true)
-          rm -rf deploy_package/node_modules/sharp
-          rm -rf deploy_package/node_modules/@img
+          rm -rf node_modules/sharp
+          rm -rf node_modules/@img
           
-          rm -rf deploy_package/node_modules/typescript
-          rm -rf deploy_package/node_modules/@types
-          rm -rf deploy_package/node_modules/@biomejs
-          rm -rf deploy_package/node_modules/eslint
-          rm -rf deploy_package/node_modules/prettier
+          rm -rf node_modules/typescript
+          rm -rf node_modules/@types
+          rm -rf node_modules/@biomejs
+          rm -rf node_modules/eslint
+          rm -rf node_modules/prettier
           # Remove platform-specific binaries not needed for Linux
-          rm -rf deploy_package/node_modules/@swc/core-darwin-*
-          rm -rf deploy_package/node_modules/@swc/core-win32-*
+          rm -rf node_modules/@swc/core-darwin-*
+          rm -rf node_modules/@swc/core-win32-*
           # Remove source maps to save space
-          find deploy_package -name "*.map" -type f -delete
+          find . -name "*.map" -type f -delete
           # ----------------------------------------------------
           
           echo "Deployment package prepared at ./deploy_package"
-          ls -F deploy_package/
+          ls -F .
 
       - name: Push to Hugging Face Space
         env:
