@@ -200,7 +200,7 @@ We are given a Product Plan, Visual Spec, and Technical Constraints.
         Hero Background: minimalist workspace (desaturated, soft focus) -> we'll set as background image of the hero section with an overlay (opacity-10) and desaturate? But note: the spec says "treated as background layers with bg-cover and opacity-10 monochrome overlay via CSS filters". However, we are constrained to Tailwind utilities.
 
         How to achieve:
-          - We'll set the background image with  but we don't have a specific image URL. Since it's a placeholder, we can use a placeholder image from Unsplash? But the problem doesn't specify the exact image.
+          - We'll set the background image with bg-[url(...)] but we don't have a specific image URL. Since it's a placeholder, we can use a placeholder image from Unsplash? But the problem doesn't specify the exact image.
 
         However, the instructions say: "Do NOT remove CDN links or the Icon initialization script." but we are allowed to use the images? But we don't have the actual image URLs.
 
