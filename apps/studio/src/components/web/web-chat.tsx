@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Thread } from "@/components/assistant-ui/thread";
+import { Thread } from "@/components/assistants/web-architect/thread";
 import { Sparkles, Terminal } from 'lucide-react';
 
 const WEB_SUGGESTIONS = [
@@ -64,7 +64,7 @@ export const WebChat: React.FC = () => {
             font-size: 1rem;
           }
         `}</style>
-        <Thread suggestions={WEB_SUGGESTIONS} forcedParadigm="text" silent={true} />
+        <Thread suggestions={WEB_SUGGESTIONS} />
       </div>
     </aside>
   );

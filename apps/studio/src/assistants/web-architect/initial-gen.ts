@@ -30,7 +30,7 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
     2. Content Structure: Define the sections of the page (e.g., Hero, Projects, Services, Contact).
     3. Detailed Copy: For each section, provide specific headlines and body text ideas.
     4. Component Needs: List specific interactive or UI components needed.
-    5. Icon & Imagery Strategy: Suggest specific Lucide icon names and Unsplash search keywords.
+    5. Icon & Imagery Strategy: Suggest specific Lucide icon names and placeholder div with solid color.
 
     Output ONLY the markdown content.
   `.trim();
