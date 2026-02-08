@@ -18,6 +18,11 @@ export const WebGenState = Annotation.Root({
   taskId: Annotation<string | undefined>(),
 
   /**
+   * The original user request (extracted from messages at start).
+   */
+  user_request: Annotation<string | undefined>(),
+
+  /**
    * Node B output: The expanded product plan.
    */
   product_plan: Annotation<string | undefined>(),

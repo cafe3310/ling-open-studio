@@ -20,16 +20,14 @@ import { useModelStore } from "@/lib/store";
 import { ThreadTitleAutomator } from "./thread-title-automator";
 import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
 import { WebTab } from "@/components/web/web-tab";
-import { useVFSTools } from "@/lib/vfs/tools-implementation";
 
 export const StudioShell = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
   const { modelId, systemPrompt, temperature, enabledTools, toolParadigm } = useModelStore();
-  const vfsTools = useVFSTools();
 
   const chatRuntime = useChatRuntime({
     transport: useMemo(() => new AssistantChatTransport({
-      api: "/api/chat",
+      api: "/api/chat/general",
       body: {
         config: {
           modelId,
@@ -44,15 +42,12 @@ export const StudioShell = () => {
 
   const webRuntime = useChatRuntime({
     transport: useMemo(() => new AssistantChatTransport({
-      api: "/api/chat",
+      api: "/api/chat/web",
       body: {
         config: {
           modelId,
-          systemPrompt: "You are an expert web developer. Focus on creating beautiful, functional web pages using HTML and Tailwind CSS.",
           temperature,
-          enabledTools: ['vfs', 'js'],
           toolParadigm,
-          mode: 'web-gen'
         }
       }
     }), [modelId, temperature, toolParadigm]),

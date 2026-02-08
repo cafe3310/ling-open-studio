@@ -6,6 +6,7 @@ import { BaseMessage } from "@langchain/core/messages";
  */
 export interface TraceLog {
   timestamp: string;
+  graph?: string;
   node: string;
   modelId: string;
   inputs: any[];
@@ -19,9 +20,10 @@ export interface TraceLog {
 export async function tracedInvoke(
   model: BaseChatModel,
   messages: BaseMessage[],
-  config: { nodeName?: string; modelId?: string } = {}
+  config: { nodeName?: string; modelId?: string; graphInfo?: { graphName: string; nodeName: string } } = {}
 ): Promise<BaseMessage> {
-  const nodeName = config.nodeName || "unknown_node";
+  const graphName = config.graphInfo?.graphName;
+  const nodeName = config.graphInfo?.nodeName || config.nodeName || "unknown_node";
   const modelId = config.modelId || (model as any).model || "unknown_model";
   
   // 1. Capture Inputs
@@ -35,7 +37,6 @@ export async function tracedInvoke(
 
   try {
     // 2. Execute the actual call
-    // Note: We use invoke here. For true streaming support, a separate tracedStream helper is needed.
     const response = await model.invoke(messages);
 
     // 3. Capture Output
@@ -44,14 +45,16 @@ export async function tracedInvoke(
     // 4. Construct Trace Log
     const traceLog: TraceLog = {
       timestamp: new Date().toISOString(),
+      graph: graphName,
       node: nodeName,
       modelId: modelId,
       inputs: serializedInputs,
       output: fullOutput
     };
 
-    // 5. Output to Server Logs (formatted for visibility)
+    // 5. Output to Server Logs
     console.log("\n" + "=".repeat(20) + " [RAW CONTEXT TRACE] " + "=".repeat(20));
+    if (graphName) console.log(`[GRAPH]: ${graphName}`);
     console.log(`[NODE]: ${nodeName}`);
     console.log(`[MODEL]: ${modelId}`);
     console.log("[INPUTS]:");
@@ -62,7 +65,7 @@ export async function tracedInvoke(
 
     return response;
   } catch (error) {
-    console.error(`[Trace Error] in node ${nodeName}:`, error);
+    console.error(`[Trace Error] in ${graphName ? `${graphName}/` : ""}${nodeName}:`, error);
     throw error;
   }
 }

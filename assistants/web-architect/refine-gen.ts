@@ -1,6 +1,7 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
+import { tracedInvoke } from "@/lib/model-tracer";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { techStacks } from "./prompts";
 
@@ -9,7 +10,9 @@ import { techStacks } from "./prompts";
  * Identifies which files need to be read to satisfy user feedback.
  */
 async function editorNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig);
+  const model = createChatModel("Ling_1T", { 
+    temperature: 0.7 
+  });
   
   // In a real scenario, we would use list_directory tool here to get the file list.
   // For now, we assume /index.html is the main target.
@@ -33,10 +36,10 @@ ${fileList.join("\n")}
 === read: [file_path] ===
 `.trim();
 
-  const response = await model.invoke([
+  const response = await tracedInvoke(model, [
     new SystemMessage(templateD),
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
-  ]);
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_1T" });
 
   return { 
     messages: [response],
@@ -49,7 +52,9 @@ ${fileList.join("\n")}
  * Receives the file content and applies the modification.
  */
 async function resolverNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig);
+  const model = createChatModel("Ling_1T", { 
+    temperature: 0.1 
+  });
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
 
   const templateE = `
@@ -73,10 +78,10 @@ ${state.messages[state.messages.length - 2].content} (Previous instruction)
 [Full content here]
 `.trim();
 
-  const response = await model.invoke([
+  const response = await tracedInvoke(model, [
     new SystemMessage(templateE),
     ...state.messages
-  ]);
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_1T" });
 
   return { 
     messages: [response],

@@ -1,6 +1,7 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
+import { tracedInvoke } from "@/lib/model-tracer";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { designs, techStacks } from "./prompts";
 
@@ -9,9 +10,11 @@ import { designs, techStacks } from "./prompts";
  * Expands user prompt into a structured Product Plan (PRD).
  */
 async function ideaExpanderNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig);
-  const userPrompt = (state.messages[0]?.content as string) || "";
-  
+  const model = createChatModel("Ling_1T", {
+    temperature: 0.7
+  });
+  const userPrompt = (state.messages.find(m => m._getType() === 'human')?.content as string) || "";
+
   // Find selected tech stack for its specific guidance
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
 
@@ -31,11 +34,12 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
     Output ONLY the markdown content.
   `.trim();
 
-  const response = await model.invoke([
+  const response = await tracedInvoke(model, [
     new SystemMessage(templateB)
-  ]);
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_1T" });
 
-  return { 
+  return {
+    user_request: userPrompt,
     product_plan: response.content as string,
     status: 'planning' as const
   };
@@ -46,9 +50,10 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
  * Translates the product idea into a visual spec (Markdown).
  */
 async function styleDirectorNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig);
-  const userPrompt = (state.messages[0]?.content as string) || "";
-  
+  const model = createChatModel("Ling_1T", {
+    temperature: 0.7
+  });
+  const userPrompt = state.user_request || "";
   // Find selected design aesthetic
   const selectedDesign = designs.find(d => d.id === state.config?.designId) || designs[0];
 
@@ -71,12 +76,12 @@ async function styleDirectorNode(state: WebGenState, config: any) {
     Output ONLY the markdown content.
   `.trim();
 
-  const response = await model.invoke([
+  const response = await tracedInvoke(model, [
     new SystemMessage(templateA),
     new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
-  ]);
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ling_1T" });
 
-  return { 
+  return {
     visual_spec: response.content as string,
     status: 'designing' as const
   };
@@ -87,9 +92,10 @@ async function styleDirectorNode(state: WebGenState, config: any) {
  * Combines Plan and Style into a final implementation call.
  */
 async function codeGeneratorNode(state: WebGenState, config: any) {
-  const model = createChatModel(config.configurable?.modelConfig);
-  const userPrompt = (state.messages[0]?.content as string) || "";
-  
+  const model = createChatModel("Ring_Flash", {
+    temperature: 0.1
+  });
+  const userPrompt = state.user_request || "";
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
 
   const templateC = `
@@ -119,20 +125,21 @@ async function codeGeneratorNode(state: WebGenState, config: any) {
     === write: [file_path] ===
     [Full content here]
 
-    Output a brief reasoning message, then the code block.
+    Output the code block.
   `.trim();
 
-  const response = await model.invoke([
-    new SystemMessage(templateC),
-    new HumanMessage(`User Original Intent: ${userPrompt}`)
-  ]);
+    const response = await tracedInvoke(model, [
+      new SystemMessage(templateC),
+      new HumanMessage(`User Original Intent: ${userPrompt}`)
+    ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: "Ring_Flash" });
 
-  return { 
-    messages: [response],
-    status: 'coding' as const
-  };
-}
+    console.log(`[InitialGen/CodeGenerator] Node execution finished. Output length: ${response.content.toString().length}`);
 
+    return {
+      messages: [response],
+      status: 'coding' as const
+    };
+  }
 // Build Graph: B (Idea) -> A (Style) -> C (Code)
 const builder = new StateGraph(WebGenState)
   .addNode("idea_expander", ideaExpanderNode)

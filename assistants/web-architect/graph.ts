@@ -12,7 +12,10 @@ async function router(state: WebGenState) {
   // If config is present in the input but not yet in state, it will be handled by the first node.
   // We determine initial vs refine based on whether we have previous messages 
   // or if we've already generated a plan.
-  if (!state.product_plan && state.messages.length <= 1) {
+  const isInitial = !state.product_plan && state.messages.length <= 1;
+  console.log(`[WebGenGraph] Routing decision: ${isInitial ? 'INITIAL' : 'REFINE'} (Plan: ${!!state.product_plan}, MsgCount: ${state.messages.length})`);
+  
+  if (isInitial) {
     return "initial";
   }
   return "refine";
