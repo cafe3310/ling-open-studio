@@ -21,15 +21,17 @@ export const WebPreview: React.FC = () => {
   // And the graph's write_file uses the delimited protocol.
   // Let's assume the preview should look at the session-specific folder.
 
-  const { files, readFile, isLoading } = useVFS(threadId || "global");
+  // We use "global" for the VFS event scope to match client-executor
+  const { files, readFile, isLoading } = useVFS("global");
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPreview = async () => {
       if (!threadId) return;
       try {
-        // In our isolated VFS architecture, the files are stored under threadId scope
-        const file = await readFile("/index.html");
+        // Important: We must use the same physical path mapping as the agent
+        const physicalPath = `/workspace/sessions/${threadId}/index.html`;
+        const file = await readFile(physicalPath);
         if (file && typeof file.content === 'string') {
           setHtmlContent(file.content);
         } else {

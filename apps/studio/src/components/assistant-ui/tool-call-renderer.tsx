@@ -10,9 +10,18 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAui, useAuiState } from "@assistant-ui/react";
 
-export const ToolCallRenderer = () => {
-  const { toolParadigm } = useModelStore();
+export const ToolCallRenderer = ({ 
+  forcedParadigm,
+  silent 
+}: { 
+  forcedParadigm?: string;
+  silent?: boolean;
+}) => {
+  const { toolParadigm: storeParadigm } = useModelStore();
   const aui = useAui();
+
+  const toolParadigm = forcedParadigm || storeParadigm;
+  const strategy = getToolContextStrategy(toolParadigm);
 
   // 1. Get running status and current message info from unified state
   const isRunning = useAuiState((s) => s.message.status?.type === "running");
@@ -45,7 +54,6 @@ export const ToolCallRenderer = () => {
     return "";
   });
 
-  const strategy = getToolContextStrategy(toolParadigm);
   const parsedResponse = !isRunning ? strategy.parseResponse(content) : null;
   const toolCalls = parsedResponse?.calls || null;
 
@@ -121,14 +129,17 @@ export const ToolCallRenderer = () => {
       console.log("[ToolCallRenderer] All executions finished. Results:", results);
       setStatus("success");
 
-      // Back-fill results to the thread as a User message
-      const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
-
-      console.log("[ToolCallRenderer] Calling aui.thread().append with string...");
-      aui.thread().append(formattedResults);
+      if (!silent) {
+        // Back-fill results to the thread as a User message
+        const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
+        console.log("[ToolCallRenderer] Calling aui.thread().append with string...");
+        aui.thread().append(formattedResults);
+      } else {
+        console.log("[ToolCallRenderer] Silent execution complete. Not appending message.");
+      }
 
     } catch (e: any) {
-      console.error("[ToolCallRenderer] FATAL ERROR during execution/append:", e);
+      console.error("[ToolCallRenderer] FATAL ERROR during execution:", e);
       setStatus("error");
       setErrorMessage(e.message);
     }

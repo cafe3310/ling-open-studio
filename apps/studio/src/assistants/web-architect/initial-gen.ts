@@ -3,6 +3,7 @@ import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
 import { tracedInvoke } from "@/lib/model-tracer";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { vfsTools, ToolCtxDelimited } from "@/lib/tools";
 import { designs, techStacks } from "./prompts";
 
 /**
@@ -92,8 +93,8 @@ async function styleDirectorNode(state: WebGenState, config: any) {
  * Combines Plan and Style into a final implementation call.
  */
 async function codeGeneratorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ring_Flash", {
-    temperature: 0.1
+  const model = createChatModel("Ling_Flash", {
+    temperature: 0.5
   });
   const userPrompt = state.user_request || "";
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
@@ -111,27 +112,20 @@ async function codeGeneratorNode(state: WebGenState, config: any) {
     - Use the following Boilerplate EXACTLY. Do NOT remove CDN links or the Icon initialization script.
     - Tech Stack Boilerplate:
     ${selectedTechStack.boilerplate_code}
-    - Protocol: ${selectedTechStack.description_style}
+    - Style Guide: ${selectedTechStack.description_style}
 
     ### 4. INSTRUCTIONS
-    - Write the final code to "/index.html" using the VFS protocol.
     - Map the "Style Tokens" from the Visual Spec to Tailwind classes.
     - Use the primary accent color for key elements like buttons and icons.
     - Ensure the copy from the Product Plan is accurately reflected.
     - Use Lucide icons correctly: <i data-lucide="icon-name"></i>.
-
-    ### PROTOCOL (CRITICAL)
-    Use the Delimited Blocks Protocol for file writing:
-    === write: [file_path] ===
-    [Full content here]
-
-    Output the code block.
+    - Write the final code to "/index.html" using the write_file tool.
   `.trim();
 
     const response = await tracedInvoke(model, [
-      new SystemMessage(templateC),
+      new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateC, vfsTools)),
       new HumanMessage(`User Original Intent: ${userPrompt}`)
-    ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: "Ring_Flash" });
+    ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: "Ling_Flash" });
 
     console.log(`[InitialGen/CodeGenerator] Node execution finished. Output length: ${response.content.toString().length}`);
 

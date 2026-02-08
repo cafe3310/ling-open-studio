@@ -46,9 +46,11 @@ interface ThreadSuggestion {
 
 interface ThreadProps {
   suggestions?: readonly ThreadSuggestion[];
+  forcedParadigm?: string;
+  silent?: boolean;
 }
 
-export const Thread: FC<ThreadProps> = ({ suggestions }) => {
+export const Thread: FC<ThreadProps> = ({ suggestions, forcedParadigm, silent }) => {
   return (
     <ThreadPrimitive.Root
       className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
@@ -68,7 +70,7 @@ export const Thread: FC<ThreadProps> = ({ suggestions }) => {
           components={{
             UserMessage,
             EditComposer,
-            AssistantMessage,
+            AssistantMessage: (props) => <AssistantMessage {...props} forcedParadigm={forcedParadigm} silent={silent} />,
           }}
         />
 
@@ -221,7 +223,7 @@ const MessageError: FC = () => {
   );
 };
 
-const AssistantMessage: FC = () => {
+const AssistantMessage: FC<{ forcedParadigm?: string; silent?: boolean }> = ({ forcedParadigm, silent }) => {
   return (
     <MessagePrimitive.Root
       className="aui-assistant-message-root fade-in slide-in-from-bottom-1 relative mx-auto w-full max-w-(--thread-max-width) animate-in py-3 duration-150"
@@ -236,7 +238,7 @@ const AssistantMessage: FC = () => {
                       tools: { Fallback: ToolFallback },
                     }}
                   />
-                  <ToolCallRenderer />
+                  <ToolCallRenderer forcedParadigm={forcedParadigm} silent={silent} />
                   <MessageError />      </div>
 
       <div className="aui-assistant-message-footer mt-1 ml-2 flex">

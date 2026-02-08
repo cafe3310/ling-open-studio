@@ -47,10 +47,10 @@ export const StudioShell = () => {
         config: {
           modelId,
           temperature,
-          toolParadigm,
+          toolParadigm: 'text', // Forced to 'text' for Web Architect
         }
       }
-    }), [modelId, temperature, toolParadigm]),
+    }), [modelId, temperature]),
   });
 
   const activeRuntime = activeTab === 'web' ? webRuntime : chatRuntime;

@@ -64,7 +64,7 @@ export const WebChat: React.FC = () => {
             font-size: 1rem;
           }
         `}</style>
-        <Thread suggestions={WEB_SUGGESTIONS} />
+        <Thread suggestions={WEB_SUGGESTIONS} forcedParadigm="text" silent={true} />
       </div>
     </aside>
   );
