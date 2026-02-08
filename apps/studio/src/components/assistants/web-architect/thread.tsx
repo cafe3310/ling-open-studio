@@ -41,7 +41,8 @@ import {
 import type { FC } from "react";
 
 /**
- * Web-specific Markdown renderer that hides tool protocol blocks
+ * Web-specific simplified text renderer.
+ * Shows text in a pre block and delegates tool calls to ToolCallRenderer.
  */
 const WebMarkdownText: FC = () => {
   const content = useAuiState((s) => {
@@ -54,10 +55,12 @@ const WebMarkdownText: FC = () => {
     return parsed ? parsed.strippedText : text;
   });
 
+  if (!content.trim()) return null;
+
   return (
-    <MarkdownText>
+    <pre className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-brand-dark/90 bg-brand-bg/5 p-3 rounded-lg border border-brand-border/20 my-2">
       {content}
-    </MarkdownText>
+    </pre>
   );
 };
 
