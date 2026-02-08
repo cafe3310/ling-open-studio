@@ -10,9 +10,9 @@ import { useVFS } from "@/lib/vfs/hooks";
 
 export const WebPreview: React.FC = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile' | 'files'>('desktop');
-  const threadId = useAuiState((s) => s.thread.threadId);
-  const isGenerating = useAuiState((s) => s.thread.status === 'running');
-  
+  const threadId = useAuiState((s) => s.threads.mainThreadId);
+  const isGenerating = useAuiState((s) => s.thread.isRunning);
+
   // We use the global scope for VFS but access thread-specific paths
   // The logic in client-executor maps / to /workspace/sessions/${threadId}/
   // So we should list the global VFS but filtered by threadId if necessary,
@@ -20,7 +20,7 @@ export const WebPreview: React.FC = () => {
   // BUT the state.ts now passes taskId (which is threadId) to the graph.
   // And the graph's write_file uses the delimited protocol.
   // Let's assume the preview should look at the session-specific folder.
-  
+
   const { files, readFile, isLoading } = useVFS(threadId || "global");
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
@@ -100,13 +100,13 @@ export const WebPreview: React.FC = () => {
             <div
             className={cn(
                 "bg-white shadow-2xl border border-brand-border transition-all duration-500 overflow-hidden relative",
-                viewMode === 'mobile' 
-                ? "w-[375px] h-[667px] rounded-[40px] border-[12px] border-zinc-900" 
+                viewMode === 'mobile'
+                ? "w-[375px] h-[667px] rounded-[40px] border-[12px] border-zinc-900"
                 : "w-full h-full rounded-2xl"
             )}
             >
             {htmlContent ? (
-              <iframe 
+              <iframe
                 srcDoc={htmlContent}
                 className="w-full h-full border-none bg-white"
                 title="Web Preview"

@@ -5,25 +5,23 @@ import { Play, Code, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useModelStore } from "@/lib/store";
 import { createClientTools } from "@/lib/tools/client-executor";
 import { getToolContextStrategy } from "@/lib/tools/registry";
-import { vfsTools } from "@/lib/tools/tools-vfs";
-import { jsTools } from "@/lib/tools/tools-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useThreadRuntime, useMessage, useThread } from "@assistant-ui/react";
+import { useAui, useAuiState } from "@assistant-ui/react";
 
 export const ToolCallRenderer = () => {
   const { toolParadigm } = useModelStore();
-  const runtime = useThreadRuntime();
+  const aui = useAui();
 
-  // 1. Get running status and current message info
-  const isRunning = useMessage((m) => m.status?.type === "running");
-  const role = useMessage((m) => m.role);
-  const messageId = useMessage((m) => m.id);
+  // 1. Get running status and current message info from unified state
+  const isRunning = useAuiState((s) => s.message.status?.type === "running");
+  const role = useAuiState((s) => s.message.role);
+  const messageId = useAuiState((s) => s.message.id);
 
   // Access full thread messages to check for existing results
-  const threadMessages = useThread((t) => t.messages);
-  const threadId = useThread((t) => t.threadId) || "global";
+  const threadMessages = useAuiState((s) => s.thread.messages);
+  const threadId = useAuiState((s) => s.threads.mainThreadId) || "global";
 
   // Determine mount points based on context
   const mounts = React.useMemo(() => ({
@@ -34,8 +32,8 @@ export const ToolCallRenderer = () => {
   const tools = React.useMemo(() => createClientTools(mounts), [mounts]);
 
   // 2. Safely extract content using a selector
-  const content = useMessage((m) => {
-    const c = m.content;
+  const content = useAuiState((s) => {
+    const c = s.message.content;
     if (!c) return "";
     if (typeof c === "string") return c;
     if (Array.isArray(c)) {
@@ -126,8 +124,8 @@ export const ToolCallRenderer = () => {
       // Back-fill results to the thread as a User message
       const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
 
-      console.log("[ToolCallRenderer] Calling runtime.append with string...");
-      runtime.append(formattedResults);
+      console.log("[ToolCallRenderer] Calling aui.thread().append with string...");
+      aui.thread().append(formattedResults);
 
     } catch (e: any) {
       console.error("[ToolCallRenderer] FATAL ERROR during execution/append:", e);
