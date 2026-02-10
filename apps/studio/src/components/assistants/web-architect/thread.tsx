@@ -33,6 +33,7 @@ import {
   ChevronRightIcon,
   CopyIcon,
   DownloadIcon,
+  Loader2,
   MoreHorizontalIcon,
   PencilIcon,
   RefreshCwIcon,
@@ -45,8 +46,19 @@ import React, { FC } from "react";
  * Shows text in a collapsible block with status indicators.
  */
 const WebMarkdownText: FC = () => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const status = useAuiState((s) => s.message.status?.type || "complete");
+  const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
+  const isRunning = status === "running";
+
+  const [isExpanded, setIsExpanded] = React.useState(isRunning);
   
+  // Auto-expand when running
+  React.useEffect(() => {
+    if (isRunning) {
+      setIsExpanded(true);
+    }
+  }, [isRunning]);
+
   const content = useAuiState((s) => {
     const c = s.message.content;
     const text = typeof c === "string" ? c : (Array.isArray(c) ? c.filter((p: any) => p.type === "text").map((p: any) => (p as any).text || "").join("\n") : "");
@@ -55,13 +67,10 @@ const WebMarkdownText: FC = () => {
     const strategy = getToolContextStrategy('text');
     let displayContent = text;
     
-    // 1. Strip tool calls (e.g. === write_file ===)
     const parsedResponse = strategy.parseResponse(displayContent);
     if (parsedResponse) {
       displayContent = parsedResponse.strippedText;
     }
-    
-    // 2. Strip tool results (e.g. === tool_result ===)
     const parsedResult = strategy.parseResult(displayContent);
     if (parsedResult) {
       displayContent = parsedResult.strippedText;
@@ -70,61 +79,71 @@ const WebMarkdownText: FC = () => {
     return displayContent;
   });
 
-  const status = useAuiState((s) => s.message.status?.type || "complete");
-  const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
-
   if (!content.trim()) return null;
-  // Map internal node names to user-friendly labels
-  const nodeLabels: Record<string, string> = {
-    "idea_expander": "规划与构思",
-    "style_director": "视觉与美学设计",
-    "code_generator": "代码生成与实现",
-    "refine": "代码优化与修正"
+
+  // Map internal node names to user-friendly labels and descriptions
+  const nodeInfo: Record<string, { label: string; desc: string }> = {
+    "idea_expander": { label: "需求规划", desc: "正在构建产品需求文档 (PRD)..." },
+    "style_director": { label: "视觉方案", desc: "正在定义美学风格与视觉规范..." },
+    "code_generator": { label: "代码实现", desc: "正在生成生产级前端代码..." },
+    "refine": { label: "优化修正", desc: "正在根据反馈优化现有代码..." }
   };
 
-  const label = nodeLabels[nodeName] || "处理中";
-  const isRunning = status === "running";
+  const info = nodeInfo[nodeName] || { label: "智能处理", desc: "正在进行深度推理..." };
 
   return (
-    <div className="my-2 border border-brand-border/20 rounded-lg overflow-hidden bg-white/50 shadow-sm">
+    <div className={cn(
+      "my-3 border rounded-xl overflow-hidden transition-all duration-300",
+      isRunning ? "border-brand-blue/40 shadow-md bg-brand-blue/5" : "border-brand-border/20 bg-white/50"
+    )}>
       {/* Header / Status Bar */}
       <div
-        className={cn(
-          "flex items-center justify-between px-3 py-2 cursor-pointer transition-colors",
-          isRunning ? "bg-brand-blue/5" : "bg-brand-bg/5"
-        )}
+        className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-2">
-          {isRunning ? (
-            <div className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-blue"></span>
-            </div>
-          ) : (
-            <CheckIcon className="w-3.5 h-3.5 text-green-600" />
-          )}
-          <span className="text-xs font-bold text-brand-dark/80 tracking-wide uppercase">
-            {label} {isRunning ? "生成中..." : "已完成"}
-          </span>
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "flex items-center justify-center size-6 rounded-full",
+            isRunning ? "bg-brand-blue/10 text-brand-blue" : "bg-green-50 text-green-600"
+          )}>
+            {isRunning ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <CheckIcon className="w-3.5 h-3.5" />
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className={cn(
+              "text-[10px] font-bold uppercase tracking-widest",
+              isRunning ? "text-brand-blue" : "text-brand-dark/40"
+            )}>
+              {info.label}
+            </span>
+            <span className="text-xs font-medium text-brand-dark/80">
+              {isRunning ? info.desc : `${info.label}任务已圆满完成`}
+            </span>
+          </div>
         </div>
 
-        <button className="text-[10px] font-bold text-brand-blue/70 hover:text-brand-blue uppercase tracking-tighter">
-          {isExpanded ? "收起原文" : "展开原文"}
+        <button className="text-[10px] font-bold text-brand-blue/60 hover:text-brand-blue transition-colors uppercase tracking-tighter">
+          {isExpanded ? "收起详情" : "查看原文"}
         </button>
       </div>
 
       {/* Content Area (Collapsible) */}
-      {isExpanded && (
-        <div className="border-t border-brand-border/10">
-          <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-4 max-h-[400px] overflow-y-auto">
-            {content}
-          </pre>
-        </div>
-      )}
+      <div className={cn(
+        "overflow-hidden transition-all duration-300 ease-in-out border-brand-border/10",
+        isExpanded ? "max-h-[1000px] opacity-100 border-t" : "max-h-0 opacity-0 border-t-0"
+      )}>
+        <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-5 max-h-[500px] overflow-y-auto">
+          {content}
+        </pre>
+      </div>
     </div>
   );
 };
+
+// Add standard lucide-react Loader2 to imports if missing
 
 interface ThreadSuggestion {
   readonly title: string;

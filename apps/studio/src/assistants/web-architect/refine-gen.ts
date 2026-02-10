@@ -39,7 +39,8 @@ ${fileList.join("\n")}
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_1T" });
 
-  // Add node metadata for UI identification
+  // Add node metadata and stable ID for UI identification
+  response.id = `web-gen-refine-editor-${state.taskId}`;
   (response as any).metadata = { langgraph_node: "refine" };
 
   return { 
@@ -80,7 +81,8 @@ ${state.messages[state.messages.length - 2].content} (Previous instruction)
     ...state.messages
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_1T" });
 
-  // Add node metadata for UI identification
+  // Add node metadata and stable ID for UI identification
+  response.id = `web-gen-refine-editor-${state.taskId}`;
   (response as any).metadata = { langgraph_node: "refine" };
 
   return { 

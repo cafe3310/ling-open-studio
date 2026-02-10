@@ -39,7 +39,8 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
     new SystemMessage(templateB)
   ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_1T" });
 
-  // Add node metadata for UI identification
+  // Add node metadata and stable ID for UI identification
+  response.id = `web-gen-idea-${state.taskId}`;
   (response as any).metadata = { langgraph_node: "idea_expander" };
 
   return {
@@ -86,7 +87,8 @@ async function styleDirectorNode(state: WebGenState, config: any) {
     new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
   ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ling_1T" });
 
-  // Add node metadata for UI identification
+  // Add node metadata and stable ID for UI identification
+  response.id = `web-gen-style-${state.taskId}`;
   (response as any).metadata = { langgraph_node: "style_director" };
 
   return {
@@ -137,7 +139,8 @@ async function codeGeneratorNode(state: WebGenState, config: any) {
 
     console.log(`[InitialGen/CodeGenerator] Node execution finished. Output length: ${response.content.toString().length}`);
 
-    // Add node metadata for UI identification
+    // Add node metadata and stable ID for UI identification
+    response.id = `web-gen-code-${state.taskId}`;
     (response as any).metadata = { langgraph_node: "code_generator" };
 
     return {

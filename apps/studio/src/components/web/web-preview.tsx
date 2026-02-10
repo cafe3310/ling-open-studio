@@ -45,6 +45,35 @@ export const WebPreview: React.FC = () => {
     loadPreview();
   }, [threadId, files, readFile]);
 
+  const finalHtmlContent = useMemo(() => {
+    if (!htmlContent) return null;
+    
+    // Inject a script to handle anchor links correctly within srcDoc
+    // and prevent them from causing unwanted navigations.
+    const patchScript = `
+      <script>
+        document.addEventListener('click', function(e) {
+          const link = e.target.closest('a');
+          if (link && link.getAttribute('href').startsWith('#')) {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').slice(1);
+            const target = document.getElementById(targetId);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+              history.replaceState(null, null, '#' + targetId);
+            }
+          }
+        });
+      </script>
+    `;
+
+    // Try to inject before </body> or at the end
+    if (htmlContent.includes('</body>')) {
+      return htmlContent.replace('</body>', `${patchScript}</body>`);
+    }
+    return htmlContent + patchScript;
+  }, [htmlContent]);
+
   return (
     <div className="flex-1 flex flex-col h-full bg-brand-bg relative p-6">
       {/* Device Toggle Toolbar */}
@@ -107,9 +136,9 @@ export const WebPreview: React.FC = () => {
                 : "w-full h-full rounded-2xl"
             )}
             >
-            {htmlContent ? (
+            {finalHtmlContent ? (
               <iframe
-                srcDoc={htmlContent}
+                srcDoc={finalHtmlContent}
                 className="w-full h-full border-none bg-white"
                 title="Web Preview"
                 sandbox="allow-scripts allow-forms allow-modals"
