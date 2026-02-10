@@ -39,6 +39,9 @@ ${fileList.join("\n")}
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_1T" });
 
+  // Add node metadata for UI identification
+  (response as any).metadata = { langgraph_node: "refine" };
+
   return { 
     messages: [response],
     status: 'refining' as const
@@ -76,6 +79,9 @@ ${state.messages[state.messages.length - 2].content} (Previous instruction)
     new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateE, vfsTools)),
     ...state.messages
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_1T" });
+
+  // Add node metadata for UI identification
+  (response as any).metadata = { langgraph_node: "refine" };
 
   return { 
     messages: [response],

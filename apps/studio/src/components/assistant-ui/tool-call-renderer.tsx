@@ -10,6 +10,10 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAui, useAuiState } from "@assistant-ui/react";
 
+// Global cache to track local executions for silent/auto tools
+// This prevents infinite loops when tools don't append to thread history.
+const localExecutionCache = new Set<string>();
+
 export const ToolCallRenderer = ({ 
   forcedParadigm,
   silent,
@@ -62,9 +66,14 @@ export const ToolCallRenderer = ({
   const toolCalls = parsedResponse?.calls || null;
 
   // Determine if this block has already been executed by checking thread history
-  // and extract the result data if found.
+  // OR our local session cache.
   const executionInfo = React.useMemo(() => {
     if (!toolCalls) return { isExecuted: false, results: {} as Record<string, any> };
+
+    // Check local cache first (for silent mode)
+    if (localExecutionCache.has(messageId)) {
+      return { isExecuted: true, results: {} };
+    }
 
     const currentIndex = threadMessages.findIndex(m => m.id === messageId);
     if (currentIndex === -1) return { isExecuted: false, results: {} };
@@ -100,10 +109,8 @@ export const ToolCallRenderer = ({
 
   // Sync local status with history check
   React.useEffect(() => {
-    if (isAlreadyExecuted) {
-      if (status !== "success") setStatus("success");
-    } else {
-      if (status === "success") setStatus("idle");
+    if (isAlreadyExecuted && status !== "success") {
+      setStatus("success");
     }
   }, [isAlreadyExecuted, status]);
 
@@ -129,12 +136,19 @@ export const ToolCallRenderer = ({
 
       console.log("[ToolCallRenderer] All executions finished. Results:", results);
       setStatus("success");
+      
+      // Mark as executed locally to prevent loops in silent mode
+      localExecutionCache.add(messageId);
 
-      // Back-fill results to the thread as a User message
-      // Note: UserMessage component should handle hiding this from UI if it's purely a tool result.
-      const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
-      console.log("[ToolCallRenderer] Calling aui.thread().append...");
-      aui.thread().append(formattedResults);
+      // Only back-fill results to the thread if NOT in silent mode
+      // WebArchitect uses silent=true to prevent unnecessary feedback loops
+      if (!silent) {
+        const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
+        console.log("[ToolCallRenderer] Appending results to thread...");
+        aui.thread().append(formattedResults);
+      } else {
+        console.log("[ToolCallRenderer] Silent execution complete. Not appending message.");
+      }
 
     } catch (e: any) {
       console.error("[ToolCallRenderer] FATAL ERROR during execution:", e);
