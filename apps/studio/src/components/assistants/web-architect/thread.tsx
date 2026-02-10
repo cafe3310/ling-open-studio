@@ -48,25 +48,27 @@ import React, { FC } from "react";
 const WebMarkdownText: FC = () => {
   const status = useAuiState((s) => s.message.status?.type || "complete");
   const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
+  const messageName = useAuiState((s) => (s.message as any).name || "");
   const isRunning = status === "running";
+  const isStatusOnly = messageName === "status";
 
-  const [isExpanded, setIsExpanded] = React.useState(isRunning);
-  
-  // Auto-expand when running
+  const [isExpanded, setIsExpanded] = React.useState(isRunning && !isStatusOnly);
+
+  // Auto-expand when running, but only for content messages
   React.useEffect(() => {
-    if (isRunning) {
+    if (isRunning && !isStatusOnly) {
       setIsExpanded(true);
     }
-  }, [isRunning]);
+  }, [isRunning, isStatusOnly]);
 
   const content = useAuiState((s) => {
     const c = s.message.content;
     const text = typeof c === "string" ? c : (Array.isArray(c) ? c.filter((p: any) => p.type === "text").map((p: any) => (p as any).text || "").join("\n") : "");
-    
+
     // Force delimited strategy to strip tool calls AND results from text
     const strategy = getToolContextStrategy('text');
     let displayContent = text;
-    
+
     const parsedResponse = strategy.parseResponse(displayContent);
     if (parsedResponse) {
       displayContent = parsedResponse.strippedText;
@@ -83,13 +85,13 @@ const WebMarkdownText: FC = () => {
 
   // Map internal node names to user-friendly labels and descriptions
   const nodeInfo: Record<string, { label: string; desc: string }> = {
-    "idea_expander": { label: "需求规划", desc: "正在构建产品需求文档 (PRD)..." },
-    "style_director": { label: "视觉方案", desc: "正在定义美学风格与视觉规范..." },
-    "code_generator": { label: "代码实现", desc: "正在生成生产级前端代码..." },
-    "refine": { label: "优化修正", desc: "正在根据反馈优化现有代码..." }
+    "idea_expander": { label: "Planning", desc: "Expanding product requirements..." },
+    "style_director": { label: "Design", desc: "Defining visual aesthetic and specs..." },
+    "code_generator": { label: "Development", desc: "Generating production-grade code..." },
+    "refine": { label: "Refinement", desc: "Optimizing code based on feedback..." }
   };
 
-  const info = nodeInfo[nodeName] || { label: "智能处理", desc: "正在进行深度推理..." };
+  const info = nodeInfo[nodeName] || { label: "Thinking", desc: "In progress..." };
 
   return (
     <div className={cn(
@@ -120,25 +122,29 @@ const WebMarkdownText: FC = () => {
               {info.label}
             </span>
             <span className="text-xs font-medium text-brand-dark/80">
-              {isRunning ? info.desc : `${info.label}任务已圆满完成`}
+              {isRunning ? info.desc : `${info.label} done`}
             </span>
           </div>
         </div>
 
-        <button className="text-[10px] font-bold text-brand-blue/60 hover:text-brand-blue transition-colors uppercase tracking-tighter">
-          {isExpanded ? "收起详情" : "查看原文"}
-        </button>
+        {!isStatusOnly && (
+          <button className="text-[10px] font-bold text-brand-blue/60 hover:text-brand-blue transition-colors uppercase tracking-tighter">
+            {isExpanded ? "Collapse" : "View Details"}
+          </button>
+        )}
       </div>
 
       {/* Content Area (Collapsible) */}
-      <div className={cn(
-        "overflow-hidden transition-all duration-300 ease-in-out border-brand-border/10",
-        isExpanded ? "max-h-[1000px] opacity-100 border-t" : "max-h-0 opacity-0 border-t-0"
-      )}>
-        <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-5 max-h-[500px] overflow-y-auto">
-          {content}
-        </pre>
-      </div>
+      {!isStatusOnly && (
+        <div className={cn(
+          "overflow-hidden transition-all duration-300 ease-in-out border-brand-border/10",
+          isExpanded ? "max-h-[1000px] opacity-100 border-t" : "max-h-0 opacity-0 border-t-0"
+        )}>
+          <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-5 max-h-[500px] overflow-y-auto">
+            {content}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
@@ -228,7 +234,7 @@ const ThreadSuggestions: FC<ThreadProps> = ({ suggestions = SUGGESTIONS }) => {
       {suggestions.map((suggestion, index) => (
         <div
           key={suggestion.prompt}
-          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200"
+          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200"
           style={{ animationDelay: `${100 + index * 50}ms` }}
         >
           <ThreadPrimitive.Suggestion prompt={suggestion.prompt} send asChild>

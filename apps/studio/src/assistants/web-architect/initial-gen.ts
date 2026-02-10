@@ -2,13 +2,19 @@ import { StateGraph, START, END } from "@langchain/langgraph";
 import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
 import { tracedInvoke } from "@/lib/model-tracer";
-import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { AIMessage, AIMessageChunk, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { vfsTools, ToolCtxDelimited } from "@/lib/tools";
 import { designs, techStacks } from "./prompts";
 
+// Helper function to create a status message
+export const createStatusMessage = (content: string) => new AIMessageChunk({
+  content,
+  name: "status",
+  id: `status-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` // Add unique ID
+});
+
 /**
  * Node B (as per Design Doc): Idea Expander
- * Expands user prompt into a structured Product Plan (PRD).
  */
 async function ideaExpanderNode(state: WebGenState, config: any) {
   const model = createChatModel("Ling_1T", {
@@ -25,26 +31,25 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
     User Prompt: ${userPrompt}
     Technical Constraints: ${selectedTechStack.description_expander}
 
-    You should output a markdown document with the following sections:
-    1. Page Concept: A 2-3 sentence overview of the site's purpose and "vibe".
-    2. Content Structure: Define the sections of the page (e.g., Hero, Projects, Services, Contact).
-    3. Detailed Copy: For each section, provide specific headlines and body text ideas.
-    4. Component Needs: List specific interactive or UI components needed.
-    5. Icon & Imagery Strategy: Suggest specific Lucide icon names and placeholder div with solid color.
-
-    Output ONLY the markdown content.
+    You should output a markdown document. Output ONLY the markdown content.
   `.trim();
 
   const response = await tracedInvoke(model, [
     new SystemMessage(templateB)
   ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_1T" });
 
-  // Add node metadata and stable ID for UI identification
-  response.id = `web-gen-idea-${state.taskId}`;
+  // Create the status message chunk
+  const statusMsg = createStatusMessage("Requirement planning completed");
+  (statusMsg as any).metadata = { langgraph_node: "idea_expander" };
+
+  // We return both: the status message for the pipeline UI, 
+  // and the actual response (which we can hide or use for context).
+  // Note: response also needs the metadata to be caught by our WebMarkdownText.
   (response as any).metadata = { langgraph_node: "idea_expander" };
+  response.id = `web-gen-idea-content-${state.taskId}`;
 
   return {
-    messages: [response],
+    messages: [statusMsg, response],
     user_request: userPrompt,
     product_plan: response.content as string,
     status: 'planning' as const

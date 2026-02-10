@@ -25,6 +25,11 @@ const WEB_SUGGESTIONS = [
     label: "clean and functional",
     prompt: "Design a clean product detail page for an e-commerce site. Include an image gallery, price, and add-to-cart button.",
   },
+  {
+    title: "Personal Business Card",
+    label: "simple and elegant",
+    prompt: "Create a simple, elegant personal business card website with my name (John Doe), a brief bio as a software engineer, and links to GitHub and Twitter. Use a clean, modern design.",
+  },
 ];
 
 export const WebChat: React.FC = () => {
