@@ -252,7 +252,7 @@ const AssistantMessage: FC = () => {
                     }}
                   />
                   {/* Web Architect always uses text/silent mode for tool calls */}
-                  <ToolCallRenderer forcedParadigm="text" silent={true} />
+                  <ToolCallRenderer forcedParadigm="text" silent={true} autoApprove={true} hideDetails={true} />
                   <MessageError />      </div>
 
       <div className="aui-assistant-message-footer mt-1 ml-2 flex">

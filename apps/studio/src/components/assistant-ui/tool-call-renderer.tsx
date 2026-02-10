@@ -12,10 +12,14 @@ import { useAui, useAuiState } from "@assistant-ui/react";
 
 export const ToolCallRenderer = ({ 
   forcedParadigm,
-  silent 
+  silent,
+  autoApprove,
+  hideDetails
 }: { 
   forcedParadigm?: string;
   silent?: boolean;
+  autoApprove?: boolean;
+  hideDetails?: boolean;
 }) => {
   const { toolParadigm: storeParadigm } = useModelStore();
   const aui = useAui();
@@ -105,12 +109,9 @@ export const ToolCallRenderer = ({
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Safety check: Assistant messages only
-  if (role !== "assistant" || !content) return null;
+  const handleExecute = React.useCallback(async () => {
+    if (!toolCalls || toolCalls.length === 0) return;
 
-  if (isRunning || !toolCalls || toolCalls.length === 0) return null;
-
-  const handleExecute = async () => {
     console.log("[ToolCallRenderer] Starting execution for tool calls:", toolCalls.length);
     setStatus("running");
     try {
@@ -129,23 +130,65 @@ export const ToolCallRenderer = ({
       console.log("[ToolCallRenderer] All executions finished. Results:", results);
       setStatus("success");
 
-      if (!silent) {
-        // Back-fill results to the thread as a User message
-        const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
-        console.log("[ToolCallRenderer] Calling aui.thread().append with string...");
-        aui.thread().append(formattedResults);
-      } else {
-        console.log("[ToolCallRenderer] Silent execution complete. Not appending message.");
-      }
+      // Back-fill results to the thread as a User message
+      // Note: UserMessage component should handle hiding this from UI if it's purely a tool result.
+      const formattedResults = results.map(r => strategy.formatToolResult(r.id, r.result)).join("\n\n");
+      console.log("[ToolCallRenderer] Calling aui.thread().append...");
+      aui.thread().append(formattedResults);
 
     } catch (e: any) {
       console.error("[ToolCallRenderer] FATAL ERROR during execution:", e);
       setStatus("error");
       setErrorMessage(e.message);
     }
-  };
+  }, [toolCalls, tools, aui, strategy]);
+
+  // 3. Auto-execution logic
+  React.useEffect(() => {
+    if (autoApprove && !isRunning && toolCalls && toolCalls.length > 0 && !isAlreadyExecuted && status === "idle") {
+      const timer = setTimeout(() => {
+        handleExecute();
+      }, 300); // Small delay for visual feedback
+      return () => clearTimeout(timer);
+    }
+  }, [autoApprove, isRunning, toolCalls, isAlreadyExecuted, status, handleExecute]);
+
+  // Safety check: Assistant messages only
+  if (role !== "assistant" || !content) return null;
+
+  if (isRunning || !toolCalls || toolCalls.length === 0) return null;
+
 
   const showResults = status === "success" && Object.keys(executionInfo.results).length > 0;
+
+  if (hideDetails) {
+    return (
+      <div className="my-2 flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-border/30 bg-brand-bg/5 w-fit">
+        <div className="flex items-center gap-1.5">
+          {status === "running" ? (
+            <Loader2 className="w-3 h-3 animate-spin text-brand-blue" />
+          ) : status === "success" ? (
+            <CheckCircle2 className="w-3 h-3 text-green-600" />
+          ) : status === "error" ? (
+            <XCircle className="w-3 h-3 text-red-600" />
+          ) : (
+            <Code className="w-3 h-3 text-brand-blue" />
+          )}
+          <span className="text-[11px] font-bold uppercase tracking-tight text-brand-dark/60">
+            {toolCalls.map(c => c.toolName).join(", ")}
+          </span>
+        </div>
+        {status === "idle" && (
+          <button 
+            onClick={handleExecute}
+            className="ml-1 p-0.5 hover:bg-brand-bg/10 rounded transition-colors"
+          >
+            <Play className="w-3 h-3 text-brand-blue fill-current" />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Card className={cn(
