@@ -11,13 +11,13 @@ import { techStacks } from "./prompts";
  * Identifies which files need to be read to satisfy user feedback.
  */
 async function editorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", { 
-    temperature: 0.7 
+  const model = createChatModel("Ling_2_5_1T", {
+    temperature: 0.7
   });
-  
+
   // In a real scenario, we would use list_directory tool here to get the file list.
   // For now, we assume /index.html is the main target.
-  const fileList = ["/index.html"]; 
+  const fileList = ["/index.html"];
 
   const templateD = `
 You are a Code Maintenance Engineer. The user wants to modify an existing website or fix a bug.
@@ -42,7 +42,7 @@ ${fileList.join("\n")}
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };
 
-  return { 
+  return {
     messages: [response],
     status: 'refining' as const
   };
@@ -53,8 +53,8 @@ ${fileList.join("\n")}
  * Receives the file content and applies the modification.
  */
 async function resolverNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", { 
-    temperature: 0.1 
+  const model = createChatModel("Ling_2_5_1T", {
+    temperature: 0.1
   });
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
 
@@ -83,7 +83,7 @@ ${state.messages[state.messages.length - 2].content} (Previous instruction)
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };
 
-  return { 
+  return {
     messages: [response],
     status: 'coding' as const
   };
@@ -94,12 +94,12 @@ const builder = new StateGraph(WebGenState)
   .addNode("editor", editorNode)
   .addNode("resolver", resolverNode)
   .addEdge(START, "editor")
-  // In a semi-automatic loop, Node D would output a 'read' block, 
+  // In a semi-automatic loop, Node D would output a 'read' block,
   // the client would execute it, and the next turn would hit Node E.
   // But for a pure server-side graph, we might need a tool execution layer here.
-  // Given our architecture, we'll let the Editor finish its turn, 
+  // Given our architecture, we'll let the Editor finish its turn,
   // and the Resolver will be the next step once content is available.
-  .addEdge("editor", "resolver") 
+  .addEdge("editor", "resolver")
   .addEdge("resolver", END);
 
 export const refineGenGraph = builder.compile();

@@ -37,6 +37,8 @@ import {
   PencilIcon,
   RefreshCwIcon,
   SquareIcon,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import React, { FC } from "react";
 
@@ -45,23 +47,33 @@ import React, { FC } from "react";
  * Shows text in a collapsible block with status indicators.
  */
 const WebMarkdownText: FC = () => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-  
+  // Fix: split selectors to avoid infinite re-renders from returning new objects
+  const status = useAuiState((s) => s.message.status?.type || "complete");
+  const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
+  const isRunning = status === "running";
+
+  const [isExpanded, setIsExpanded] = React.useState(isRunning);
+
+  // Auto-expand when running
+  React.useEffect(() => {
+    if (isRunning) {
+      setIsExpanded(true);
+    }
+  }, [isRunning]);
+
   const content = useAuiState((s) => {
     const c = s.message.content;
     const text = typeof c === "string" ? c : (Array.isArray(c) ? c.filter((p: any) => p.type === "text").map((p: any) => (p as any).text || "").join("\n") : "");
-    
+
     // Force delimited strategy to strip tool calls AND results from text
     const strategy = getToolContextStrategy('text');
     let displayContent = text;
-    
-    // 1. Strip tool calls (e.g. === write_file ===)
+
     const parsedResponse = strategy.parseResponse(displayContent);
     if (parsedResponse) {
       displayContent = parsedResponse.strippedText;
     }
-    
-    // 2. Strip tool results (e.g. === tool_result ===)
+
     const parsedResult = strategy.parseResult(displayContent);
     if (parsedResult) {
       displayContent = parsedResult.strippedText;
@@ -70,58 +82,64 @@ const WebMarkdownText: FC = () => {
     return displayContent;
   });
 
-  const status = useAuiState((s) => s.message.status?.type || "complete");
-  const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
-
-  if (!content.trim()) return null;
-  // Map internal node names to user-friendly labels
-  const nodeLabels: Record<string, string> = {
-    "idea_expander": "规划与构思",
-    "style_director": "视觉与美学设计",
-    "code_generator": "代码生成与实现",
-    "refine": "代码优化与修正"
+  // Map internal node names to user-friendly labels and descriptions
+  // Internationalization: Unified English labels
+  const nodeInfo: Record<string, { label: string; desc: string }> = {
+    "idea_expander": { label: "Planning", desc: "Expanding product requirements..." },
+    "style_director": { label: "Design", desc: "Defining visual aesthetic and specs..." },
+    "code_generator": { label: "Development", desc: "Generating production-grade code..." },
+    "refine": { label: "Refinement", desc: "Optimizing code based on feedback..." }
   };
 
-  const label = nodeLabels[nodeName] || "处理中";
-  const isRunning = status === "running";
+  const info = nodeInfo[nodeName] || { label: "Thinking", desc: "In progress..." };
 
   return (
-    <div className="my-2 border border-brand-border/20 rounded-lg overflow-hidden bg-white/50 shadow-sm">
-      {/* Header / Status Bar */}
-      <div
-        className={cn(
-          "flex items-center justify-between px-3 py-2 cursor-pointer transition-colors",
-          isRunning ? "bg-brand-blue/5" : "bg-brand-bg/5"
-        )}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-2">
+    <div className={cn(
+      "my-4 rounded-2xl border transition-all duration-300 overflow-hidden",
+      isRunning ? "border-brand-blue shadow-md shadow-brand-blue/5" : "border-brand-border/50 bg-white/50"
+    )}>
+      {/* Status Header */}
+      <div className="flex items-center justify-between px-5 py-3 bg-brand-bg/10 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
           {isRunning ? (
-            <div className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-blue"></span>
+            <div className="relative">
+              <Loader2 className="w-4 h-4 text-brand-blue animate-spin" />
+              <div className="absolute inset-0 blur-[4px] text-brand-blue animate-pulse opacity-50">
+                <Loader2 className="w-4 h-4" />
+              </div>
             </div>
           ) : (
-            <CheckIcon className="w-3.5 h-3.5 text-green-600" />
+            <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
+               <CheckCircle2 className="w-3 h-3 text-green-600" />
+            </div>
           )}
-          <span className="text-xs font-bold text-brand-dark/80 tracking-wide uppercase">
-            {label} {isRunning ? "生成中..." : "已完成"}
-          </span>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark/40 leading-none mb-1">
+              {info.label}
+            </span>
+            <span className="text-xs font-medium text-brand-dark/80">
+              {isRunning ? info.desc : `${info.label} done`}
+            </span>
+          </div>
         </div>
 
-        <button className="text-[10px] font-bold text-brand-blue/70 hover:text-brand-blue uppercase tracking-tighter">
-          {isExpanded ? "收起原文" : "展开原文"}
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-[10px] font-bold text-brand-blue/60 hover:text-brand-blue transition-colors uppercase tracking-tighter"
+        >
+          {isExpanded ? "Collapse" : "View Details"}
         </button>
       </div>
 
       {/* Content Area (Collapsible) */}
-      {isExpanded && (
-        <div className="border-t border-brand-border/10">
-          <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-4 max-h-[400px] overflow-y-auto">
-            {content}
-          </pre>
-        </div>
-      )}
+      <div className={cn(
+        "overflow-hidden transition-all duration-300 ease-in-out border-brand-border/10",
+        isExpanded ? "max-h-[1000px] opacity-100 border-t" : "max-h-0 opacity-0 border-t-0"
+      )}>
+        <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-5 max-h-[500px] overflow-y-auto">
+          {content}
+        </pre>
+      </div>
     </div>
   );
 };
@@ -209,7 +227,8 @@ const ThreadSuggestions: FC<ThreadProps> = ({ suggestions = SUGGESTIONS }) => {
       {suggestions.map((suggestion, index) => (
         <div
           key={suggestion.prompt}
-          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200"
+          // CSS Fix: Ensure suggestions are visible in the sidebar by removing hidden classes
+          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200"
           style={{ animationDelay: `${100 + index * 50}ms` }}
         >
           <ThreadPrimitive.Suggestion prompt={suggestion.prompt} send asChild>
