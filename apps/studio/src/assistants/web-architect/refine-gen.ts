@@ -11,7 +11,7 @@ import { techStacks } from "./prompts";
  * Identifies which files need to be read to satisfy user feedback.
  */
 async function editorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_1T", { 
+  const model = createChatModel("Ling_2_5_1T", { 
     temperature: 0.7 
   });
   
@@ -37,7 +37,7 @@ ${fileList.join("\n")}
   const response = await tracedInvoke(model, [
     new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateD, vfsTools)),
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
-  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_1T" });
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_2_5_1T" });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };
@@ -53,7 +53,7 @@ ${fileList.join("\n")}
  * Receives the file content and applies the modification.
  */
 async function resolverNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_1T", { 
+  const model = createChatModel("Ling_2_5_1T", { 
     temperature: 0.1 
   });
   const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
@@ -78,7 +78,7 @@ ${state.messages[state.messages.length - 2].content} (Previous instruction)
   const response = await tracedInvoke(model, [
     new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateE, vfsTools)),
     ...state.messages
-  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_1T" });
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_2_5_1T" });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };
