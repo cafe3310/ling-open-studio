@@ -6,13 +6,6 @@ import { AIMessage, AIMessageChunk, HumanMessage, SystemMessage } from "@langcha
 import { vfsTools, ToolCtxDelimited } from "@/lib/tools";
 import { designs, techStacks } from "./prompts";
 
-// Helper function to create a status message
-export const createStatusMessage = (content: string) => new AIMessageChunk({
-  content,
-  name: "status",
-  id: `status-${Date.now()}-${Math.random().toString(36).substring(2, 9)}` // Add unique ID
-});
-
 /**
  * Node B (as per Design Doc): Idea Expander
  */
@@ -38,18 +31,8 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
     new SystemMessage(templateB)
   ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_1T" });
 
-  // Create the status message chunk
-  const statusMsg = createStatusMessage("Requirement planning completed");
-  (statusMsg as any).metadata = { langgraph_node: "idea_expander" };
-
-  // We return both: the status message for the pipeline UI, 
-  // and the actual response (which we can hide or use for context).
-  // Note: response also needs the metadata to be caught by our WebMarkdownText.
-  (response as any).metadata = { langgraph_node: "idea_expander" };
-  response.id = `web-gen-idea-content-${state.taskId}`;
-
   return {
-    messages: [statusMsg, response],
+    messages: [response],
     user_request: userPrompt,
     product_plan: response.content as string,
     status: 'planning' as const
@@ -91,10 +74,6 @@ async function styleDirectorNode(state: WebGenState, config: any) {
     new SystemMessage(templateA),
     new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
   ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ling_1T" });
-
-  // Add node metadata and stable ID for UI identification
-  response.id = `web-gen-style-${state.taskId}`;
-  (response as any).metadata = { langgraph_node: "style_director" };
 
   return {
     messages: [response],
@@ -143,10 +122,6 @@ async function codeGeneratorNode(state: WebGenState, config: any) {
     ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: "Ling_Flash" });
 
     console.log(`[InitialGen/CodeGenerator] Node execution finished. Output length: ${response.content.toString().length}`);
-
-    // Add node metadata and stable ID for UI identification
-    response.id = `web-gen-code-${state.taskId}`;
-    (response as any).metadata = { langgraph_node: "code_generator" };
 
     return {
       messages: [response],

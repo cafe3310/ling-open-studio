@@ -43,24 +43,9 @@ import React, { FC } from "react";
 
 /**
  * Web-specific simplified text renderer.
- * Shows text in a collapsible block with status indicators.
+ * Focuses on clean text output without card wrappers.
  */
 const WebMarkdownText: FC = () => {
-  const status = useAuiState((s) => s.message.status?.type || "complete");
-  const nodeName = useAuiState((s) => (s.message as any).metadata?.langgraph_node || "");
-  const messageName = useAuiState((s) => (s.message as any).name || "");
-  const isRunning = status === "running";
-  const isStatusOnly = messageName === "status";
-
-  const [isExpanded, setIsExpanded] = React.useState(isRunning && !isStatusOnly);
-
-  // Auto-expand when running, but only for content messages
-  React.useEffect(() => {
-    if (isRunning && !isStatusOnly) {
-      setIsExpanded(true);
-    }
-  }, [isRunning, isStatusOnly]);
-
   const content = useAuiState((s) => {
     const c = s.message.content;
     const text = typeof c === "string" ? c : (Array.isArray(c) ? c.filter((p: any) => p.type === "text").map((p: any) => (p as any).text || "").join("\n") : "");
@@ -83,68 +68,9 @@ const WebMarkdownText: FC = () => {
 
   if (!content.trim()) return null;
 
-  // Map internal node names to user-friendly labels and descriptions
-  const nodeInfo: Record<string, { label: string; desc: string }> = {
-    "idea_expander": { label: "Planning", desc: "Expanding product requirements..." },
-    "style_director": { label: "Design", desc: "Defining visual aesthetic and specs..." },
-    "code_generator": { label: "Development", desc: "Generating production-grade code..." },
-    "refine": { label: "Refinement", desc: "Optimizing code based on feedback..." }
-  };
-
-  const info = nodeInfo[nodeName] || { label: "Thinking", desc: "In progress..." };
-
   return (
-    <div className={cn(
-      "my-3 border rounded-xl overflow-hidden transition-all duration-300",
-      isRunning ? "border-brand-blue/40 shadow-md bg-brand-blue/5" : "border-brand-border/20 bg-white/50"
-    )}>
-      {/* Header / Status Bar */}
-      <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className={cn(
-            "flex items-center justify-center size-6 rounded-full",
-            isRunning ? "bg-brand-blue/10 text-brand-blue" : "bg-green-50 text-green-600"
-          )}>
-            {isRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <CheckIcon className="w-3.5 h-3.5" />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className={cn(
-              "text-[10px] font-bold uppercase tracking-widest",
-              isRunning ? "text-brand-blue" : "text-brand-dark/40"
-            )}>
-              {info.label}
-            </span>
-            <span className="text-xs font-medium text-brand-dark/80">
-              {isRunning ? info.desc : `${info.label} done`}
-            </span>
-          </div>
-        </div>
-
-        {!isStatusOnly && (
-          <button className="text-[10px] font-bold text-brand-blue/60 hover:text-brand-blue transition-colors uppercase tracking-tighter">
-            {isExpanded ? "Collapse" : "View Details"}
-          </button>
-        )}
-      </div>
-
-      {/* Content Area (Collapsible) */}
-      {!isStatusOnly && (
-        <div className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out border-brand-border/10",
-          isExpanded ? "max-h-[1000px] opacity-100 border-t" : "max-h-0 opacity-0 border-t-0"
-        )}>
-          <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-brand-dark/80 bg-brand-bg/5 p-5 max-h-[500px] overflow-y-auto">
-            {content}
-          </pre>
-        </div>
-      )}
+    <div className="prose prose-sm prose-slate max-w-none dark:prose-invert">
+      <MarkdownText />
     </div>
   );
 };
@@ -330,17 +256,18 @@ const AssistantMessage: FC = () => {
       data-role="assistant"
     >
       <div className="aui-assistant-message-content wrap-break-word px-2 text-foreground leading-relaxed">
-                  <MessagePrimitive.Parts
-                    components={{
-                      Text: WebMarkdownText, // Use Web-specific renderer
-                      Reasoning,
-                      ReasoningGroup,
-                      tools: { Fallback: ToolFallback },
-                    }}
-                  />
-                  {/* Web Architect always uses text/silent mode for tool calls */}
-                  <ToolCallRenderer forcedParadigm="text" silent={true} autoApprove={true} hideDetails={true} />
-                  <MessageError />      </div>
+                                    <MessagePrimitive.Parts
+                                      components={{
+                                        Text: WebMarkdownText, // Use Web-specific renderer
+                                        Reasoning,
+                                        ReasoningGroup,
+                                        tools: { Fallback: ToolFallback },
+                                      }}
+                                    />
+                                    {/* Web Architect always uses text/silent mode for tool calls */}
+                                    <ToolCallRenderer forcedParadigm="text" silent={true} />
+                                    <MessageError />
+                        </div>
 
       <div className="aui-assistant-message-footer mt-1 ml-2 flex">
         <BranchPicker />
