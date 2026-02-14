@@ -11,6 +11,33 @@ export const designs: DesignOption[] = [
     description_font: "Use bold, sans-serif typography like Inter or Helvetica. Large, impactful headings with tight leading."
   },
   {
+    id: "glassmorphism",
+    name: "Glassmorphism",
+    icon: "Wind",
+    description_general: "Modern, lightweight, and transparent. Focus on depth and frost-glass effects.",
+    description_color: "Soft gradients for background. Use white or black with high transparency (30-50%) for card backgrounds.",
+    description_shape: "Medium border radius (rounded-2xl). Strong backdrop-blur-md. Thin, semi-transparent white borders (border-white/20).",
+    description_font: "Clean and legible sans-serif like Inter. High letter spacing for a modern tech feel."
+  },
+  {
+    id: "cyber-glow",
+    name: "Cyber-Glow",
+    icon: "Zap",
+    description_general: "Futuristic, high-energy, and dark-centric. Inspired by cyberpunk aesthetics.",
+    description_color: "Dark Slate backgrounds (#0F172A). Neon Cyan (#22D3EE) or Magenta (#F02AD3) as primary accent colors.",
+    description_shape: "Small border radius (rounded-md). Text and borders should have glow effects (drop-shadow).",
+    description_font: "Technical monospace fonts like Space Mono or modern bold sans-serif. Uppercase for navigation."
+  },
+  {
+    id: "bento",
+    name: "Bento Modern",
+    icon: "Grid",
+    description_general: "Structured, modular, and Apple-inspired layout. High clarity and information density.",
+    description_color: "Minimalist Slate backgrounds (#F8FAFC). Pure white cards with deep gray text.",
+    description_shape: "Large border radius (rounded-3xl). Flat design with very subtle borders or no borders at all.",
+    description_font: "Elegant sans-serif like Inter. Careful use of hierarchy and whitespace within grid items."
+  },
+  {
     id: "minimalist",
     name: "Warm Minimalist",
     icon: "Feather",

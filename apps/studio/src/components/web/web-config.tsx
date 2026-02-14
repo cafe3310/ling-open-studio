@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutTemplate, Sparkles, Zap, Moon, Palette, LucideIcon } from 'lucide-react';
+import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +14,10 @@ export const WebConfig: React.FC = () => {
     switch (iconName) {
       case 'Layout': return LayoutTemplate;
       case 'Feather': return Sparkles;
-      case 'Box': return Zap;
+      case 'Box': return Palette;
+      case 'Wind': return Wind;
+      case 'Zap': return Zap;
+      case 'Grid': return LayoutGrid;
       default: return Palette;
     }
   };
@@ -76,30 +79,6 @@ export const WebConfig: React.FC = () => {
               <p className="text-[9px] text-slate-400 px-1 leading-normal italic">
                 * Selected stack will be used by the Agent.
               </p>
-            </div>
-          </section>
-
-          <Separator className="bg-slate-100" />
-
-          {/* Advanced Toggles */}
-          <section>
-            <h3 className="text-[11px] font-bold text-brand-gray uppercase tracking-widest mb-4">Advanced Options</h3>
-            <div className="space-y-1">
-              {[
-                { id: 'dark', label: 'Dark Mode Support', icon: Moon, default: false },
-                { id: 'anim', label: 'Motion Effects', icon: Zap, default: false },
-              ].map((opt) => (
-                <label key={opt.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group opacity-50 grayscale pointer-events-none">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-slate-200">
-                      <opt.icon className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-dark" />
-                    </div>
-                    <span className="text-xs text-brand-gray font-medium group-hover:text-brand-dark transition-colors">{opt.label}</span>
-                  </div>
-                  <input type="checkbox" disabled defaultChecked={opt.default} className="w-4 h-4 rounded border-slate-300 text-brand-blue focus:ring-brand-blue transition-all accent-brand-blue" />
-                </label>
-              ))}
-              <p className="text-[9px] text-brand-gray px-1 italic">Disabled as per current design spec.</p>
             </div>
           </section>
         </div>
