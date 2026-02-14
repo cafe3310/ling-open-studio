@@ -75,8 +75,19 @@
 - [ ] 实现前端 `ToolCallRenderer` 拦截并渲染 JSON/XML 调用块
 - [ ] 实现 `browser_js_eval` 工具在前端的执行逻辑
 - [ ] 实现 VFS 工具 (list/read/write) 在前端的执行逻辑
-- [ ] 实现半自动 Loop 结果回填逻辑 (将结果作为 User 消息发送)
+    - [ ] 实现半自动 Loop 结果回填逻辑 (将结果作为 User 消息发送)
+
+## 第五阶段：Model Write (写作助手) 复刻与填充 <!-- id: 26 -->
+- [ ] **UI 架构复刻**： <!-- id: 27 -->
+    - [ ] 恢复 `badge.tsx` 等缺失的 UI 组件
+    - [ ] 恢复 `write-architect` 三栏式 UI 组件
+    - [ ] 在 `registry.ts` 和 `StudioShell` 中完成集成
+- [ ] **编辑器集成**： <!-- id: 28 -->
+    - [ ] 集成 TipTap 或基础编辑器到 `WriteCanvas`
+- [ ] **功能闭环**： <!-- id: 29 -->
+    - [ ] 实现专属 LangGraph 逻辑（处理灵感生成与续写）
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
+
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
 - [ ] **最终测试**：进行全流程的功能回归测试 <!-- id: 19 -->
