@@ -10,6 +10,7 @@ import { useModelStore } from "@/lib/store";
 import { WriteLeftSidebar } from "./write-left-sidebar";
 import { WriteCanvas } from "./write-canvas";
 import { WriteRightSidebar } from "./write-right-sidebar";
+import { WriteStatusViewer } from "./write-status-viewer";
 
 export const WriteArchitectAssistant = () => {
   const { modelId, temperature } = useModelStore();
@@ -29,7 +30,7 @@ export const WriteArchitectAssistant = () => {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex h-full w-full overflow-hidden bg-white">
+      <div className="flex h-full w-full overflow-hidden bg-white relative">
         {/* Left column: Context & Controls */}
         <WriteLeftSidebar />
 
@@ -38,6 +39,9 @@ export const WriteArchitectAssistant = () => {
 
         {/* Right column: AI Intelligence */}
         <WriteRightSidebar />
+
+        {/* Floating Debug / Status Viewer */}
+        <WriteStatusViewer />
       </div>
     </AssistantRuntimeProvider>
   );
