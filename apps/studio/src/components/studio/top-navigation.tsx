@@ -3,6 +3,8 @@ import { MessageSquare, Code, PenTool, Layout, Box, HardDrive } from 'lucide-rea
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import { APP_CONFIG } from "@/lib/config";
+
 export type Tab = 'chat' | 'web' | 'write' | 'filesystem';
 
 interface TopNavigationProps {
@@ -11,12 +13,15 @@ interface TopNavigationProps {
 }
 
 export function TopNavigation({ activeTab, onTabChange }: TopNavigationProps) {
-  const navItems: { id: Tab; label: string; icon: React.ElementType }[] = [
+  const allNavItems: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: 'chat', label: 'Model Chat', icon: MessageSquare },
     { id: 'web', label: 'Model Web', icon: Code },
     { id: 'write', label: 'Model Write', icon: PenTool },
     { id: 'filesystem', label: 'Agent Filesystem', icon: HardDrive },
   ];
+
+  // Filter based on configuration
+  const navItems = allNavItems.filter(item => APP_CONFIG.features.tabs[item.id]);
 
   return (
     <header className="h-16 bg-white border-b border-brand-border flex items-center justify-between px-6 shrink-0 z-50">

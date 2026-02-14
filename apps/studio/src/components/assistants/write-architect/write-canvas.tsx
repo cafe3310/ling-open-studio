@@ -1,32 +1,40 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const WriteCanvas = () => {
-  return (
-    <main className="flex-1 bg-white relative overflow-y-auto">
-      <div className="max-w-[800px] mx-auto py-24 px-12 lg:px-20">
-        <article className="prose prose-slate max-w-none">
-          <p className="font-serif text-[20px] leading-[1.8] text-brand-dark/90 mb-10 antialiased">
-            The rain had not stopped for three days. It drummed against the stained glass windows of the library, a rhythmic accompaniment to the silence that filled the room.
-          </p>
-          <p className="font-serif text-[20px] leading-[1.8] text-brand-dark/90 mb-10 antialiased">
-            Elara traced the spine of the ancient tome. "They say the ink never dries," she whispered, though there was no one to hear her. The candle flickered, casting long, dancing shadows against the shelves.
-          </p>
-          <p className="font-serif text-[20px] leading-[1.8] text-brand-dark/90 mb-10 antialiased font-medium italic">
-            "You shouldn't be reading that," a voice echoed from the dark corner.
-          </p>
-        </article>
-      </div>
+  const [content, setContent] = useState(
+    `The rain had not stopped for three days. It drummed against the stained glass windows of the library, a rhythmic accompaniment to the silence that filled the room.\n\n` +
+    `Elara traced the spine of the ancient tome. "They say the ink never dries," she whispered, though there was no one to hear her. The candle flickered, casting long, dancing shadows against the shelves.\n\n` +
+    `"You shouldn't be reading that," a voice echoed from the dark corner.`
+  );
 
-      {/* Floating AI Assist Action */}
-      <div className="fixed bottom-10 right-[360px] z-20">
-        <Button className="rounded-full h-12 px-8 gap-3 bg-brand-blue hover:bg-brand-blue/90 shadow-[0_8px_24px_rgba(59,130,246,0.3)] hover:scale-105 transition-all">
-          <Sparkles className="w-4 h-4 fill-white" />
-          <span className="font-bold text-xs uppercase tracking-widest">AI Assist</span>
-        </Button>
+  const ghostText = " She turned slowly, her heart pounding against her ribs as she searched for the speaker in the gloom...";
+
+  return (
+    <main className="flex-1 bg-white relative overflow-y-auto font-mono">
+      <div className="max-w-[800px] mx-auto py-24 px-12 lg:px-20">
+        <div className="relative group cursor-text min-h-[50vh]">
+          {/* Main Text Content */}
+          <div className="text-[15px] leading-[1.8] text-brand-dark/90 whitespace-pre-wrap antialiased">
+            {content}
+            {/* Ghost Text */}
+            <span 
+              className="text-brand-dark/20 cursor-pointer hover:text-brand-blue/40 transition-colors inline italic"
+              title="Click to accept suggestion"
+              onClick={() => {
+                setContent(prev => prev + ghostText);
+              }}
+            >
+              {ghostText}
+            </span>
+            {/* Caret Blinker */}
+            <span className="inline-block w-1.5 h-5 bg-brand-blue ml-0.5 align-middle animate-pulse" />
+          </div>
+        </div>
       </div>
     </main>
   );
