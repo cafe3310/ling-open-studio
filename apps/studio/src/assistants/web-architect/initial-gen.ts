@@ -11,7 +11,7 @@ import { designs, techStacks } from "./prompts";
  * Expands user prompt into a structured Product Plan (PRD).
  */
 async function ideaExpanderNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ring_2_5_1T", {
+  const model = createChatModel("Ling_2_5_1T", {
     temperature: 0.7
   });
   const userPrompt = (state.messages.find(m => m._getType() === 'human')?.content as string) || "";
@@ -37,7 +37,7 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
 
   const response = await tracedInvoke(model, [
     new SystemMessage(templateB)
-  ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ring_2_5_1T" });
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_2_5_1T" });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "idea_expander" };
@@ -55,7 +55,7 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
  * Translates the product idea into a visual spec (Markdown).
  */
 async function styleDirectorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ring_2_5_1T", {
+  const model = createChatModel("Ling_2_5_1T", {
     temperature: 0.7
   });
   const userPrompt = state.user_request || "";
@@ -84,7 +84,7 @@ async function styleDirectorNode(state: WebGenState, config: any) {
   const response = await tracedInvoke(model, [
     new SystemMessage(templateA),
     new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
-  ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ring_2_5_1T" });
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ling_2_5_1T" });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "style_director" };
