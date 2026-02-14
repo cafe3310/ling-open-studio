@@ -51,6 +51,9 @@
     - [ ] **上下文工程与 Boilerplates**：
         - [ ] 创建 `lib/boilerplates/index.ts` 定义 HTML/React 模板
         - [ ] 定义 `Aesthetic Definitions` 美学风格库
+        - [ ] **新增视觉风格扩展** (Glassmorphism, Cyber-Glow, Bento Modern) <!-- id: 30 -->
+            - [ ] 在 `designs.ts` 中添加风格定义 <!-- id: 31 -->
+            - [ ] 在 `WebConfig` 中集成新图标并适配 UI <!-- id: 32 -->
     - [ ] **Graph 逻辑实现 (双 Graph 架构)**：
         - [ ] 实现 `InitialGenGraph` (Idea Expander -> Style Director -> Code Generator)
         - [ ] 实现 `RefineGraph` (Editor Node)
