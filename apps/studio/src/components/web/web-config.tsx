@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useModelStore } from "@/lib/store";
-import { designs, techStacks } from "@/assistants/web-architect/prompts";
+import { WebArchitect } from "@/lib/prompts";
+const { designs, techStacks } = WebArchitect;
 
 export const WebConfig: React.FC = () => {
   const { designId, setDesignId, techStackId, setTechStackId } = useModelStore();

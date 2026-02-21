@@ -7,70 +7,11 @@ import { ToolContextDef } from "./index";
  * Format: === tool_name: primary_argument ===\n[Body Content]
  */
 export const ToolCtxDelimited: ToolContextDef = {
-  conceptFragment: `
-### TOOL_USE_PROTOCOL (DELIMITED BLOCKS)
-You have access to interactive tools. To use a tool, especially those requiring large code blocks, use the following delimited format:
-
-- **Format**:
-  === tool_name: primary_argument ===
-  [Optional Body Content]
-
-- **Rules**:
-  - The "primary_argument" is typically a file path, a label, or a target name.
-  - The "Body Content" starts on the line immediately after the "===" marker.
-  - The block ends at the next "===" marker or the end of the message.
-  - Use this instead of JSON to avoid escaping issues with HTML/JS code.
-`,
-
-  exampleFragment: `
-#### Call Examples:
-
-1. Writing a file:
-=== write_file: /index.html ===
-<!DOCTYPE html>
-<html>...</html>
-
-2. Executing JavaScript:
-=== browser_js_eval: calculate_sum ===
-const a = 1;
-const b = 2;
-return a + b;
-
-3. Reading a file:
-=== read_file: /config.json ===
-`,
-
-  returnExampleFragment: `
-#### Result Example (System will provide this):
-=== content: /index.html ===
-[Actual file content here]
-
-OR
-
-=== result: calculate_sum ===
-3
-`,
-
-  availableToolsFragment: (tools) => {
-    return `#### Available Tools:\n${tools.map(t => `- ${t.name}: ${t.desc}`).join("\n")}`;
-  },
-
-  spliceSystemPrompt: (baseSystem, tools) => {
-    if (tools.length === 0) return baseSystem;
-    return [
-      baseSystem,
-      ToolCtxDelimited.conceptFragment,
-      ToolCtxDelimited.availableToolsFragment(tools),
-      ToolCtxDelimited.exampleFragment,
-      ToolCtxDelimited.returnExampleFragment
-    ].join("\n\n");
-  },
-
   formatToolResult: (toolCallId, result) => {
     // If the result looks like code or large text, use 'content' label, otherwise 'result'
     const isLarge = typeof result === 'string' && (result.length > 100 || result.includes('\n'));
     const label = isLarge ? 'content' : 'result';
-    return `=== ${label}: ${toolCallId} ===\n${result}`;
+    return `=== \${label}: \${toolCallId} ===\n\${result}`;
   },
 
   handleUserRejection: (responseWithTool) => {

@@ -3,8 +3,9 @@ import { WebGenState } from "./state";
 import { createChatModel } from "@/lib/model";
 import { tracedInvoke } from "@/lib/model-tracer";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { vfsTools, ToolCtxDelimited } from "@/lib/tools";
-import { techStacks } from "./prompts";
+import { vfsTools } from "@/lib/tools";
+import { WebArchitect } from "@/lib/prompts";
+import { PromptBuilder } from "@/lib/prompt-engine";
 
 /**
  * Node D (as per Design Doc): Editor / Reader
@@ -19,23 +20,20 @@ async function editorNode(state: WebGenState, config: any) {
   // For now, we assume /index.html is the main target.
   const fileList = ["/index.html"];
 
-  const templateD = `
-You are a Code Maintenance Engineer. The user wants to modify an existing website or fix a bug.
+  const baseTemplateD = WebArchitect.WEB_EDITOR_PROMPT(
+    state.messages[state.messages.length - 1].content as string,
+    fileList
+  );
 
-### 1. USER INSTRUCTION
-${state.messages[state.messages.length - 1].content}
-
-### 2. CURRENT PROJECT FILES
-${fileList.join("\n")}
-
-### 3. INSTRUCTIONS
-- Identify which file(s) contain the code that needs modification.
-- Usually, this is "/index.html".
-- Use the read_file tool to read the content of the file.
-`.trim();
+  const enhancedPromptD = PromptBuilder.build({
+    basePrompt: baseTemplateD,
+    tools: vfsTools.map(t => ({ name: t.name, desc: t.desc })),
+    paradigm: 'delimited',
+    includeStandardConstraints: true
+  });
 
   const response = await tracedInvoke(model, [
-    new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateD, vfsTools)),
+    new SystemMessage(enhancedPromptD),
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_2_5_1T" });
 
@@ -56,27 +54,22 @@ async function resolverNode(state: WebGenState, config: any) {
   const model = createChatModel("Ling_2_5_1T", {
     temperature: 0.1
   });
-  const selectedTechStack = techStacks.find(ts => ts.id === state.config?.techStackId) || techStacks[0];
+  const selectedTechStack = WebArchitect.techStacks.find(ts => ts.id === state.config?.techStackId) || WebArchitect.techStacks[0];
 
-  const templateE = `
-You are a Senior Frontend Developer. You have been provided with the content of a file and a specific modification request.
+  const baseTemplateE = WebArchitect.WEB_RESOLVER_PROMPT(
+    state.messages[state.messages.length - 2].content as string,
+    selectedTechStack.description_style
+  );
 
-### 1. USER INSTRUCTION
-${state.messages[state.messages.length - 2].content} (Previous instruction)
-
-### 2. TECHNICAL RULES
-- Tech Stack Guide: ${selectedTechStack.description_style}
-- Do NOT output partial diffs. Output the ENTIRE file content.
-
-### 3. INSTRUCTIONS
-- Analyze the code provided in the conversation history (as content blocks).
-- Apply the requested changes accurately.
-- Ensure the resulting page is still valid and functional.
-- Write the final updated code back to the file using the write_file tool.
-`.trim();
+  const enhancedPromptE = PromptBuilder.build({
+    basePrompt: baseTemplateE,
+    tools: vfsTools.map(t => ({ name: t.name, desc: t.desc })),
+    paradigm: 'delimited',
+    includeStandardConstraints: true
+  });
 
   const response = await tracedInvoke(model, [
-    new SystemMessage(ToolCtxDelimited.spliceSystemPrompt(templateE, vfsTools)),
+    new SystemMessage(enhancedPromptE),
     ...state.messages
   ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_2_5_1T" });
 

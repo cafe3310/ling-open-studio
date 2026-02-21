@@ -46,31 +46,6 @@ export interface ToolParsedResult {
  */
 export interface ToolContextDef {
   /**
-   * Descriptive fragment about the concept of tool use.
-   */
-  conceptFragment: string;
-
-  /**
-   * Example fragment showing how to call a tool.
-   */
-  exampleFragment: string;
-
-  /**
-   * Example fragment showing what a tool return looks like.
-   */
-  returnExampleFragment: string;
-
-  /**
-   * Function to generate the list of available tools formatted for the prompt.
-   */
-  availableToolsFragment: (tools: ToolDef[]) => string;
-
-  /**
-   * Function to splice the base system prompt with tool context.
-   */
-  spliceSystemPrompt: (baseSystem: string, tools: ToolDef[]) => string;
-
-  /**
    * Function to format a tool execution result into a user message content.
    */
   formatToolResult: (toolCallId: string, result: any) => string;

@@ -14,7 +14,5 @@ export const FORMATTING_CONSTRAINTS = `
 ### Formatting Rules
 - Use valid Markdown for documents.
 - Use properly escaped strings in JSON if applicable.
-- Ensure code blocks are correctly labeled with their language (e.g., 
-```html, 
-```typescript).
+- Ensure code blocks are correctly labeled with their language (e.g., \`\`\`html, \`\`\`typescript).
 `.trim();

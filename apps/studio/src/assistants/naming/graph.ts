@@ -1,6 +1,7 @@
 import { StateGraph, Annotation } from "@langchain/langgraph";
 import { BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { createChatModel } from "@/lib/model";
+import { Naming } from "@/lib/prompts";
 
 // Define the state for the naming graph
 export const NamingGraphState = Annotation.Root({
@@ -22,14 +23,7 @@ async function generateTitleNode(state: typeof NamingGraphState.State) {
     .map(m => `${m._getType() === 'human' ? 'User' : 'Assistant'}: ${m.content}`)
     .join('\n');
 
-  const fullPrompt =
-    "Task: Generate a very concise title (2-5 words) for the following conversation.\n" +
-    "Constraint: The title must be in the same language as the conversation.\n" +
-    "Do not use quotes, periods or prefixes like 'Title:'.\n" +
-    "Respond with the title text.\n\n" +
-    "<conversation>\n" +
-    conversationText.slice(0, 120) +
-    "</conversation>\n";
+  const fullPrompt = Naming.NAMING_SUMMARIZER_PROMPT(conversationText.slice(0, 120));
 
   const response = await model.invoke([new SystemMessage(fullPrompt)]);
 

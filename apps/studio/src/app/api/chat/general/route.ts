@@ -2,28 +2,32 @@ import { assistantRegistry } from "@/assistants/registry";
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { ReasoningSplitter } from "@/lib/assistant-utils/reasoning-splitter";
-import { getToolContextStrategy } from "@/lib/tools/registry";
 import { vfsTools } from "@/lib/tools/tools-vfs";
 import { jsTools } from "@/lib/tools/tools-js";
 import { ToolDef } from "@/lib/tools";
+import { PromptBuilder, ToolParadigm } from "@/lib/prompt-engine";
 
 export async function POST(req: Request) {
   const { messages, config } = await req.json();
   const mode = 'chat'; // Dedicated endpoint for chat
   
-  const { enabledTools = [], toolParadigm = 'json', systemPrompt: baseSystemPrompt } = config;
+  const { enabledTools = [], toolParadigm = 'json', systemPrompt: baseSystemPrompt = "" } = config;
 
-  console.log(`[API/Chat/General] Starting request, tools: ${enabledTools}, paradigm: ${toolParadigm}`);
+  console.log(`[API/Chat/General] Starting request, tools: \${enabledTools}, paradigm: \${toolParadigm}`);
 
-  // 1. Select Tool Strategy and Collection
-  const strategy = getToolContextStrategy(toolParadigm);
+  // 1. Collect Active Tools
   const activeTools: ToolDef[] = [];
   if (enabledTools.includes('vfs')) activeTools.push(...vfsTools);
   if (enabledTools.includes('js')) activeTools.push(...jsTools);
 
-  // 2. Build Enhanced System Prompt (Inject Protocol)
-  const enhancedSystemPrompt = strategy.spliceSystemPrompt(baseSystemPrompt, activeTools);
-  console.log("[API/Chat/General] Enhanced System Prompt Injected");
+  // 2. Build Enhanced System Prompt using PromptBuilder
+  const enhancedSystemPrompt = PromptBuilder.build({
+    basePrompt: baseSystemPrompt,
+    tools: activeTools.map(t => ({ name: t.name, desc: t.desc })),
+    paradigm: toolParadigm as ToolParadigm,
+    includeStandardConstraints: true
+  });
+  console.log("[API/Chat/General] Enhanced System Prompt Injected via PromptBuilder");
 
   // 3. Prepare Messages for Model
   const langchainMessages = await toBaseMessages(messages);
