@@ -4,23 +4,23 @@
 
 export const XML_PROTOCOL_CONCEPT = `
 ### TOOL_USE_PROTOCOL
-You can invoke tools by wrapping your request in <tool_code> tags.
+You can invoke tools by wrapping your request in <tool_call> tags.
 - **Workflow**:
   1. Think about the parameters needed.
-  2. Output <tool_code> containing the tool name and parameters in JSON format.
+  2. Output <tool_call> containing the tool name and parameters in JSON format.
   3. Stop generating and wait for the user to provide <tool_result>.
 `.trim();
 
 export const XML_PROTOCOL_EXAMPLES = `
 #### Call Example:
-<tool_code>
+<tool_call>
 {
   "name": "tool_name",
   "arguments": {
     "arg1": "value"
   }
 }
-</tool_code>
+</tool_call>
 `.trim();
 
 export const XML_PROTOCOL_RETURNS = `

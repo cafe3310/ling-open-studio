@@ -2,7 +2,7 @@ import { ToolContextDef } from "./index";
 
 /**
  * Strategy: XML Tag
- * 
+ *
  * Instructs the model to use XML tags for tool invocation.
  * Best for: Anthropic Claude, DeepSeek R1, Mistral.
  */
@@ -18,7 +18,7 @@ export const ToolCtxXml: ToolContextDef = {
   },
 
   parseResponse: (content) => {
-    const pattern = /<tool_code>([\s\S]*?)<\/tool_code>/g;
+    const pattern = /<tool_call>([\s\S]*?)<\/tool_call>/g;
     const matches = [...content.matchAll(pattern)];
     if (matches.length === 0) return null;
 

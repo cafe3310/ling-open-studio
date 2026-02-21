@@ -10,6 +10,7 @@ You have access to a set of client-side tools. To use a tool, you must output a 
   - Do NOT wrap the JSON in markdown code blocks.
   - The JSON must be valid and parsable.
   - You can invoke multiple tools in one array if needed.
+  - RESPOND IN 'ASSISTANT' ROLE ONLY, DO NOT RESPOND IN 'TOOL' ROLE.
 `.trim();
 
 export const JSON_PROTOCOL_EXAMPLES = `
