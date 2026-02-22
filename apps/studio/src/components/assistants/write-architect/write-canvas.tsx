@@ -16,7 +16,7 @@ export const WriteCanvas = () => {
         <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 backdrop-blur border border-brand-border/50 rounded-full shadow-sm">
           <div className="size-1.5 bg-amber-500 rounded-full animate-pulse" />
           <span className="text-[9px] font-bold text-brand-dark/40 uppercase tracking-widest">
-            Preprocessing... (Dev Placeholder)
+            Preprocessing... (Live Analysis)
           </span>
         </div>
       </div>
@@ -153,8 +153,29 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
       setGhostText(null);
     } else if (e.key === "Tab" && runtime.ghostText) {
       e.preventDefault();
-      const newContent = segment.content + (segment.content.endsWith(" ") ? "" : " ") + runtime.ghostText;
-      updateSegment(segment.id, { content: newContent });
+      
+      // Smart merging: find overlap between segment end and ghost start
+      const currentContent = segment.content.trimEnd();
+      const ghost = runtime.ghostText.trimStart();
+      
+      // Simple overlap detection (last 10 chars vs start of ghost)
+      let mergedContent = segment.content;
+      let overlapFound = false;
+      
+      for (let len = Math.min(currentContent.length, ghost.length, 20); len > 0; len--) {
+        const tail = currentContent.slice(-len);
+        if (ghost.startsWith(tail)) {
+          mergedContent = currentContent + ghost.slice(len);
+          overlapFound = true;
+          break;
+        }
+      }
+
+      if (!overlapFound) {
+        mergedContent = segment.content + (segment.content.endsWith(" ") ? "" : " ") + runtime.ghostText;
+      }
+
+      updateSegment(segment.id, { content: mergedContent });
       setGhostText(null);
     } else if (e.key === "Backspace" && segment.content === "") {
       if (segments.length > 1) {
@@ -192,12 +213,6 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
 
     // Clear ghost text on change
     setGhostText(null);
-
-    // Debounce preprocessing (2s)
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    debounceTimerRef.current = setTimeout(() => {
-      triggerPreprocessing();
-    }, 2000);
 
     // Debounce prediction (500ms) - only if cursor is likely at the end
     if (predictTimerRef.current) clearTimeout(predictTimerRef.current);
@@ -243,7 +258,7 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
             <div className="flex items-center gap-2">
               <Sparkles className="w-3 h-3 text-amber-500 animate-pulse fill-amber-500/20" />
               <span className="text-[10px] font-mono font-bold text-amber-600/40 uppercase tracking-widest italic">
-                ...正在续写
+                ...Predicting
               </span>
             </div>
           ) : runtime.ghostText ? (
@@ -252,7 +267,7 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
                 "{runtime.ghostText}"
               </span>
               <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-brand-blue/5 border border-brand-blue/10 rounded text-[9px] font-bold text-brand-blue/60 uppercase tracking-tight">
-                按 Tab 接受
+                Press Tab to Accept
               </div>
             </div>
           ) : null}
