@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 
 export const WriteCanvas = () => {
-  const { segments, activeSegmentId, setActiveSegment, splitSegment, updateSegment } = useWriteStore();
+  const { segments, activeSegmentId, setActiveSegment, splitSegment, updateSegment, metadata } = useWriteStore();
   
   return (
     <main className="flex-1 bg-white relative overflow-y-auto">
@@ -47,7 +47,7 @@ export const WriteCanvas = () => {
 const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: boolean }) => {
   const { 
     segments, setActiveSegment, splitSegment, updateSegment, deleteSegment, 
-    runtime, setGhostText, setPredicting 
+    runtime, setGhostText, setPredicting, metadata 
   } = useWriteStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -80,7 +80,7 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prefixContext: content,
-          storySummary: useWriteStore.getState().metadata.summary,
+          storySummary: metadata.summary,
         }),
       });
 
@@ -111,7 +111,7 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
           body: JSON.stringify({
             segmentId: segment.id,
             content: segment.content,
-            storySummary: useWriteStore.getState().metadata.summary,
+            storySummary: metadata.summary,
           }),
         });
 
