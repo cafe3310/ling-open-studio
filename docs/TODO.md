@@ -51,9 +51,9 @@
     - [ ] **上下文工程与 Boilerplates**：
         - [ ] 创建 `lib/boilerplates/index.ts` 定义 HTML/React 模板
         - [ ] 定义 `Aesthetic Definitions` 美学风格库
-        - [x] **新增视觉风格扩展** (Glassmorphism, Cyber-Glow, Bento Modern) <!-- id: 30 -->
-            - [x] 在 `designs.ts` 中添加风格定义 <!-- id: 31 -->
-            - [x] 在 `WebConfig` 中集成新图标并适配 UI <!-- id: 32 -->
+        - [x] **新增视觉风格扩展与优化** (Glassmorphism, Flat VTuber, Bento Modern) <!-- id: 30 -->
+            - [x] 在 `designs.ts` 中添加风格定义 (含 Flat VTuber 饱和度与装饰优化) <!-- id: 31 -->
+            - [x] 在 `WebConfig` 中集成新图标并适配 UI (修复了 Code 图标导入错误) <!-- id: 32 -->
     - [ ] **Graph 逻辑实现 (双 Graph 架构)**：
         - [ ] 实现 `InitialGenGraph` (Idea Expander -> Style Director -> Code Generator)
         - [ ] 实现 `RefineGraph` (Editor Node)
@@ -91,6 +91,6 @@
     - [ ] 实现专属 LangGraph 逻辑（处理灵感生成与续写）
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
-- [x] **多模型配置支持** (设计模型 vs 代码模型)
+- [x] **多模型配置支持** (设计模型 vs 代码模型，修复了 API 透传与类型错误)
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
 - [ ] **最终测试**：进行全流程的功能回归测试 <!-- id: 19 -->
