@@ -15,15 +15,28 @@ import {
 export class VirtualFileSystem implements IVirtualFileSystem {
   private db: VFSDatabase;
   private listeners: Map<string, Set<() => void>> = new Map();
+  private initPromise: Promise<void> | null = null;
 
   constructor() {
     this.db = new VFSDatabase();
   }
 
   async init(): Promise<void> {
-    console.log('[VFS] Initializing database...');
-    await this.db.init();
-    console.log('[VFS] Database initialized.');
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = (async () => {
+      console.log('[VFS] Initializing database...');
+      await this.db.init();
+      console.log('[VFS] Database initialized.');
+    })();
+    return this.initPromise;
+  }
+
+  private async ensureInit(): Promise<void> {
+    if (!this.initPromise) {
+      await this.init();
+    } else {
+      await this.initPromise;
+    }
   }
 
   private notify(threadId: string) {
@@ -49,6 +62,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
     content: string | ArrayBuffer, 
     source: 'agent' | 'user' = 'agent'
   ): Promise<VirtualFile> {
+    await this.ensureInit();
     const normalizedPath = normalizePath(path);
     console.log(`[VFS] Writing file: ${normalizedPath} (source: ${source}, thread: ${threadId})`);
     this.checkPermission(normalizedPath, source);
@@ -82,6 +96,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async readFile(threadId: string, path: string): Promise<VirtualFile> {
+    await this.ensureInit();
     const normalizedPath = normalizePath(path);
     console.log(`[VFS] Reading file: ${normalizedPath} (thread: ${threadId})`);
     const file = await this.db.getByPath(threadId, normalizedPath);
@@ -93,12 +108,14 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async exists(threadId: string, path: string): Promise<boolean> {
+    await this.ensureInit();
     const normalizedPath = normalizePath(path);
     const file = await this.db.getByPath(threadId, normalizedPath);
     return !!file;
   }
 
   async deleteFile(threadId: string, path: string, source: 'agent' | 'user' = 'user'): Promise<void> {
+    await this.ensureInit();
     const normalizedPath = normalizePath(path);
     console.log(`[VFS] Deleting file: ${normalizedPath} (source: ${source})`);
     this.checkPermission(normalizedPath, source);
@@ -116,6 +133,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
     newPath: string, 
     source: 'agent' | 'user' = 'user'
   ): Promise<VirtualFile> {
+    await this.ensureInit();
     const normalizedOld = normalizePath(oldPath);
     const normalizedNew = normalizePath(newPath);
     console.log(`[VFS] Renaming: ${normalizedOld} -> ${normalizedNew}`);
@@ -150,12 +168,14 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async stat(threadId: string, path: string): Promise<Omit<VirtualFile, 'content'>> {
+    await this.ensureInit();
     const file = await this.readFile(threadId, path);
     const { content, ...rest } = file;
     return rest;
   }
 
   async listDir(threadId: string, dirPath: string = '/'): Promise<VirtualFile[]> {
+    await this.ensureInit();
     let normalizedDir = normalizePath(dirPath);
     if (normalizedDir !== '/' && !normalizedDir.endsWith('/')) {
       normalizedDir += '/';
@@ -165,6 +185,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async deleteDir(threadId: string, dirPath: string, source: 'agent' | 'user' = 'user'): Promise<void> {
+    await this.ensureInit();
     let normalizedDir = normalizePath(dirPath);
     if (normalizedDir !== '/' && !normalizedDir.endsWith('/')) {
       normalizedDir += '/';
@@ -176,6 +197,7 @@ export class VirtualFileSystem implements IVirtualFileSystem {
   }
 
   async clearThread(threadId: string): Promise<void> {
+    await this.ensureInit();
     await this.db.deleteFilesByPrefix(threadId, '');
     this.notify(threadId);
   }
