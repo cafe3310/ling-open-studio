@@ -25,6 +25,8 @@ export const WebConfig: React.FC = () => {
       case 'Wind': return Wind;
       case 'Zap': return Zap;
       case 'Grid': return LayoutGrid;
+      case 'Sparkles': return Sparkles;
+      case 'Palette': return Palette;
       default: return Palette;
     }
   };

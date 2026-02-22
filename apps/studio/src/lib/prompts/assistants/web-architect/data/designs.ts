@@ -20,13 +20,13 @@ export const designs: DesignOption[] = [
     description_font: "Clean and legible sans-serif like Inter. High letter spacing for a modern tech feel."
   },
   {
-    id: "cyber-glow",
-    name: "Cyber-Glow",
-    icon: "Zap",
-    description_general: "Futuristic, high-energy, and dark-centric. Inspired by cyberpunk aesthetics.",
-    description_color: "Dark Slate backgrounds (#0F172A). Neon Cyan (#22D3EE) or Magenta (#F02AD3) as primary accent colors.",
-    description_shape: "Small border radius (rounded-md). Text and borders should have glow effects (drop-shadow).",
-    description_font: "Technical monospace fonts like Space Mono or modern bold sans-serif. Uppercase for navigation."
+    id: "flat-vtuber",
+    name: "Flat VTuber",
+    icon: "Sparkles",
+    description_general: "Clean, fresh, and rounded. Inspired by VTubers or virtual streamers. A balance of 'kawaii' minimalism and vibrant pop accents. Incorporate playful decorative elements in the background.",
+    description_color: "Background: Pure white or very light color. Accents: Use high-saturation 'pop' colors for CTAs. Use at least two distinct color systems.",
+    description_shape: "Maximum roundness (rounded-3xl or rounded-full). Decorative background elements like subtle floating dots, sparkles (using SVG or CSS), or soft organic shapes are encouraged to break flat surfaces. Avoid shadows to maintain a clean, flat aesthetic. Use accent colors for buttons and interactive elements to create visual interest without overwhelming the design.",
+    description_font: "Clean, rounded sans-serif typography like Quicksand or Varela Round. Maintain high readability with ample whitespace."
   },
   {
     id: "bento",

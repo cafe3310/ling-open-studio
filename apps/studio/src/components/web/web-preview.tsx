@@ -159,7 +159,7 @@ export const WebPreview: React.FC = () => {
                 <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center z-50 transition-all">
                   <div className="flex flex-col items-center gap-4 bg-white/90 p-6 rounded-2xl shadow-xl border border-brand-border">
                       <Loader2 className="w-8 h-8 text-brand-blue animate-spin" />
-                      <span className="font-serif italic text-brand-dark text-lg">Syncing VFS...</span>
+                      <span className="font-medium text-brand-dark text-sm">Designing and Generating</span>
                   </div>
                 </div>
             )}
