@@ -34,7 +34,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   designId: 'minimalist',
   techStackId: 'html-tailwind',
   designModelId: 'Ling_2_5_1T',
-  codeModelId: 'Ling_2_5_1T',
+  codeModelId: 'Ling_1T',
   setModelId: (modelId) => set({ modelId }),
   setSystemPrompt: (systemPrompt) => set({ systemPrompt }),
   setTemperature: (temperature) => set({ temperature }),
