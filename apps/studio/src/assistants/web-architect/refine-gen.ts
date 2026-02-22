@@ -12,7 +12,8 @@ import { PromptBuilder } from "@/lib/prompt-engine";
  * Identifies which files need to be read to satisfy user feedback.
  */
 async function editorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", {
+  const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
+  const model = createChatModel(modelKey, {
     temperature: 0.7
   });
 
@@ -35,7 +36,7 @@ async function editorNode(state: WebGenState, config: any) {
   const response = await tracedInvoke(model, [
     new SystemMessage(enhancedPromptD),
     ...state.messages.slice(0, -1) // Context without the latest prompt to keep focus
-  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: "Ling_2_5_1T" });
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebEditor" }, modelId: modelKey });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };
@@ -51,7 +52,8 @@ async function editorNode(state: WebGenState, config: any) {
  * Receives the file content and applies the modification.
  */
 async function resolverNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", {
+  const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
+  const model = createChatModel(modelKey, {
     temperature: 0.1
   });
   const selectedTechStack = WebArchitect.techStacks.find(ts => ts.id === state.config?.techStackId) || WebArchitect.techStacks[0];
@@ -71,7 +73,7 @@ async function resolverNode(state: WebGenState, config: any) {
   const response = await tracedInvoke(model, [
     new SystemMessage(enhancedPromptE),
     ...state.messages
-  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: "Ling_2_5_1T" });
+  ], { graphInfo: { graphName: "RefineGen", nodeName: "WebResolver" }, modelId: modelKey });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "refine" };

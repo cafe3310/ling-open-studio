@@ -25,6 +25,10 @@ export async function POST(req: Request) {
         modelId: config.modelId,
         designId: config.designId,
         techStackId: config.techStackId,
+        designModelId: config.designModelId,
+        codeModelId: config.codeModelId,
+        temperature: config.temperature,
+        toolParadigm: config.toolParadigm,
       }
     },
     {

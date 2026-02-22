@@ -12,7 +12,8 @@ import { PromptBuilder } from "@/lib/prompt-engine";
  * Expands user prompt into a structured Product Plan (PRD).
  */
 async function ideaExpanderNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", {
+  const modelKey = (state.config?.designModelId as any) || "Ling_2_5_1T";
+  const model = createChatModel(modelKey, {
     temperature: 0.7
   });
   const userPrompt = (state.messages.find(m => m._getType() === 'human')?.content as string) || "";
@@ -24,7 +25,7 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
 
   const response = await tracedInvoke(model, [
     new SystemMessage(templateB)
-  ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: "Ling_2_5_1T" });
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "IdeaExpander" }, modelId: modelKey });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "idea_expander" };
@@ -42,7 +43,8 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
  * Translates the product idea into a visual spec (Markdown).
  */
 async function styleDirectorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", {
+  const modelKey = (state.config?.designModelId as any) || "Ling_2_5_1T";
+  const model = createChatModel(modelKey, {
     temperature: 0.7
   });
   const userPrompt = state.user_request || "";
@@ -54,7 +56,7 @@ async function styleDirectorNode(state: WebGenState, config: any) {
   const response = await tracedInvoke(model, [
     new SystemMessage(templateA),
     new HumanMessage(`Product Plan Context:\n${state.product_plan}`)
-  ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: "Ling_2_5_1T" });
+  ], { graphInfo: { graphName: "InitialGen", nodeName: "StyleDirector" }, modelId: modelKey });
 
   // Add node metadata for UI identification
   (response as any).metadata = { langgraph_node: "style_director" };
@@ -71,7 +73,8 @@ async function styleDirectorNode(state: WebGenState, config: any) {
  * Combines Plan and Style into a final implementation call.
  */
 async function codeGeneratorNode(state: WebGenState, config: any) {
-  const model = createChatModel("Ling_2_5_1T", {
+  const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
+  const model = createChatModel(modelKey, {
     temperature: 0.5
   });
   const userPrompt = state.user_request || "";
@@ -89,7 +92,7 @@ async function codeGeneratorNode(state: WebGenState, config: any) {
     const response = await tracedInvoke(model, [
       new SystemMessage(enhancedPromptC),
       new HumanMessage(`User Original Intent: ${userPrompt}`)
-    ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: "Ling_2_5_1T" });
+    ], { graphInfo: { graphName: "InitialGen", nodeName: "CodeGenerator" }, modelId: modelKey });
 
     console.log(`[InitialGen/CodeGenerator] Node execution finished. Output length: ${response.content.toString().length}`);
 

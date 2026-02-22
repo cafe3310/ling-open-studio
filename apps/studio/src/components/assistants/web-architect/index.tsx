@@ -13,7 +13,7 @@ import { WebConfig } from "@/components/web/web-config";
 import { ThreadTitleAutomator } from "@/components/studio/thread-title-automator";
 
 export const WebArchitectAssistant = () => {
-  const { modelId, temperature, designId, techStackId } = useModelStore();
+  const { modelId, temperature, designId, techStackId, designModelId, codeModelId } = useModelStore();
 
   const runtime = useChatRuntime({
     transport: useMemo(() => new AssistantChatTransport({
@@ -24,10 +24,12 @@ export const WebArchitectAssistant = () => {
           temperature,
           designId,
           techStackId,
+          designModelId,
+          codeModelId,
           toolParadigm: 'xml', // Switched to 'xml' for better compatibility with Ling-2.5
         }
       }
-    }), [modelId, temperature, designId, techStackId]),
+    }), [modelId, temperature, designId, techStackId, designModelId, codeModelId]),
   });
 
   return (

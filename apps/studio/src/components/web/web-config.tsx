@@ -1,15 +1,21 @@
 import React from 'react';
-import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon } from 'lucide-react';
+import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon, Code } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useModelStore } from "@/lib/store";
 import { WebArchitect } from "@/lib/prompts";
+import { MODEL_CONFIG } from "@/lib/model";
 const { designs, techStacks } = WebArchitect;
 
 export const WebConfig: React.FC = () => {
-  const { designId, setDesignId, techStackId, setTechStackId } = useModelStore();
+  const { 
+    designId, setDesignId, 
+    techStackId, setTechStackId,
+    designModelId, setDesignModelId,
+    codeModelId, setCodeModelId
+  } = useModelStore();
 
   const getIcon = (iconName: string): LucideIcon => {
     switch (iconName) {
@@ -22,6 +28,11 @@ export const WebConfig: React.FC = () => {
       default: return Palette;
     }
   };
+
+  const modelOptions = Object.entries(MODEL_CONFIG.models).map(([key, def]) => ({
+    id: key,
+    name: def.displayName
+  }));
 
   return (
     <aside className="w-72 border-l border-brand-border bg-white flex flex-col h-full overflow-y-auto hide-scrollbar">
@@ -77,9 +88,56 @@ export const WebConfig: React.FC = () => {
                   <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
                 </div>
               </div>
-              <p className="text-[9px] text-slate-400 px-1 leading-normal italic">
-                * Selected stack will be used by the Agent.
-              </p>
+            </div>
+          </section>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Design Model */}
+          <section>
+            <h3 className="text-[11px] font-bold text-brand-gray uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Sparkles className="w-3 h-3 text-brand-blue" />
+              Design Model
+            </h3>
+            <div className="space-y-2">
+              <div className="relative">
+                <select 
+                  value={designModelId}
+                  onChange={(e) => setDesignModelId(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs text-brand-dark appearance-none focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all cursor-pointer"
+                >
+                  {modelOptions.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Code Model */}
+          <section>
+            <h3 className="text-[11px] font-bold text-brand-gray uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Code className="w-3 h-3 text-brand-blue" />
+              Code Model
+            </h3>
+            <div className="space-y-2">
+              <div className="relative">
+                <select 
+                  value={codeModelId}
+                  onChange={(e) => setCodeModelId(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs text-brand-dark appearance-none focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all cursor-pointer"
+                >
+                  {modelOptions.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                </div>
+              </div>
             </div>
           </section>
         </div>

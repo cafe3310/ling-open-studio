@@ -9,6 +9,8 @@ interface ModelConfig {
   // Web Generation Specific
   designId?: string;
   techStackId?: string;
+  designModelId?: string;
+  codeModelId?: string;
 }
 
 interface ModelStore extends ModelConfig {
@@ -19,6 +21,8 @@ interface ModelStore extends ModelConfig {
   setToolParadigm: (paradigm: 'json' | 'xml' | 'text') => void;
   setDesignId: (id: string) => void;
   setTechStackId: (id: string) => void;
+  setDesignModelId: (id: string) => void;
+  setCodeModelId: (id: string) => void;
 }
 
 export const useModelStore = create<ModelStore>((set) => ({
@@ -29,6 +33,8 @@ export const useModelStore = create<ModelStore>((set) => ({
   toolParadigm: 'json',
   designId: 'minimalist',
   techStackId: 'html-tailwind',
+  designModelId: 'Ling_2_5_1T',
+  codeModelId: 'Ling_2_5_1T',
   setModelId: (modelId) => set({ modelId }),
   setSystemPrompt: (systemPrompt) => set({ systemPrompt }),
   setTemperature: (temperature) => set({ temperature }),
@@ -36,4 +42,6 @@ export const useModelStore = create<ModelStore>((set) => ({
   setToolParadigm: (toolParadigm) => set({ toolParadigm }),
   setDesignId: (designId) => set({ designId }),
   setTechStackId: (techStackId) => set({ techStackId }),
+  setDesignModelId: (designModelId) => set({ designModelId }),
+  setCodeModelId: (codeModelId) => set({ codeModelId }),
 }));
