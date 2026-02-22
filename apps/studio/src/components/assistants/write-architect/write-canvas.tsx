@@ -20,9 +20,9 @@ export const WriteCanvas = () => {
         </div>
       </div>
 
-      <div className="max-w-[1000px] mx-auto py-24 px-12 lg:px-20 grid grid-cols-[1fr_280px] gap-16">
+      <div className="max-w-[1200px] mx-auto min-h-full py-24 px-12 lg:px-20 grid grid-cols-[1fr_280px] gap-16">
         {/* Left Column: Editor Canvas */}
-        <div className="space-y-4">
+        <div className="space-y-1">
           {segments.map((segment) => (
             <SegmentEditor 
               key={segment.id} 
@@ -33,9 +33,9 @@ export const WriteCanvas = () => {
         </div>
 
         {/* Right Column: Preprocessing Insights (Margin) */}
-        <div className="space-y-4 pt-1 border-l border-brand-border/30 pl-8">
+        <div className="space-y-1 pt-1 border-l border-brand-border/30 pl-8">
           {segments.map((segment) => (
-            <InsightMargin key={`insight-${segment.id}`} segment={segment} />
+            <InsightMargin key={`insight-${segment.id}`} segment={segment} isActive={activeSegmentId === segment.id} />
           ))}
         </div>
       </div>
@@ -44,7 +44,7 @@ export const WriteCanvas = () => {
 };
 
 const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: boolean }) => {
-  const { setActiveSegment, splitSegment, updateSegment } = useWriteStore();
+  const { segments, setActiveSegment, splitSegment, updateSegment, deleteSegment } = useWriteStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -55,6 +55,13 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [segment.content]);
+
+  // Focus management
+  useEffect(() => {
+    if (isActive && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isActive]);
 
   const triggerPreprocessing = async () => {
     if (segment.content.trim() === "") return;
@@ -94,16 +101,48 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const cursorPosition = e.currentTarget.selectionStart;
+    const isAtStart = cursorPosition === 0;
+    const isAtEnd = cursorPosition === segment.content.length;
+    
+    const currentIndex = segments.findIndex(s => s.id === segment.id);
+    const prevSegment = segments[currentIndex - 1];
+    const nextSegment = segments[currentIndex + 1];
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const cursorPosition = e.currentTarget.selectionStart;
       const contentBefore = segment.content.substring(0, cursorPosition);
       const contentAfter = segment.content.substring(cursorPosition);
       
       splitSegment(segment.id, contentBefore, contentAfter);
-      
-      // Trigger precompute for the segment that was just "finished"
       triggerPreprocessing();
+    } else if (e.key === "Backspace" && segment.content === "") {
+      if (segments.length > 1) {
+        e.preventDefault();
+        const focusTarget = prevSegment || nextSegment;
+        deleteSegment(segment.id);
+        if (focusTarget) setActiveSegment(focusTarget.id);
+      }
+    } else if (e.key === "ArrowUp") {
+      if (prevSegment) {
+        e.preventDefault();
+        setActiveSegment(prevSegment.id);
+      }
+    } else if (e.key === "ArrowDown") {
+      if (nextSegment) {
+        e.preventDefault();
+        setActiveSegment(nextSegment.id);
+      }
+    } else if (e.key === "ArrowLeft" && isAtStart) {
+      if (prevSegment) {
+        e.preventDefault();
+        setActiveSegment(prevSegment.id);
+      }
+    } else if (e.key === "ArrowRight" && isAtEnd) {
+      if (nextSegment) {
+        e.preventDefault();
+        setActiveSegment(nextSegment.id);
+      }
     }
   };
 
@@ -119,7 +158,13 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
   };
 
   return (
-    <div className="relative group min-h-[1.9em]">
+    <div 
+      onClick={() => setActiveSegment(segment.id)}
+      className={cn(
+        "relative group px-2 py-1 rounded-sm transition-all duration-200 cursor-text",
+        isActive ? "bg-brand-blue/[0.03] ring-1 ring-brand-blue/5 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.05)]" : "hover:bg-brand-dark/[0.01]"
+      )}
+    >
       <textarea
         ref={textareaRef}
         value={segment.content}
@@ -127,7 +172,7 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
         onKeyDown={handleKeyDown}
         onFocus={() => setActiveSegment(segment.id)}
         onBlur={() => {
-          setActiveSegment(null);
+          // Note: Don't unset activeSegment here to keep the highlight during preprocessing
           triggerPreprocessing();
         }}
         className={cn(
@@ -136,11 +181,11 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
           segment.status === 'processing' && "text-amber-600/50",
           segment.status === 'completed' && "text-indigo-900/70"
         )}
-        placeholder={isActive ? "Start writing segment..." : ""}
+        placeholder={(isActive || (segments.length === 1 && segment.content === "")) ? "Once upon a time..." : ""}
         rows={1}
       />
       {segment.status === 'raw' && isActive && (
-        <span className="absolute bottom-2 right-0 text-[10px] text-brand-dark/10 font-mono pointer-events-none">
+        <span className="absolute bottom-1 right-2 text-[10px] text-brand-dark/10 font-mono pointer-events-none">
           {/* TODO: Placeholder for Ghost Text (PhantomWeaver) */}
           暂时未开发: Ghost Text
         </span>
@@ -149,9 +194,12 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
   );
 };
 
-const InsightMargin = ({ segment }: { segment: TextSegment }) => {
+const InsightMargin = ({ segment, isActive }: { segment: TextSegment; isActive: boolean }) => {
   return (
-    <div className="min-h-[1.9em] flex flex-col justify-start">
+    <div className={cn(
+      "flex flex-col justify-start px-2 py-1 rounded-sm transition-all duration-200 min-h-[1.9em]",
+      isActive && "bg-brand-blue/[0.03]"
+    )}>
       {segment.status === 'completed' ? (
         <div className="space-y-3 animate-in fade-in slide-in-from-right-2 duration-700">
           <div className="space-y-1">
