@@ -13,7 +13,7 @@ import { PromptBuilder } from "@/lib/prompt-engine";
  */
 async function ideaExpanderNode(state: WebGenState, config: any) {
   const modelKey = (state.config?.designModelId as any) || "Ling_2_5_1T";
-  const model = createChatModel(modelKey, {
+  const model = createChatModel(modelKey as any, {
     temperature: 0.7
   });
   const userPrompt = (state.messages.find(m => m._getType() === 'human')?.content as string) || "";
@@ -44,7 +44,7 @@ async function ideaExpanderNode(state: WebGenState, config: any) {
  */
 async function styleDirectorNode(state: WebGenState, config: any) {
   const modelKey = (state.config?.designModelId as any) || "Ling_2_5_1T";
-  const model = createChatModel(modelKey, {
+  const model = createChatModel(modelKey as any, {
     temperature: 0.7
   });
   const userPrompt = state.user_request || "";
@@ -74,7 +74,7 @@ async function styleDirectorNode(state: WebGenState, config: any) {
  */
 async function codeGeneratorNode(state: WebGenState, config: any) {
   const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
-  const model = createChatModel(modelKey, {
+  const model = createChatModel(modelKey as any, {
     temperature: 0.5
   });
   const userPrompt = state.user_request || "";

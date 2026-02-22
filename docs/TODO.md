@@ -75,10 +75,10 @@
 - [x] 重构工具定义为简化结构 (`lib/tools/index.ts`)
 - [x] 实现 `ToolContextDef` 范式策略 (JSON/XML)
 - [x] 在 `app/api/chat/route.ts` 中集成 `ToolContextBuilder` 动态注入系统提示词
-- [ ] 实现前端 `ToolCallRenderer` 拦截并渲染 JSON/XML 调用块
-- [ ] 实现 `browser_js_eval` 工具在前端的执行逻辑
-- [ ] 实现 VFS 工具 (list/read/write) 在前端的执行逻辑
-    - [ ] 实现半自动 Loop 结果回填逻辑 (将结果作为 User 消息发送)
+- [x] 实现前端 `ToolCallRenderer` 拦截并渲染 JSON/XML 调用块
+- [x] 实现 `browser_js_eval` 工具在前端的执行逻辑 (修复了结果展示问题)
+- [x] 实现 VFS 工具 (list/read/write) 在前端的执行逻辑 (修复了数据库初始化报错)
+    - [x] 实现半自动 Loop 结果回填逻辑 (将结果作为 User 消息发送)
 
 ## 第五阶段：Model Write (写作助手) 复刻与填充 <!-- id: 26 -->
 - [ ] **UI 架构复刻**： <!-- id: 27 -->
@@ -91,6 +91,6 @@
     - [ ] 实现专属 LangGraph 逻辑（处理灵感生成与续写）
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
-
+- [x] **多模型配置支持** (设计模型 vs 代码模型)
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
 - [ ] **最终测试**：进行全流程的功能回归测试 <!-- id: 19 -->

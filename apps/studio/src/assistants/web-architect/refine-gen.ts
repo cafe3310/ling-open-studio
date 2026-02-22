@@ -13,7 +13,7 @@ import { PromptBuilder } from "@/lib/prompt-engine";
  */
 async function editorNode(state: WebGenState, config: any) {
   const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
-  const model = createChatModel(modelKey, {
+  const model = createChatModel(modelKey as any, {
     temperature: 0.7
   });
 
@@ -53,7 +53,7 @@ async function editorNode(state: WebGenState, config: any) {
  */
 async function resolverNode(state: WebGenState, config: any) {
   const modelKey = (state.config?.codeModelId as any) || "Ling_2_5_1T";
-  const model = createChatModel(modelKey, {
+  const model = createChatModel(modelKey as any, {
     temperature: 0.1
   });
   const selectedTechStack = WebArchitect.techStacks.find(ts => ts.id === state.config?.techStackId) || WebArchitect.techStacks[0];
