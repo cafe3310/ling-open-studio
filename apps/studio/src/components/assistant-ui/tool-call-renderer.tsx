@@ -106,6 +106,7 @@ export const ToolCallRenderer = ({
 
   const isAlreadyExecuted = executionInfo.isExecuted;
   const [status, setStatus] = useState<"idle" | "running" | "success" | "error">("idle");
+  const [localResults, setLocalResults] = useState<Record<string, any>>({});
 
   // Sync local status with history check
   React.useEffect(() => {
@@ -135,6 +136,13 @@ export const ToolCallRenderer = ({
       }));
 
       console.log("[ToolCallRenderer] All executions finished. Results:", results);
+      
+      // Update local results first to ensure immediate UI feedback
+      const newLocalResults: Record<string, any> = {};
+      results.forEach(r => {
+        newLocalResults[r.id] = r.result;
+      });
+      setLocalResults(newLocalResults);
       setStatus("success");
       
       // Mark as executed locally to prevent loops in silent mode
@@ -155,7 +163,12 @@ export const ToolCallRenderer = ({
       setStatus("error");
       setErrorMessage(e.message);
     }
-  }, [toolCalls, tools, aui, strategy]);
+  }, [toolCalls, tools, aui, strategy, silent, messageId]);
+
+  // Merge results from thread history and local execution state
+  const mergedResults = React.useMemo(() => {
+    return { ...executionInfo.results, ...localResults };
+  }, [executionInfo.results, localResults]);
 
   // 3. Auto-execution logic
   React.useEffect(() => {
@@ -173,7 +186,7 @@ export const ToolCallRenderer = ({
   if (isRunning || !toolCalls || toolCalls.length === 0) return null;
 
 
-  const showResults = status === "success" && Object.keys(executionInfo.results).length > 0;
+  const showResults = status === "success" && Object.keys(mergedResults).length > 0;
 
   if (hideDetails) {
     return (
@@ -257,9 +270,9 @@ export const ToolCallRenderer = ({
                   </div>
                   <pre
                     className="text-[11px] font-mono text-brand-dark/90 whitespace-pre-wrap break-all bg-white/50 p-1.5 rounded">
-                    {typeof executionInfo.results[call.callId] === "object"
-                      ? JSON.stringify(executionInfo.results[call.callId], null, 2)
-                      : String(executionInfo.results[call.callId])}
+                    {typeof mergedResults[call.callId] === "object"
+                      ? JSON.stringify(mergedResults[call.callId], null, 2)
+                      : String(mergedResults[call.callId])}
                   </pre>
                 </div>
               ))}
