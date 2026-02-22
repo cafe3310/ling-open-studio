@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import { APP_CONFIG } from "@/lib/config";
 
-export type Tab = 'chat' | 'web' | 'write' | 'filesystem';
+export type Tab = 'chat' | 'web' | 'write' | 'writeV2' | 'filesystem';
 
 interface TopNavigationProps {
   activeTab: Tab;
@@ -16,7 +16,8 @@ export function TopNavigation({ activeTab, onTabChange }: TopNavigationProps) {
   const allNavItems: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: 'chat', label: 'Model Chat', icon: MessageSquare },
     { id: 'web', label: 'Model Web', icon: Code },
-    { id: 'write', label: 'Model Write', icon: PenTool },
+    { id: 'write', label: 'Write (Ref)', icon: PenTool },
+    { id: 'writeV2', label: 'Model Write', icon: PenTool },
     { id: 'filesystem', label: 'Agent Filesystem', icon: HardDrive },
   ];
 

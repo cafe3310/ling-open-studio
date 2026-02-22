@@ -1,7 +1,7 @@
 import { simpleGraph } from "./general-chat/graph";
 import { webGenGraph } from "./web-architect/graph";
 
-export type AssistantMode = 'chat' | 'web-gen' | 'write-gen';
+export type AssistantMode = 'chat' | 'web-gen' | 'write-gen' | 'write-gen-v2';
 
 export interface AssistantEntry {
   id: string;
@@ -23,7 +23,12 @@ const registry: Record<AssistantMode, AssistantEntry> = {
   'write-gen': {
     id: 'write-architect-ref',
     graph: simpleGraph, // Placeholder using simpleGraph for now
-    description: 'Creative writing and storytelling assistant'
+    description: 'Creative writing and storytelling assistant (Reference)'
+  },
+  'write-gen-v2': {
+    id: 'write-architect',
+    graph: simpleGraph, // Placeholder for new graph
+    description: 'Next-gen creative writing assistant (Development)'
   }
 };
 

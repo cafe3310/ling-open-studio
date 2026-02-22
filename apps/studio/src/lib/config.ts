@@ -9,8 +9,8 @@ export const APP_CONFIG = {
     tabs: {
       chat: true,
       web: true,
-      // Hide Write tab in production as it's still in development
-      write: !isProduction,
+      write: !isProduction,   // Reference (ref)
+      writeV2: !isProduction, // New (development)
       filesystem: true,
     }
   }
