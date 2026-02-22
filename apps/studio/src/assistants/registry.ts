@@ -21,7 +21,7 @@ const registry: Record<AssistantMode, AssistantEntry> = {
     description: 'Specialized web application generator'
   },
   'write-gen': {
-    id: 'write-architect',
+    id: 'write-architect-ref',
     graph: simpleGraph, // Placeholder using simpleGraph for now
     description: 'Creative writing and storytelling assistant'
   }

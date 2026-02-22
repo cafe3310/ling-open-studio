@@ -5,7 +5,7 @@ import { TopNavigation, Tab } from "./top-navigation";
 import { FilesystemTab } from "@/components/filesystem/filesystem-tab";
 import { GeneralChatAssistant } from "@/components/assistants/general-chat";
 import { WebArchitectAssistant } from "@/components/assistants/web-architect";
-import { WriteArchitectAssistant } from "@/components/assistants/write-architect";
+import { WriteArchitectAssistant } from "@/components/assistants/write-architect-ref";
 
 export const StudioShell = () => {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
