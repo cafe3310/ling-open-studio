@@ -20,6 +20,10 @@ interface WriteState {
   };
   segments: TextSegment[];
   activeSegmentId: string | null;
+  runtime: {
+    ghostText: string | null;
+    isPredicting: boolean;
+  };
   
   // Actions
   updateMetadata: (metadata: Partial<WriteState["metadata"]>) => void;
@@ -27,6 +31,8 @@ interface WriteState {
   updateSegment: (id: string, updates: Partial<TextSegment>) => void;
   deleteSegment: (id: string) => void;
   setActiveSegment: (id: string | null) => void;
+  setGhostText: (text: string | null) => void;
+  setPredicting: (isPredicting: boolean) => void;
   splitSegment: (id: string, contentBefore: string, contentAfter: string) => void;
 }
 
@@ -43,6 +49,10 @@ export const useWriteStore = create<WriteState>((set) => ({
     },
   ],
   activeSegmentId: null,
+  runtime: {
+    ghostText: null,
+    isPredicting: false,
+  },
 
   updateMetadata: (metadata) =>
     set((state) => ({
@@ -75,6 +85,14 @@ export const useWriteStore = create<WriteState>((set) => ({
     })),
 
   setActiveSegment: (id) => set({ activeSegmentId: id }),
+
+  setGhostText: (text) => set((state) => ({ 
+    runtime: { ...state.runtime, ghostText: text } 
+  })),
+
+  setPredicting: (isPredicting) => set((state) => ({ 
+    runtime: { ...state.runtime, isPredicting } 
+  })),
 
   splitSegment: (id, contentBefore, contentAfter) =>
     set((state) => {

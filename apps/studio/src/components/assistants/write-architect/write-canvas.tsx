@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from "react";
 import { useWriteStore, TextSegment } from "./store";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
 
 export const WriteCanvas = () => {
   const { segments, activeSegmentId, setActiveSegment, splitSegment, updateSegment } = useWriteStore();
@@ -44,9 +45,13 @@ export const WriteCanvas = () => {
 };
 
 const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: boolean }) => {
-  const { segments, setActiveSegment, splitSegment, updateSegment, deleteSegment } = useWriteStore();
+  const { 
+    segments, setActiveSegment, splitSegment, updateSegment, deleteSegment, 
+    runtime, setGhostText, setPredicting 
+  } = useWriteStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const predictTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -62,6 +67,35 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
       textareaRef.current.focus();
     }
   }, [isActive]);
+
+  const triggerPrediction = async (content: string) => {
+    if (content.trim().length < 5) return;
+    
+    setPredicting(true);
+    setGhostText(null);
+
+    try {
+      const response = await fetch("/api/chat/write/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prefixContext: content,
+          storySummary: useWriteStore.getState().metadata.summary,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (isActive) { // Only set if we are still on the same segment
+          setGhostText(result.ghostText);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to predict:", error);
+    } finally {
+      setPredicting(false);
+    }
+  };
 
   const triggerPreprocessing = async () => {
     if (segment.content.trim() === "") return;
@@ -116,6 +150,12 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
       
       splitSegment(segment.id, contentBefore, contentAfter);
       triggerPreprocessing();
+      setGhostText(null);
+    } else if (e.key === "Tab" && runtime.ghostText) {
+      e.preventDefault();
+      const newContent = segment.content + (segment.content.endsWith(" ") ? "" : " ") + runtime.ghostText;
+      updateSegment(segment.id, { content: newContent });
+      setGhostText(null);
     } else if (e.key === "Backspace" && segment.content === "") {
       if (segments.length > 1) {
         e.preventDefault();
@@ -150,11 +190,22 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
     const newContent = e.target.value;
     updateSegment(segment.id, { content: newContent, status: "raw" });
 
+    // Clear ghost text on change
+    setGhostText(null);
+
     // Debounce preprocessing (2s)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(() => {
       triggerPreprocessing();
     }, 2000);
+
+    // Debounce prediction (500ms) - only if cursor is likely at the end
+    if (predictTimerRef.current) clearTimeout(predictTimerRef.current);
+    predictTimerRef.current = setTimeout(() => {
+      if (isActive) {
+        triggerPrediction(newContent);
+      }
+    }, 500);
   };
 
   return (
@@ -174,6 +225,8 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
         onBlur={() => {
           // Note: Don't unset activeSegment here to keep the highlight during preprocessing
           triggerPreprocessing();
+          setGhostText(null);
+          setPredicting(false);
         }}
         className={cn(
           "w-full resize-none overflow-hidden bg-transparent border-none focus:ring-0 p-0 font-mono text-[15px] leading-[1.9] antialiased transition-colors duration-700 outline-none block h-auto",
@@ -184,11 +237,26 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
         placeholder={(isActive || (segments.length === 1 && segment.content === "")) ? "Once upon a time..." : ""}
         rows={1}
       />
-      {segment.status === 'raw' && isActive && (
-        <span className="absolute bottom-1 right-2 text-[10px] text-brand-dark/10 font-mono pointer-events-none">
-          {/* TODO: Placeholder for Ghost Text (PhantomWeaver) */}
-          暂时未开发: Ghost Text
-        </span>
+      {isActive && (runtime.isPredicting || runtime.ghostText) && (
+        <div className="mt-2 flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-300">
+          {runtime.isPredicting ? (
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-3 h-3 text-amber-500 animate-pulse fill-amber-500/20" />
+              <span className="text-[10px] font-mono font-bold text-amber-600/40 uppercase tracking-widest italic">
+                ...正在续写
+              </span>
+            </div>
+          ) : runtime.ghostText ? (
+            <div className="flex items-center gap-3 group/ghost">
+              <span className="text-[12px] font-mono text-brand-dark/30 italic leading-relaxed">
+                "{runtime.ghostText}"
+              </span>
+              <div className="flex items-center gap-1.5 px-1.5 py-0.5 bg-brand-blue/5 border border-brand-blue/10 rounded text-[9px] font-bold text-brand-blue/60 uppercase tracking-tight">
+                按 Tab 接受
+              </div>
+            </div>
+          ) : null}
+        </div>
       )}
     </div>
   );
