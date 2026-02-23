@@ -2,47 +2,62 @@
 
 ## 项目概述
 
-`ling-open-studio` 是一个专为 "ling 系列 LLM" 设计的一站式 Playground 应用。
+`ling-open-studio` 是一个专为 Ling 系列 LLM 设计的一站式 Playground 应用。
 
 它是一个将 [assistant-ui](https://github.com/Yonom/assistant-ui) 与 [LangGraph](https://langchain-ai.github.io/langgraph/) 集成的项目。
 
 该应用提供了一个基于 React 和 Next.js 构建的现代多 Tab 聊天界面（Chat, Web, Write），并通过 LangGraph 后端来管理 Agent 的状态和执行。
 
-## 项目技能 (Agent Skills)
+## Agent 协作指南
 
-本项目使用 `doc-todo-log-loop` Agent Skill 进行任务管理和日志记录。
+### 沟通规范
 
-## 文档规范
+- Agent 与用户使用中文进行沟通。
+- 表达应简洁、直接且技术化。避免任何寒暄或废话。
 
-本项目文档
+### Agent Skill
 
-- 本项目的文档都在 `docs/` 目录下，文件名规范 `%Y-%m-%d-%H-%M-<title>.md`。
-- 开发日志文档的命名格式为 `%Y-%m-%d-%H-%M-开发日志.md`。
+- 本项目使用 `doc-todo-log-loop` 技能（本地技能，[在线版本](https://github.com/cafe3310/public-agent-skills)）进行任务管理和过程追踪。
+- 在完成一个有意义的工作块后，必须记录开发日志。
 
-参考项目文档
+### 关键目录
 
-- 本项目在启动阶段参考了其他本地项目和开源项目，在分析过程中创建的文档在 `docs/reference/` 目录下。
-- 参考项目: `ling-model-judge` 和 `osw-studio`
+本项目使用 monorepo 结构，主要目录包括：
 
-Inbox 目录
+`根目录`: 项目配置和文档。
+- `./docs/` : 存放设计文档、开发日志和研究资料。
+- `./.github/` : GitHub 相关配置（如工作流、Issue 模板等）。
 
-- `docs/inbox/` 目录作为用户提供文件（文档、图片等）的存放位置，供 Agent 读取和处理。
-- Agent 处理内容后应该将结果存放到 `docs/` 中并按项目文档命名格式重命名。
+`./apps/studio/`: 主应用 package。
 
-## 项目资源与文档 (Resources)
+### 文档规范
+
+- 文件名格式使用: `%Y-%m-%d-%H-%M-<标题>.md`。
+- 在新文档开始处引用来源文档，以保持知识的可追溯性。
+- Inbox 目录: `docs/inbox/` 目录作为用户提供文件（文档、图片等）的存放位置，供 Agent 读取和处理。处理之前应移动文件至 `docs/` 并合理重命名。
+
+### 项目架构与背景
+
+- 后端架构: 采用模块化 LangGraph 实现。基于 assistant 身份功能纵向切分目录，每个 Agent 拥有独立的子目录（如 `src/assistants/write-architect/preprocessor/`）。
+- 前端架构: 使用 Zustand 进行状态管理，`assistant-ui` 处理聊天交互，自定义组件实现特定领域的写作/网页画布，同样基于 assisatnt 身份进行功能划分。
+- 存储: IndexedDB (浏览器端 VFS)。
+
+### 技术栈
+
+整体遵循 Tailwind CSS 4, React 19 (Next.js 16) 和 LangGraph 模式。
+
+- 框架: Next.js 16 (App Router) - Standalone 输出模式
+- 语言: TypeScript
+- UI 组件: React 19, Tailwind CSS 4, Radix UI, Shadcn UI
+- AI/聊天接口: `@assistant-ui/react`, `@assistant-ui/react-ai-sdk`, `@assistant-ui/react-langgraph`
+
+验证机制: 每一项变更都必须经过实证验证。对于 Bug 修复，需先复现失败场景。
+
+### 参考 API 文档
 
 - **assistant-ui 文档**: [https://www.assistant-ui.com/docs/api-reference/overview](https://www.assistant-ui.com/docs/api-reference/overview)
 - **AI SDK 参考**: [https://ai-sdk.dev/docs/reference](https://ai-sdk.dev/docs/reference)
 - **LangGraph 文档**: [https://langchain-ai.github.io/langgraph/](https://langchain-ai.github.io/langgraph/)
-
-### 技术栈
-
-*   **框架:** Next.js 16 (App Router) - Standalone 输出模式
-*   **语言:** TypeScript
-*   **UI 组件:** React 19, Tailwind CSS 4, Radix UI, Shadcn UI
-*   **AI/聊天接口:** `@assistant-ui/react`, `@assistant-ui/react-ai-sdk`, `@assistant-ui/react-langgraph`
-*   **Agent 编排:** `@langchain/langgraph` (Local Graph Definition)
-*   **存储:** IndexedDB (浏览器端 VFS)
 
 ## 构建与运行
 
@@ -50,50 +65,17 @@ Inbox 目录
 
 确保已安装 Node.js 和 pnpm。
 
-### 环境配置
-
-在根目录下创建一个 `.env.local` 文件，并添加以下配置项：
+在 `apps/studio` 目录下创建一个 `.env.local` 文件，参考 `.env.example` 来配置 OpenAI 兼容 API 密钥和其他相关设置。
 
 ```env
 OPENAI_API_KEY=your_openai_compatible_api_key
 OPENAI_API_BASE=your_api_endpoint
+... 还有更多配置
 ```
 
-### 脚本命令
+常用命令
 
 *   **安装依赖:** `pnpm install`
-*   **启动开发服务器:** `pnpm run dev` (运行于 `http://localhost:3000`)
-*   **生产环境构建:** `pnpm run build`
-*   **启动生产服务器:** `pnpm run start`
+*   **启动开发服务器:** `pnpm run dev`
 *   **代码 Lint 检查:** `pnpm run lint`
 *   **代码格式化:** `pnpm run prettier:fix`
-
-## 项目结构与关键文件
-
-本项目采用“以助手为中心”的垂直切分架构，所有源码位于 `src/` 目录下：
-
-*   **`src/app/`**: Next.js 路由层 (Server Components)。仅负责路由分发和基础布局。
-    *   `page.tsx`: 主入口，渲染 `StudioShell`。
-    *   `layout.tsx`: 全局根布局。
-*   **`src/assistants/`**: 业务助手层 (Server Logic)。
-    *   `registry.ts`: 助手注册表，根据请求模式路由到不同的 Graph。
-    *   `general-chat/`: 通用对话助手逻辑。
-    *   `web-architect/`: 网页生成助手逻辑。
-    *   `naming/`: 标题自动命名逻辑。
-*   **`src/components/`**: UI 组件层 (Client Components)。
-    *   `studio/`: 全局 Studio 框架组件（`StudioShell`, `TopNavigation`, `ModelConfig`）。
-    *   `web/`: Model Web 专属 UI 模块。
-    *   `assistant-ui/`: 聊天界面基础组件。
-    *   `filesystem/`: 虚拟文件系统可视化组件。
-*   **`src/lib/`**: 共享基础设施。
-    *   `vfs/`: 浏览器端虚拟文件系统核心。
-    *   `tools/`: Agent Tool 调用解析与 VFS 工具集。
-    *   `assistant-utils/`: 推理过程解析等通用助手工具。
-    *   `model.ts`: 模型工厂配置。
-
-## 开发规范
-
-*   **样式:** 使用 Tailwind CSS v4。
-*   **状态管理:** 前端使用 Zustand (`lib/store.ts`) 管理模型参数，后端依赖 LangGraph 状态机。
-*   **隔离性:** 不同 Tab 使用独立的 `AssistantRuntime` 实例，通过 `StudioShell` 统一调度。
-*   **持久化:** 所有生成的文件均存储在浏览器 IndexedDB 中，支持跨会话访问。
