@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Code, PenTool, Layout, Box, HardDrive } from 'lucide-react';
+import { MessageSquare, Code, PenTool, Layout, Box, HardDrive, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -51,14 +51,19 @@ export function TopNavigation({ activeTab, onTabChange }: TopNavigationProps) {
         ))}
       </nav>
 
-      <div className="flex items-center gap-4">
-        <div className="hidden md:flex items-center gap-2 text-xs text-brand-gray">
-           <div className="w-2 h-2 rounded-full bg-green-500"></div>
-           System Operational
-        </div>
-        <div className="w-8 h-8 rounded-full bg-brand-dark text-white flex items-center justify-center font-serif text-sm">
-          U
-        </div>
+      <div className="flex items-center">
+        <a
+          href="https://huggingface.co/inclusionAI"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-border bg-white hover:border-brand-blue/30 hover:bg-brand-blue/[0.02] transition-all duration-300"
+        >
+          <ExternalLink className="w-3.5 h-3.5 text-brand-blue" />
+          <span className="text-xs font-medium text-brand-gray group-hover:text-brand-dark transition-colors">
+            Ling Series Models
+          </span>
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-blue opacity-40 group-hover:opacity-100 transition-opacity"></div>
+        </a>
       </div>
     </header>
   );

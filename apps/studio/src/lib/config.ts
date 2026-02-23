@@ -10,7 +10,7 @@ export const APP_CONFIG = {
       chat: true,
       web: true,
       write: !isProduction,   // Reference (ref)
-      writeV2: !isProduction, // New (development)
+      writeV2: true,          // New (development) - Enabled for production
       filesystem: true,
     }
   }
