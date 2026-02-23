@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 
 export type SegmentStatus = "raw" | "processing" | "completed";
+export type EntryCategory = 'worldSettings' | 'characters' | 'concepts';
+export type EntryType = 'manual' | 'auto';
 
 export interface TextSegment {
   id: string;
@@ -13,12 +15,28 @@ export interface TextSegment {
   } | null;
 }
 
+export interface KnowledgeEntry {
+  id: string;
+  name: string;
+  category: EntryCategory;
+  type: EntryType;
+  definition: string;
+  suggestions: string[];
+  isApproved: boolean;
+  lastDetectedAt: number;
+}
+
 interface WriteState {
   metadata: {
     title: string;
     summary: string;
   };
   segments: TextSegment[];
+  knowledgeBase: {
+    worldSettings: KnowledgeEntry[];
+    characters: KnowledgeEntry[];
+    concepts: KnowledgeEntry[];
+  };
   activeSegmentId: string | null;
   runtime: {
     ghostText: string | null;
@@ -34,6 +52,11 @@ interface WriteState {
   setGhostText: (text: string | null) => void;
   setPredicting: (isPredicting: boolean) => void;
   splitSegment: (id: string, contentBefore: string, contentAfter: string) => void;
+  
+  // KB Actions
+  upsertEntry: (entry: Partial<KnowledgeEntry> & { name: string; category: EntryCategory }) => void;
+  approveEntry: (id: string, category: EntryCategory) => void;
+  deleteEntry: (id: string, category: EntryCategory) => void;
 }
 
 export const useWriteStore = create<WriteState>((set) => ({
@@ -48,6 +71,11 @@ export const useWriteStore = create<WriteState>((set) => ({
       status: "raw",
     },
   ],
+  knowledgeBase: {
+    worldSettings: [],
+    characters: [],
+    concepts: [],
+  },
   activeSegmentId: null,
   runtime: {
     ghostText: null,
@@ -121,4 +149,50 @@ export const useWriteStore = create<WriteState>((set) => ({
         activeSegmentId: newId 
       };
     }),
+
+  upsertEntry: (entry) =>
+    set((state) => {
+      const category = entry.category;
+      const list = [...state.knowledgeBase[category]];
+      const index = list.findIndex(e => e.name.toLowerCase() === entry.name.toLowerCase());
+
+      if (index > -1) {
+        list[index] = { ...list[index], ...entry };
+      } else {
+        list.push({
+          id: uuidv4(),
+          type: 'auto',
+          definition: '',
+          suggestions: [],
+          isApproved: false,
+          lastDetectedAt: Date.now(),
+          ...entry
+        } as KnowledgeEntry);
+      }
+
+      return {
+        knowledgeBase: {
+          ...state.knowledgeBase,
+          [category]: list
+        }
+      };
+    }),
+
+  approveEntry: (id, category) =>
+    set((state) => ({
+      knowledgeBase: {
+        ...state.knowledgeBase,
+        [category]: state.knowledgeBase[category].map(e => 
+          e.id === id ? { ...e, type: 'manual', isApproved: true } : e
+        )
+      }
+    })),
+
+  deleteEntry: (id, category) =>
+    set((state) => ({
+      knowledgeBase: {
+        ...state.knowledgeBase,
+        [category]: state.knowledgeBase[category].filter(e => e.id !== id)
+      }
+    })),
 }));

@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { BookOpen, Globe, Plus } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 import { useWriteStore } from './store';
 import { cn } from "@/lib/utils";
+import { KnowledgeBase } from './knowledge/KnowledgeBase';
 
 export const WriteLeftSidebar = () => {
   const { metadata, updateMetadata } = useWriteStore();
@@ -83,19 +84,9 @@ export const WriteLeftSidebar = () => {
           </Dialog>
         </section>
 
-        {/* Knowledge Base Section - Placeholder for now */}
+        {/* Knowledge Base Section */}
         <section className="space-y-6">
-          <div className="flex items-center justify-between opacity-50">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark/30 flex items-center gap-2">
-              <Globe className="w-3 h-3" />
-              Knowledge Base
-            </h3>
-          </div>
-          <div className="p-4 border border-dashed border-brand-border rounded-xl flex items-center justify-center text-center">
-            <span className="text-[10px] font-bold text-brand-dark/20 uppercase tracking-[0.2em] italic">
-              暂时未开发: Knowledge Base
-            </span>
-          </div>
+          <KnowledgeBase />
         </section>
       </div>
     </aside>
