@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { preprocessorGraph } from "@/assistants/write-architect/preprocessor/graph";
 import { keeperGraph } from "@/assistants/write-architect/keeper/graph";
+import { PreprocessorState } from "@/assistants/write-architect/preprocessor/state";
+import { KeeperState } from "@/assistants/write-architect/keeper/state";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +17,7 @@ export async function POST(req: NextRequest) {
       content,
       storySummary,
       status: "running"
-    });
+    }) as unknown as PreprocessorState;
 
     const extractedNames: string[] = precomputeResult.extractedEntities || [];
     
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
         context: content,
         storySummary,
         status: "running"
-      });
+      }) as unknown as KeeperState;
       newEntries = keeperResult.entries || [];
     }
 

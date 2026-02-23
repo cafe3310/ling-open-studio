@@ -28,7 +28,7 @@ export const predictorNode = async (state: WeaverState) => {
   const context = buildWritingContext(state.prefixContext, state.storySummary);
   
   const response = await model.invoke(await PREDICT_PROMPT.format({ context }));
-  let ghostText = response.content.toString().trim();
+  let ghostText: string | null = response.content.toString().trim();
   
   // Clean up potential AI prefixes or "..."
   if (ghostText === "...") ghostText = null;
