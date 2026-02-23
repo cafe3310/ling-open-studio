@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import type { FC } from "react";
 
+import { ThreadSuggestions } from "./suggestions/ThreadSuggestions";
+
 interface ThreadSuggestion {
   readonly title: string;
   readonly label: string;
@@ -45,12 +47,11 @@ interface ThreadSuggestion {
 }
 
 interface ThreadProps {
-  suggestions?: readonly ThreadSuggestion[];
   forcedParadigm?: string;
   silent?: boolean;
 }
 
-export const Thread: FC<ThreadProps> = ({ suggestions, forcedParadigm, silent }) => {
+export const Thread: FC<ThreadProps> = ({ forcedParadigm, silent }) => {
   return (
     <ThreadPrimitive.Root
       className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
@@ -63,7 +64,7 @@ export const Thread: FC<ThreadProps> = ({ suggestions, forcedParadigm, silent })
         className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth px-4 pt-4"
       >
         <AssistantIf condition={({ thread }) => thread.isEmpty}>
-          <ThreadWelcome suggestions={suggestions} />
+          <ThreadWelcome />
         </AssistantIf>
 
         <ThreadPrimitive.Messages
@@ -97,7 +98,7 @@ const ThreadScrollToBottom: FC = () => {
   );
 };
 
-const ThreadWelcome: FC<ThreadProps> = ({ suggestions }) => {
+const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-(--thread-max-width) grow flex-col">
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
@@ -110,49 +111,7 @@ const ThreadWelcome: FC<ThreadProps> = ({ suggestions }) => {
           </p>
         </div>
       </div>
-      <ThreadSuggestions suggestions={suggestions} />
-    </div>
-  );
-};
-
-const SUGGESTIONS = [
-  {
-    title: "What's the weather",
-    label: "in San Francisco?",
-    prompt: "What's the weather in San Francisco?",
-  },
-  {
-    title: "Explain React hooks",
-    label: "like useState and useEffect",
-    prompt: "Explain React hooks like useState and useEffect",
-  },
-] as const;
-
-const ThreadSuggestions: FC<ThreadProps> = ({ suggestions = SUGGESTIONS }) => {
-  return (
-    <div className="aui-thread-welcome-suggestions grid w-full @md:grid-cols-2 gap-2 pb-4">
-      {suggestions.map((suggestion, index) => (
-        <div
-          key={suggestion.prompt}
-          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200"
-          style={{ animationDelay: `${100 + index * 50}ms` }}
-        >
-          <ThreadPrimitive.Suggestion prompt={suggestion.prompt} send asChild>
-            <Button
-              variant="ghost"
-              className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
-              aria-label={suggestion.prompt}
-            >
-              <span className="aui-thread-welcome-suggestion-text-1 font-medium">
-                {suggestion.title}
-              </span>
-              <span className="aui-thread-welcome-suggestion-text-2 text-muted-foreground">
-                {suggestion.label}
-              </span>
-            </Button>
-          </ThreadPrimitive.Suggestion>
-        </div>
-      ))}
+      <ThreadSuggestions />
     </div>
   );
 };
