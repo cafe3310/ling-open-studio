@@ -289,6 +289,23 @@ const SegmentEditor = ({
     }, 500);
   };
 
+  const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    const start = target.selectionStart;
+    const end = target.selectionEnd;
+    
+    if (start !== end) {
+      useWriteStore.getState().setSelection({
+        segmentId: segment.id,
+        text: segment.content.substring(start, end),
+        start,
+        end
+      });
+    } else {
+      useWriteStore.getState().setSelection(null);
+    }
+  };
+
   return (
     <div 
       onClick={() => setActiveSegment(segment.id)}
@@ -301,6 +318,7 @@ const SegmentEditor = ({
         ref={textareaRef}
         value={segment.content}
         onChange={handleChange}
+        onSelect={handleSelect}
         onKeyDown={handleKeyDown}
         onFocus={() => setActiveSegment(segment.id)}
         onBlur={() => {

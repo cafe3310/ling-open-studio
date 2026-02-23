@@ -34,6 +34,56 @@ INSTRUCTION:
 - Output ONLY the story text, no meta-commentary.
 `);
 
+export const REWRITE_PROMPT = PromptTemplate.fromTemplate(`
+You are a master editor. Your task is to rewrite the SELECTED TEXT to improve its prose, rhythm, and emotional impact, while keeping the original meaning intact.
+
+<story_foundation>
+{storySummary}
+</story_foundation>
+
+<active_lore>
+{activeLore}
+</active_lore>
+
+<manuscript_context>
+{recentText}
+</manuscript_context>
+
+SELECTED TEXT TO REWRITE:
+"{selectedText}"
+
+INSTRUCTION:
+- Rewrite the SELECTED TEXT to be more evocative and polished.
+- Maintain consistency with the surrounding <manuscript_context>.
+- Deeply incorporate the directions in <creative_directives> if any: {activeInspirations}
+- Output ONLY the rewritten text, no quotes or meta-commentary.
+`);
+
+export const EXPAND_PROMPT = PromptTemplate.fromTemplate(`
+You are a master novelist. Your task is to expand the SELECTED TEXT by adding sensory details, internal monologue, or descriptive depth.
+
+<story_foundation>
+{storySummary}
+</story_foundation>
+
+<active_lore>
+{activeLore}
+</active_lore>
+
+<manuscript_context>
+{recentText}
+</manuscript_context>
+
+SELECTED TEXT TO EXPAND:
+"{selectedText}"
+
+INSTRUCTION:
+- Expand the SELECTED TEXT by adding 1-2 sentences of rich detail.
+- Maintain the voice and style of the surrounding <manuscript_context>.
+- Deeply incorporate the directions in <creative_directives> if any: {activeInspirations}
+- Output ONLY the expanded text, no quotes or meta-commentary.
+`);
+
 export const narrativeWriterNode = async (state: NarrativeState) => {
   const model = createChatModel("Ling_2_5_1T", { 
     temperature: 0.8,

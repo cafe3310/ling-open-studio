@@ -48,6 +48,12 @@ interface WriteState {
   inspirations: InspirationCard[];
   activeInspirationIds: string[];
   activeSegmentId: string | null;
+  selection: {
+    segmentId: string;
+    text: string;
+    start: number;
+    end: number;
+  } | null;
   runtime: {
     ghostText: string | null;
     isPredicting: boolean;
@@ -65,6 +71,7 @@ interface WriteState {
   updateSegment: (id: string, updates: Partial<TextSegment>) => void;
   deleteSegment: (id: string) => void;
   setActiveSegment: (id: string | null) => void;
+  setSelection: (selection: WriteState["selection"]) => void;
   setGhostText: (text: string | null) => void;
   setPredicting: (isPredicting: boolean) => void;
   setGenerating: (isGenerating: boolean) => void;
@@ -101,6 +108,7 @@ export const useWriteStore = create<WriteState>((set) => ({
   inspirations: [],
   activeInspirationIds: [],
   activeSegmentId: null,
+  selection: null,
   runtime: {
     ghostText: null,
     isPredicting: false,
@@ -145,6 +153,8 @@ export const useWriteStore = create<WriteState>((set) => ({
     })),
 
   setActiveSegment: (id) => set({ activeSegmentId: id }),
+
+  setSelection: (selection) => set({ selection }),
 
   setGhostText: (text) => set((state) => ({ 
     runtime: { ...state.runtime, ghostText: text } 

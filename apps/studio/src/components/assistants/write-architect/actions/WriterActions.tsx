@@ -4,23 +4,16 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, PenTool, RotateCcw, Maximize2, Loader2 } from "lucide-react";
 import { useWriteStore } from "../store";
-import { readDataStream } from "@assistant-ui/react-ai-sdk";
 
 export const WriterActions = () => {
   const { 
     metadata, segments, knowledgeBase, inspirations, 
-    activeInspirationIds, runtime, setGenerating, addSegment, 
-    updateSegment, updateGraphStatus 
+    activeInspirationIds, runtime, selection, setGenerating, addSegment, 
+    updateSegment, updateGraphStatus, setSelection
   } = useWriteStore();
   const { isGenerating } = runtime;
 
-  const handleContinueWriting = async () => {
-    if (isGenerating) return;
-
-    setGenerating(true);
-    updateGraphStatus('NarrativeFlow', { status: 'running', progress: 0 });
-
-    // 1. Prepare Context
+  const prepareContext = () => {
     const historySummaries = segments
       .filter(s => s.status === "completed" && s.preprocessed?.summary)
       .map(s => s.preprocessed!.summary)
@@ -45,7 +38,15 @@ export const WriterActions = () => {
       .map(i => i.content)
       .join("\n");
 
-    // 2. Create new segment for streaming
+    return { historySummaries, recentText, approvedLore, activeInspirations };
+  };
+
+  const handleContinueWriting = async () => {
+    if (isGenerating) return;
+    setGenerating(true);
+    updateGraphStatus('NarrativeFlow', { status: 'running', progress: 0 });
+
+    const context = prepareContext();
     const newSegmentId = addSegment("");
     let fullContent = "";
 
@@ -54,31 +55,81 @@ export const WriterActions = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          task: "continue",
           storySummary: metadata.summary,
-          historySummaries,
-          recentText,
-          activeLore: approvedLore,
-          activeInspirations
+          ...context
         }),
       });
 
       if (!response.ok || !response.body) throw new Error("Failed to generate");
-
-      // 3. Process Stream
-      await readDataStream(response.body, {
-        onText: (text) => {
-          fullContent += text;
-          updateSegment(newSegmentId, { content: fullContent });
-          updateGraphStatus('NarrativeFlow', { progress: fullContent.length });
-        },
+      await processStream(response.body, (text) => {
+        fullContent += text;
+        updateSegment(newSegmentId, { content: fullContent });
+        updateGraphStatus('NarrativeFlow', { progress: fullContent.length });
       });
-
       updateGraphStatus('NarrativeFlow', { status: 'success', lastResult: 'New content generated.' });
     } catch (error) {
       console.error("Generation error:", error);
       updateGraphStatus('NarrativeFlow', { status: 'error' });
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleSelectionAction = async (task: 'rewrite' | 'expand') => {
+    if (isGenerating || !selection) return; 
+    
+    setGenerating(true);
+    const graphName = task === 'rewrite' ? 'ContentRewriter' : 'NarrativeFlow'; // Placeholder for expand
+    updateGraphStatus(graphName, { status: 'running', progress: 0 });
+
+    const context = prepareContext();
+    const targetSegment = segments.find(s => s.id === selection.segmentId);
+    if (!targetSegment) return;
+
+    let fullContent = "";
+    const prefix = targetSegment.content.substring(0, selection.start);
+    const suffix = targetSegment.content.substring(selection.end);
+
+    try {
+      const response = await fetch("/api/chat/write/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          task,
+          selectedText: selection.text,
+          storySummary: metadata.summary,
+          ...context
+        }),
+      });
+
+      if (!response.ok || !response.body) throw new Error("Failed to execute selection task");
+      
+      await processStream(response.body, (text) => {
+        fullContent += text;
+        // In-place update of the segment
+        updateSegment(selection.segmentId, { content: prefix + fullContent + suffix });
+        updateGraphStatus(graphName, { progress: fullContent.length });
+      });
+
+      updateGraphStatus(graphName, { status: 'success', lastResult: `${task} completed.` });
+      // Clear selection after completion
+      setSelection(null);
+    } catch (error) {
+      console.error(`${task} error:`, error);
+      updateGraphStatus(graphName, { status: 'error' });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const processStream = async (body: ReadableStream<Uint8Array>, onText: (text: string) => void) => {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      onText(decoder.decode(value, { stream: true }));
     }
   };
 
@@ -104,18 +155,28 @@ export const WriterActions = () => {
         </Button>
         
         <div className="grid grid-cols-2 gap-2">
-          <Button disabled variant="ghost" className="h-10 text-[10px] font-bold text-brand-dark/40 border border-brand-border/40 hover:bg-white hover:text-brand-blue gap-2 rounded-lg transition-all opacity-50 cursor-not-allowed">
+          <Button 
+            onClick={() => handleSelectionAction('rewrite')}
+            disabled={isGenerating || !selection}
+            variant="ghost" 
+            className="h-10 text-[10px] font-bold text-brand-dark/40 border border-brand-border/40 hover:bg-white hover:text-brand-blue disabled:opacity-30 disabled:cursor-not-allowed gap-2 rounded-lg transition-all"
+          >
             <RotateCcw className="w-3 h-3" />
             REWRITE
           </Button>
-          <Button disabled variant="ghost" className="h-10 text-[10px] font-bold text-brand-dark/40 border border-brand-border/40 hover:bg-white hover:text-brand-blue gap-2 rounded-lg transition-all opacity-50 cursor-not-allowed">
+          <Button 
+            onClick={() => handleSelectionAction('expand')}
+            disabled={isGenerating || !selection}
+            variant="ghost" 
+            className="h-10 text-[10px] font-bold text-brand-dark/40 border border-brand-border/40 hover:bg-white hover:text-brand-blue disabled:opacity-30 disabled:cursor-not-allowed gap-2 rounded-lg transition-all"
+          >
             <Maximize2 className="w-3 h-3" />
             EXPAND
           </Button>
         </div>
         
         <p className="text-[9px] text-center text-brand-dark/20 font-medium uppercase tracking-tight">
-          Select text on canvas for context-aware actions
+          {selection ? `Selected: ${selection.text.length} chars` : "Select text on canvas for context-aware actions"}
         </p>
       </div>
     </section>
