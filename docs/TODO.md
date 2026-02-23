@@ -91,15 +91,15 @@
     - [x] **PhantomWeaver**: 实现 500ms 停顿触发的行内续写 (Ghost Text) <!-- id: 37 -->
     - [x] **LoreKeeper**: 实现知识库条目自动发现与画像生成 (二段式转正) <!-- id: 38 -->
     - [x] **全链路联调**: 实现 `/api/chat/write/precompute` 和 `/api/chat/write/predict` 接口 <!-- id: 39 -->
-- [ ] **叙事流与创作产出 (NarrativeFlow)**： <!-- id: 29 -->
-    - [ ] 实现 `WriteRightSidebar` 基础布局与动作按钮 <!-- id: 40 -->
-    - [ ] 实现 `NarrativeFlow` Graph (Ling_2_5_1T 流式创作) <!-- id: 41 -->
-    - [ ] 实现 "/api/chat/write/generate" 接口并支持段落回填 <!-- id: 42 -->
-- [ ] **灵感与辅助工具 (MuseWhisper & Tools)**： <!-- id: 43 -->
-    - [ ] 实现 `MuseWhisper` Graph (生成 Plot/Atmosphere/Dialogue 灵感卡片) <!-- id: 44 -->
-    - [ ] 实现灵感卡片激活逻辑及其对续写指令的注入 <!-- id: 45 -->
-    - [ ] 实现 `Selection Tools` (选中文字后的 Rewrite/Expand/Refine) <!-- id: 46 -->
-    - [ ] 优化 `WriteStatusViewer` 支持全局 Log 预览 <!-- id: 47 -->
+- [x] **叙事流与创作产出 (NarrativeFlow)**： <!-- id: 29 -->
+    - [x] 实现 `WriteRightSidebar` 基础布局与动作按钮 <!-- id: 40 -->
+    - [x] 实现 `NarrativeFlow` Graph (Ling_2_5_1T 流式创作) <!-- id: 41 -->
+    - [x] 实现 "/api/chat/write/generate" 接口并支持段落回填 <!-- id: 42 -->
+- [x] **灵感与辅助工具 (MuseWhisper & Tools)**： <!-- id: 43 -->
+    - [x] 实现 `MuseWhisper` Graph (生成 Plot/Atmosphere/Dialogue 灵感卡片) <!-- id: 44 -->
+    - [x] 实现灵感卡片激活逻辑及其对续写指令的注入 <!-- id: 45 -->
+    - [x] 实现 `Selection Tools` (选中文字后的 Rewrite/Expand/Refine) <!-- id: 46 -->
+    - [x] 优化 `WriteStatusViewer` 支持全局 Log 预览与全量状态对接 <!-- id: 47 -->
 
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
 - [x] **多模型配置支持** (设计模型 vs 代码模型，修复了 API 透传与类型错误)
