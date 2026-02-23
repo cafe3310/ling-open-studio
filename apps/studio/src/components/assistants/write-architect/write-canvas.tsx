@@ -5,6 +5,7 @@ import { useWriteStore, TextSegment } from "./store";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 export const WriteCanvas = () => {
   const { 
@@ -138,6 +139,12 @@ const SegmentEditor = ({
         ...knowledgeBase.concepts.map((e: any) => e.name),
       ];
 
+      // Collect history summaries for the Muse
+      const historySummaries = segments
+        .filter(s => s.status === "completed" && s.preprocessed?.summary)
+        .map(s => s.preprocessed!.summary)
+        .join(" ");
+
       try {
         const response = await fetch("/api/chat/write/precompute", {
           method: "POST",
@@ -146,6 +153,7 @@ const SegmentEditor = ({
             segmentId: segment.id,
             content: segment.content,
             storySummary: metadata.summary,
+            historySummaries: historySummaries,
             existingEntityNames: existingNames,
           }),
         });
@@ -174,9 +182,13 @@ const SegmentEditor = ({
             });
           }
 
-          // Update inspirations
+          // Update inspirations with unique IDs
           if (result.inspirations) {
-            setInspirations(result.inspirations);
+            const sanitizedInspirations = result.inspirations.map((ins: any) => ({
+              ...ins,
+              id: ins.id || uuidv4()
+            }));
+            setInspirations(sanitizedInspirations);
           }
         } else {
           updateSegment(segment.id, { status: "raw" }); // Rollback on error

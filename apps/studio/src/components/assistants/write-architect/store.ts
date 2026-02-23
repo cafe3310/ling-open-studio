@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 export type SegmentStatus = "raw" | "processing" | "completed";
 export type EntryCategory = 'worldSettings' | 'characters' | 'concepts';
 export type EntryType = 'manual' | 'auto';
+export type GraphStatus = 'idle' | 'running' | 'success' | 'error';
 
 export interface TextSegment {
   id: string;
@@ -50,6 +51,11 @@ interface WriteState {
   runtime: {
     ghostText: string | null;
     isPredicting: boolean;
+    graphStates: Record<string, {
+      status: GraphStatus;
+      progress?: number;
+      lastResult?: string;
+    }>;
   };
   
   // Actions
@@ -60,6 +66,7 @@ interface WriteState {
   setActiveSegment: (id: string | null) => void;
   setGhostText: (text: string | null) => void;
   setPredicting: (isPredicting: boolean) => void;
+  updateGraphStatus: (codeName: string, updates: Partial<WriteState["runtime"]["graphStates"][string]>) => void;
   splitSegment: (id: string, contentBefore: string, contentAfter: string) => void;
   
   // KB Actions
@@ -95,6 +102,13 @@ export const useWriteStore = create<WriteState>((set) => ({
   runtime: {
     ghostText: null,
     isPredicting: false,
+    graphStates: {
+      'PhantomWeaver': { status: 'idle' },
+      'SegmentPreprocessor': { status: 'idle' },
+      'NarrativeFlow': { status: 'idle' },
+      'LoreKeeper': { status: 'idle' },
+      'MuseWhisper': { status: 'idle' },
+    },
   },
 
   updateMetadata: (metadata) =>
@@ -136,6 +150,17 @@ export const useWriteStore = create<WriteState>((set) => ({
   setPredicting: (isPredicting) => set((state) => ({ 
     runtime: { ...state.runtime, isPredicting } 
   })),
+
+  updateGraphStatus: (codeName, updates) =>
+    set((state) => ({
+      runtime: {
+        ...state.runtime,
+        graphStates: {
+          ...state.runtime.graphStates,
+          [codeName]: { ...state.runtime.graphStates[codeName], ...updates }
+        }
+      }
+    })),
 
   splitSegment: (id, contentBefore, contentAfter) =>
     set((state) => {

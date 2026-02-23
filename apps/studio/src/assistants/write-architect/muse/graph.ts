@@ -1,31 +1,18 @@
-import { StateGraph, END } from "@langchain/langgraph";
+import { StateGraph, START, END } from "@langchain/langgraph";
 import { MuseState } from "./state";
-import { museNode } from "./nodes";
-
-const graphState: any = {
-  context: {
-    value: (x: string, y: string) => y ?? x,
-    default: () => ""
-  },
-  storySummary: {
-    value: (x?: string, y?: string) => y ?? x,
-    default: () => ""
-  },
-  inspirations: {
-    value: (x?: any[], y?: any[]) => y ?? x,
-    default: () => []
-  },
-  status: {
-    value: (x: string, y: string) => y ?? x,
-    default: () => "idle"
-  }
-};
+import { museGeneratorNode } from "./nodes";
 
 const workflow = new StateGraph<MuseState>({
-  channels: graphState
+  channels: {
+    storySummary: null,
+    recentContext: null,
+    historySummaries: null,
+    inspirations: null,
+    status: null,
+  }
 })
-  .addNode("muse", museNode)
-  .setEntryPoint("muse")
-  .addEdge("muse", END);
+  .addNode("generator", museGeneratorNode)
+  .addEdge(START, "generator")
+  .addEdge("generator", END);
 
 export const museGraph = workflow.compile();

@@ -4,6 +4,7 @@ import React from "react";
 import { WriteCanvas } from "./write-canvas";
 import { WriteLeftSidebar } from "./write-left-sidebar";
 import { WriteRightSidebar } from "./write-right-sidebar";
+import { WriteStatusViewer } from "./WriteStatusViewer";
 
 export const WriteArchitectAssistantV2 = () => {
   return (
@@ -16,6 +17,9 @@ export const WriteArchitectAssistantV2 = () => {
 
       {/* Right Sidebar */}
       <WriteRightSidebar />
+
+      {/* Status Overlay */}
+      <WriteStatusViewer />
     </div>
   );
 };

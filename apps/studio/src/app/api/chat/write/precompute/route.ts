@@ -8,7 +8,13 @@ import { MuseState } from "@/assistants/write-architect/muse/state";
 
 export async function POST(req: NextRequest) {
   try {
-    const { segmentId, content, storySummary, existingEntityNames = [] } = await req.json();
+    const { 
+      segmentId, 
+      content, 
+      storySummary, 
+      historySummaries = "",
+      existingEntityNames = [] 
+    } = await req.json();
 
     if (!content) {
       return NextResponse.json({ error: "Missing content" }, { status: 400 });
@@ -40,7 +46,8 @@ export async function POST(req: NextRequest) {
 
     // Phase 3: Creative Muse (Inspiration Cards)
     const museResult = await museGraph.invoke({
-      context: content,
+      recentContext: content,
+      historySummaries: historySummaries,
       storySummary,
       status: "running"
     }) as unknown as MuseState;
