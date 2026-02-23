@@ -7,7 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 
 export const WriteCanvas = () => {
-  const { segments, activeSegmentId, setActiveSegment, splitSegment, updateSegment, metadata } = useWriteStore();
+  const { 
+    segments, activeSegmentId, setActiveSegment, splitSegment, 
+    updateSegment, metadata, knowledgeBase, upsertEntry 
+  } = useWriteStore();
   
   return (
     <main className="flex-1 bg-white relative overflow-y-auto">
@@ -29,6 +32,8 @@ export const WriteCanvas = () => {
               key={segment.id} 
               segment={segment} 
               isActive={activeSegmentId === segment.id}
+              knowledgeBase={knowledgeBase}
+              upsertEntry={upsertEntry}
             />
           ))}
         </div>
@@ -44,7 +49,14 @@ export const WriteCanvas = () => {
   );
 };
 
-const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: boolean }) => {
+const SegmentEditor = ({ 
+  segment, isActive, knowledgeBase, upsertEntry 
+}: { 
+  segment: TextSegment; 
+  isActive: boolean;
+  knowledgeBase: any;
+  upsertEntry: (e: any) => void;
+}) => {
   const { 
     segments, setActiveSegment, splitSegment, updateSegment, deleteSegment, 
     runtime, setGhostText, setPredicting, metadata 
@@ -104,6 +116,13 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
     if (segment.status === "raw") {
       updateSegment(segment.id, { status: "processing" });
       
+      // Get all existing names to avoid duplicates
+      const existingNames = [
+        ...knowledgeBase.worldSettings.map((e: any) => e.name),
+        ...knowledgeBase.characters.map((e: any) => e.name),
+        ...knowledgeBase.concepts.map((e: any) => e.name),
+      ];
+
       try {
         const response = await fetch("/api/chat/write/precompute", {
           method: "POST",
@@ -112,11 +131,14 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
             segmentId: segment.id,
             content: segment.content,
             storySummary: metadata.summary,
+            existingEntityNames: existingNames,
           }),
         });
 
         if (response.ok) {
           const result = await response.json();
+          
+          // Update segment state
           updateSegment(segment.id, {
             status: "completed",
             preprocessed: {
@@ -124,6 +146,18 @@ const SegmentEditor = ({ segment, isActive }: { segment: TextSegment; isActive: 
               extractedEntities: result.extractedEntities,
             }
           });
+
+          // Inject new entries discovered by AI
+          if (result.newEntries && result.newEntries.length > 0) {
+            result.newEntries.forEach((entry: any) => {
+              upsertEntry({
+                ...entry,
+                type: 'auto',
+                isApproved: false,
+                lastDetectedAt: Date.now()
+              });
+            });
+          }
         } else {
           updateSegment(segment.id, { status: "raw" }); // Rollback on error
         }
