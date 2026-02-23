@@ -49,7 +49,11 @@ async function styleDirectorNode(state: WebGenState, config: any) {
   });
   const userPrompt = state.user_request || "";
   // Find selected design aesthetic
-  const selectedDesign = WebArchitect.designs.find(d => d.id === state.config?.designId) || WebArchitect.designs[0];
+  const selectedDesign = WebArchitect.designs.find(d => d.id === state.config?.designId);
+  
+  if (!selectedDesign) {
+    throw new Error(`[WebArchitect] Design style not found for ID: "${state.config?.designId}". Available IDs: ${WebArchitect.designs.map(d => d.id).join(', ')}`);
+  }
 
   const templateA = WebArchitect.STYLE_DIRECTOR_PROMPT(userPrompt, selectedDesign);
 

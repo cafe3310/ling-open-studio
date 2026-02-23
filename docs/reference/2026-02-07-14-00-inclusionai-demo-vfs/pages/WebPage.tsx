@@ -16,7 +16,7 @@ const WebPage: React.FC = () => {
       {/* Left: Instruction Chat */}
       <Sidebar position="left" className="p-4 w-80 bg-white">
         <SectionTitle className="text-lg mb-6">Generator</SectionTitle>
-        
+
         <div className="flex flex-col h-full">
           <div className="flex-1 space-y-4 overflow-y-auto mb-4">
              {/* Mock Chat History */}
@@ -47,17 +47,17 @@ const WebPage: React.FC = () => {
       <MainContent className="bg-brand-bg relative flex items-center justify-center p-8">
         {/* Toolbar */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-sm border border-brand-border p-1 flex gap-1 z-20">
-          <Button 
-            variant={viewMode === 'desktop' ? 'secondary' : 'ghost'} 
-            size="sm" 
+          <Button
+            variant={viewMode === 'desktop' ? 'secondary' : 'ghost'}
+            size="sm"
             onClick={() => setViewMode('desktop')}
             className={viewMode === 'desktop' ? 'bg-brand-bg' : ''}
           >
             <Monitor className="w-4 h-4" />
           </Button>
-          <Button 
-            variant={viewMode === 'mobile' ? 'secondary' : 'ghost'} 
-            size="sm" 
+          <Button
+            variant={viewMode === 'mobile' ? 'secondary' : 'ghost'}
+            size="sm"
             onClick={() => setViewMode('mobile')}
             className={viewMode === 'mobile' ? 'bg-brand-bg' : ''}
           >
@@ -66,7 +66,7 @@ const WebPage: React.FC = () => {
         </div>
 
         {/* Preview Container */}
-        <div 
+        <div
           className={`transition-all duration-500 bg-white shadow-lg border border-brand-border overflow-hidden relative ${
             viewMode === 'mobile' ? 'w-[375px] h-[667px] rounded-[30px]' : 'w-full h-full rounded-xl'
           }`}
@@ -92,7 +92,7 @@ const WebPage: React.FC = () => {
                ))}
             </div>
           </div>
-          
+
           {isGenerating && (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
                <div className="flex flex-col items-center gap-3">
@@ -115,7 +115,7 @@ const WebPage: React.FC = () => {
           <div>
             <SubTitle>Design Aesthetic</SubTitle>
             <div className="grid grid-cols-2 gap-2">
-              {['Minimal', 'Modern', 'Brutalist', 'Warm'].map(style => (
+              {['Minimal', 'Modern', 'Skeuomorphic', 'Warm'].map(style => (
                 <button key={style} className="text-xs border border-brand-border rounded px-3 py-2 text-brand-gray hover:border-brand-cyan hover:text-brand-cyan transition-colors text-left">
                   {style}
                 </button>

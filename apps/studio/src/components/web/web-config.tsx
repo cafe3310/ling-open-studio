@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon, Code } from 'lucide-react';
+import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon, Code, Layers } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,6 +27,7 @@ export const WebConfig: React.FC = () => {
       case 'Grid': return LayoutGrid;
       case 'Sparkles': return Sparkles;
       case 'Palette': return Palette;
+      case 'Layers': return Layers;
       default: return Palette;
     }
   };
