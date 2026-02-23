@@ -51,6 +51,7 @@ interface WriteState {
   runtime: {
     ghostText: string | null;
     isPredicting: boolean;
+    isGenerating: boolean;
     graphStates: Record<string, {
       status: GraphStatus;
       progress?: number;
@@ -66,6 +67,7 @@ interface WriteState {
   setActiveSegment: (id: string | null) => void;
   setGhostText: (text: string | null) => void;
   setPredicting: (isPredicting: boolean) => void;
+  setGenerating: (isGenerating: boolean) => void;
   updateGraphStatus: (codeName: string, updates: Partial<WriteState["runtime"]["graphStates"][string]>) => void;
   splitSegment: (id: string, contentBefore: string, contentAfter: string) => void;
   
@@ -102,6 +104,7 @@ export const useWriteStore = create<WriteState>((set) => ({
   runtime: {
     ghostText: null,
     isPredicting: false,
+    isGenerating: false,
     graphStates: {
       'PhantomWeaver': { status: 'idle' },
       'SegmentPreprocessor': { status: 'idle' },
@@ -149,6 +152,10 @@ export const useWriteStore = create<WriteState>((set) => ({
 
   setPredicting: (isPredicting) => set((state) => ({ 
     runtime: { ...state.runtime, isPredicting } 
+  })),
+
+  setGenerating: (isGenerating) => set((state) => ({ 
+    runtime: { ...state.runtime, isGenerating } 
   })),
 
   updateGraphStatus: (codeName, updates) =>
