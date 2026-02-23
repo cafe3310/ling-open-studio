@@ -9,17 +9,19 @@ import {
   CheckCircle2,
   CircleDashed,
   Clock,
-  Terminal
+  Terminal,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWriteStore, GraphStatus } from "./store";
 
 const GRAPH_LABELS: Record<string, string> = {
-  PhantomWeaver: "PhantomWeaver",
-  SegmentPreprocessor: "SegmentPreprocessor",
-  NarrativeFlow: "NarrativeFlow",
-  LoreKeeper: "LoreKeeper",
-  MuseWhisper: "MuseWhisper",
+  'PhantomWeaver': '幻影编织者',
+  'SegmentPreprocessor': '片段预处理器',
+  'NarrativeFlow': '叙事流',
+  'LoreKeeper': '知识守夜人',
+  'MuseWhisper': '缪斯低语',
+  'ContentRewriter': '改写与扩写',
 };
 
 export const WriteStatusViewer = () => {
@@ -39,7 +41,7 @@ export const WriteStatusViewer = () => {
       isExpanded ? "w-80 bg-white h-auto max-h-[500px]" : "w-12 h-12 bg-brand-dark hover:bg-brand-dark/90"
     )}>
       {/* Header / Toggle Button */}
-      <button
+      <button 
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           "w-full flex items-center shrink-0 transition-colors",
@@ -85,24 +87,27 @@ export const WriteStatusViewer = () => {
               Reasoning Graphs
             </h4>
             <div className="space-y-4">
-              {Object.entries(graphStates).map(([codeName, state]) => (
-                <div key={codeName} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-brand-dark/80">{codeName}</span>
-                      <span className="text-[9px] text-brand-dark/30">({GRAPH_LABELS[codeName] || 'Unknown'})</span>
+              {Object.keys(GRAPH_LABELS).map((codeName) => {
+                const state = graphStates[codeName] || { status: 'idle' };
+                return (
+                  <div key={codeName} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-brand-dark/80">{codeName}</span>
+                        <span className="text-[9px] text-brand-dark/30">({GRAPH_LABELS[codeName]})</span>
+                      </div>
+                      <StatusIcon status={state.status} progress={state.progress} />
                     </div>
-                    <StatusIcon status={state.status} progress={state.progress} />
+                    {state.lastResult && (
+                      <div className="p-2 bg-brand-bg rounded-lg border border-brand-border/30">
+                        <p className="text-[10px] text-brand-dark/40 italic line-clamp-2 font-mono">
+                          "{state.lastResult}"
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  {state.lastResult && (
-                    <div className="p-2 bg-brand-bg rounded-lg border border-brand-border/30">
-                      <p className="text-[10px] text-brand-dark/40 italic line-clamp-2 font-mono">
-                        "{state.lastResult}"
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         </div>
@@ -116,19 +121,19 @@ const StatusIcon = ({ status, progress }: { status: GraphStatus, progress?: numb
     case 'running':
       return (
         <div className="flex items-center gap-2">
-          {progress !== undefined && (
+          {progress !== undefined && progress > 0 && (
             <span className="text-[9px] font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100/50">
-              {Math.floor(progress / 50) * 50}+
+              {progress > 1000 ? `${(progress/1000).toFixed(1)}k` : progress}
             </span>
           )}
           <CircleDashed className="w-3.5 h-3.5 text-amber-500 animate-spin" />
         </div>
       );
     case 'success':
-      return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
+      return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />;
     case 'error':
-      return <Activity className="w-3.5 h-3.5 text-red-500" />;
+      return <AlertCircle className="w-3.5 h-3.5 text-rose-500" />;
     default:
-      return <Clock className="w-3.5 h-3.5 text-brand-dark/20" />;
+      return <Clock className="w-3.5 h-3.5 text-slate-300" />;
   }
 };

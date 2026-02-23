@@ -16,16 +16,6 @@ export const WriteCanvas = () => {
   
   return (
     <main className="flex-1 bg-white relative overflow-y-auto">
-      {/* Action Indicators (Top Right) */}
-      <div className="fixed top-20 right-8 z-30">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 backdrop-blur border border-brand-border/50 rounded-full shadow-sm">
-          <div className="size-1.5 bg-amber-500 rounded-full animate-pulse" />
-          <span className="text-[9px] font-bold text-brand-dark/40 uppercase tracking-widest">
-            Preprocessing... (Live Analysis)
-          </span>
-        </div>
-      </div>
-
       <div className="max-w-[1200px] mx-auto min-h-full py-24 px-12 lg:px-20 grid grid-cols-[1fr_280px] gap-16">
         {/* Left Column: Editor Canvas */}
         <div className="space-y-1">
@@ -94,6 +84,7 @@ const SegmentEditor = ({
     
     setPredicting(true);
     setGhostText(null);
+    useWriteStore.getState().updateGraphStatus('PhantomWeaver', { status: 'running' });
 
     // Get active inspirations content
     const activeInspContent = inspirations
@@ -116,10 +107,15 @@ const SegmentEditor = ({
         const result = await response.json();
         if (isActive) { // Only set if we are still on the same segment
           setGhostText(result.ghostText);
+          useWriteStore.getState().updateGraphStatus('PhantomWeaver', { 
+            status: 'success', 
+            lastResult: result.ghostText 
+          });
         }
       }
     } catch (error) {
       console.error("Failed to predict:", error);
+      useWriteStore.getState().updateGraphStatus('PhantomWeaver', { status: 'error' });
     } finally {
       setPredicting(false);
     }
@@ -132,6 +128,11 @@ const SegmentEditor = ({
     if (segment.status === "raw") {
       updateSegment(segment.id, { status: "processing" });
       
+      const { updateGraphStatus } = useWriteStore.getState();
+      updateGraphStatus('SegmentPreprocessor', { status: 'running' });
+      updateGraphStatus('LoreKeeper', { status: 'running' });
+      updateGraphStatus('MuseWhisper', { status: 'running' });
+
       // Get all existing names to avoid duplicates
       const existingNames = [
         ...knowledgeBase.worldSettings.map((e: any) => e.name),
@@ -170,6 +171,11 @@ const SegmentEditor = ({
             }
           });
 
+          // Update Monitor
+          updateGraphStatus('SegmentPreprocessor', { status: 'success', lastResult: result.summary });
+          updateGraphStatus('LoreKeeper', { status: 'success' });
+          updateGraphStatus('MuseWhisper', { status: 'success' });
+
           // Inject new entries discovered by AI
           if (result.newEntries && result.newEntries.length > 0) {
             result.newEntries.forEach((entry: any) => {
@@ -192,10 +198,16 @@ const SegmentEditor = ({
           }
         } else {
           updateSegment(segment.id, { status: "raw" }); // Rollback on error
+          updateGraphStatus('SegmentPreprocessor', { status: 'error' });
+          updateGraphStatus('LoreKeeper', { status: 'error' });
+          updateGraphStatus('MuseWhisper', { status: 'error' });
         }
       } catch (error) {
         console.error("Failed to precompute segment:", error);
         updateSegment(segment.id, { status: "raw" }); // Rollback on error
+        updateGraphStatus('SegmentPreprocessor', { status: 'error' });
+        updateGraphStatus('LoreKeeper', { status: 'error' });
+        updateGraphStatus('MuseWhisper', { status: 'error' });
       }
     }
   };
