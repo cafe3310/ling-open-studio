@@ -9,7 +9,8 @@ import { Sparkles } from "lucide-react";
 export const WriteCanvas = () => {
   const { 
     segments, activeSegmentId, setActiveSegment, splitSegment, 
-    updateSegment, metadata, knowledgeBase, upsertEntry 
+    updateSegment, metadata, knowledgeBase, upsertEntry, setInspirations,
+    inspirations, activeInspirationIds
   } = useWriteStore();
   
   return (
@@ -34,6 +35,9 @@ export const WriteCanvas = () => {
               isActive={activeSegmentId === segment.id}
               knowledgeBase={knowledgeBase}
               upsertEntry={upsertEntry}
+              setInspirations={setInspirations}
+              inspirations={inspirations}
+              activeInspirationIds={activeInspirationIds}
             />
           ))}
         </div>
@@ -50,12 +54,16 @@ export const WriteCanvas = () => {
 };
 
 const SegmentEditor = ({ 
-  segment, isActive, knowledgeBase, upsertEntry 
+  segment, isActive, knowledgeBase, upsertEntry, setInspirations,
+  inspirations, activeInspirationIds
 }: { 
   segment: TextSegment; 
   isActive: boolean;
   knowledgeBase: any;
   upsertEntry: (e: any) => void;
+  setInspirations: (ins: any[]) => void;
+  inspirations: any[];
+  activeInspirationIds: string[];
 }) => {
   const { 
     segments, setActiveSegment, splitSegment, updateSegment, deleteSegment, 
@@ -86,6 +94,12 @@ const SegmentEditor = ({
     setPredicting(true);
     setGhostText(null);
 
+    // Get active inspirations content
+    const activeInspContent = inspirations
+      .filter(i => activeInspirationIds.includes(i.id))
+      .map(i => i.content)
+      .join("; ");
+
     try {
       const response = await fetch("/api/chat/write/predict", {
         method: "POST",
@@ -93,6 +107,7 @@ const SegmentEditor = ({
         body: JSON.stringify({
           prefixContext: content,
           storySummary: metadata.summary,
+          activeInspirationContent: activeInspContent
         }),
       });
 
@@ -157,6 +172,11 @@ const SegmentEditor = ({
                 lastDetectedAt: Date.now()
               });
             });
+          }
+
+          // Update inspirations
+          if (result.inspirations) {
+            setInspirations(result.inspirations);
           }
         } else {
           updateSegment(segment.id, { status: "raw" }); // Rollback on error

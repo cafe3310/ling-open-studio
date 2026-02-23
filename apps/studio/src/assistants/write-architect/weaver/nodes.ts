@@ -10,6 +10,8 @@ Predict the next 10-20 words to continue the following segment.
 CONTEXT:
 {context}
 
+{inspiration_clause}
+
 RULES:
 - Predict EXACTLY how the sentence or paragraph would naturally continue.
 - Keep the style, tone, and POV consistent.
@@ -26,8 +28,15 @@ export const predictorNode = async (state: WeaverState) => {
   
   // Use prefixContext as the primary input content
   const context = buildWritingContext(state.prefixContext, state.storySummary);
+
+  const inspiration_clause = state.activeInspirationContent 
+    ? `SPECIFIC GUIDANCE (Incorporate this idea): "${state.activeInspirationContent}"`
+    : "";
   
-  const response = await model.invoke(await PREDICT_PROMPT.format({ context }));
+  const response = await model.invoke(await PREDICT_PROMPT.format({ 
+    context,
+    inspiration_clause
+  }));
   let ghostText: string | null = response.content.toString().trim();
   
   // Clean up potential AI prefixes or "..."

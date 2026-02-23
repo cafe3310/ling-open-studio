@@ -3,7 +3,7 @@ import { weaverGraph } from "@/assistants/write-architect/weaver/graph";
 
 export async function POST(req: NextRequest) {
   try {
-    const { prefixContext, storySummary } = await req.json();
+    const { prefixContext, storySummary, activeInspirationContent } = await req.json();
 
     if (!prefixContext) {
       return NextResponse.json({ ghostText: null });
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     const result = await weaverGraph.invoke({
       prefixContext,
       storySummary,
+      activeInspirationContent,
       status: "running"
     });
 

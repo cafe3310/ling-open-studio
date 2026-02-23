@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { preprocessorGraph } from "@/assistants/write-architect/preprocessor/graph";
 import { keeperGraph } from "@/assistants/write-architect/keeper/graph";
+import { museGraph } from "@/assistants/write-architect/muse/graph";
 import { PreprocessorState } from "@/assistants/write-architect/preprocessor/state";
 import { KeeperState } from "@/assistants/write-architect/keeper/state";
+import { MuseState } from "@/assistants/write-architect/muse/state";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,11 +38,19 @@ export async function POST(req: NextRequest) {
       newEntries = keeperResult.entries || [];
     }
 
+    // Phase 3: Creative Muse (Inspiration Cards)
+    const museResult = await museGraph.invoke({
+      context: content,
+      storySummary,
+      status: "running"
+    }) as unknown as MuseState;
+
     return NextResponse.json({
       segmentId,
       summary: precomputeResult.summary,
       extractedEntities: extractedNames,
       newEntries, // New KnowledgeEntry objects
+      inspirations: museResult.inspirations || [],
       status: "success"
     });
   } catch (error: any) {

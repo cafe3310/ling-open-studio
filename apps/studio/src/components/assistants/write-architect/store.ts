@@ -26,6 +26,13 @@ export interface KnowledgeEntry {
   lastDetectedAt: number;
 }
 
+export interface InspirationCard {
+  id: string;
+  type: 'Plot' | 'Atmosphere' | 'Dialogue';
+  title: string;
+  content: string;
+}
+
 interface WriteState {
   metadata: {
     title: string;
@@ -37,6 +44,8 @@ interface WriteState {
     characters: KnowledgeEntry[];
     concepts: KnowledgeEntry[];
   };
+  inspirations: InspirationCard[];
+  activeInspirationIds: string[];
   activeSegmentId: string | null;
   runtime: {
     ghostText: string | null;
@@ -57,6 +66,10 @@ interface WriteState {
   upsertEntry: (entry: Partial<KnowledgeEntry> & { name: string; category: EntryCategory }) => void;
   approveEntry: (id: string, category: EntryCategory) => void;
   deleteEntry: (id: string, category: EntryCategory) => void;
+
+  // Inspiration Actions
+  setInspirations: (inspirations: InspirationCard[]) => void;
+  toggleInspiration: (id: string) => void;
 }
 
 export const useWriteStore = create<WriteState>((set) => ({
@@ -76,6 +89,8 @@ export const useWriteStore = create<WriteState>((set) => ({
     characters: [],
     concepts: [],
   },
+  inspirations: [],
+  activeInspirationIds: [],
   activeSegmentId: null,
   runtime: {
     ghostText: null,
@@ -195,4 +210,12 @@ export const useWriteStore = create<WriteState>((set) => ({
         [category]: state.knowledgeBase[category].filter(e => e.id !== id)
       }
     })),
+
+  setInspirations: (inspirations) => set({ inspirations }),
+
+  toggleInspiration: (id) => set((state) => ({
+    activeInspirationIds: state.activeInspirationIds.includes(id)
+      ? state.activeInspirationIds.filter((i) => i !== id)
+      : [...state.activeInspirationIds, id]
+  })),
 }));

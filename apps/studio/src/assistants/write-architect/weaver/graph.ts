@@ -11,6 +11,10 @@ const graphState: any = {
     value: (x?: string, y?: string) => y ?? x,
     default: () => ""
   },
+  activeInspirationContent: {
+    value: (x?: string, y?: string) => y ?? x,
+    default: () => ""
+  },
   ghostText: {
     value: (x?: string | null, y?: string | null) => y ?? x,
     default: () => null
