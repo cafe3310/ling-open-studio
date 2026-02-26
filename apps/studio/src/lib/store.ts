@@ -11,6 +11,7 @@ interface ModelConfig {
   techStackId?: string;
   designModelId?: string;
   codeModelId?: string;
+  presetStylePrompt?: string | null;
 }
 
 interface ModelStore extends ModelConfig {
@@ -23,6 +24,7 @@ interface ModelStore extends ModelConfig {
   setTechStackId: (id: string) => void;
   setDesignModelId: (id: string) => void;
   setCodeModelId: (id: string) => void;
+  setPresetStylePrompt: (prompt: string | null) => void;
 }
 
 export const useModelStore = create<ModelStore>((set) => ({
@@ -35,6 +37,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   techStackId: 'html-tailwind',
   designModelId: 'Ling_2_5_1T',
   codeModelId: 'Ling_1T',
+  presetStylePrompt: null,
   setModelId: (modelId) => set({ modelId }),
   setSystemPrompt: (systemPrompt) => set({ systemPrompt }),
   setTemperature: (temperature) => set({ temperature }),
@@ -44,4 +47,5 @@ export const useModelStore = create<ModelStore>((set) => ({
   setTechStackId: (techStackId) => set({ techStackId }),
   setDesignModelId: (designModelId) => set({ designModelId }),
   setCodeModelId: (codeModelId) => set({ codeModelId }),
+  setPresetStylePrompt: (presetStylePrompt) => set({ presetStylePrompt }),
 }));
