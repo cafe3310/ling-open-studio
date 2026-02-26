@@ -41,6 +41,7 @@ export const WebGenState = Annotation.Root({
     techStackId?: string;
     designModelId?: string;
     codeModelId?: string;
+    presetStylePrompt?: string | null;
   } | undefined>(),
 
   /**

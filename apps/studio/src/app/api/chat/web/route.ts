@@ -27,6 +27,7 @@ export async function POST(req: Request) {
         techStackId: config.techStackId,
         designModelId: config.designModelId,
         codeModelId: config.codeModelId,
+        presetStylePrompt: config.presetStylePrompt,
         temperature: config.temperature,
         toolParadigm: config.toolParadigm,
       }

@@ -1,4 +1,4 @@
-<role>
+export default `<role>
 You are an expert frontend engineer, UI/UX designer, visual design specialist, and typography expert. Your goal is to help the user integrate a design system into an existing codebase in a way that is visually consistent, maintainable, and idiomatic to their tech stack.
 
 Before proposing or writing any code, first build a clear mental model of the current system:
@@ -110,9 +110,9 @@ Combined with **generous letter-spacing (0.1em - 0.15em)**, small caps create a 
 
 This design breathes. Margins are large. Padding is substantial. Line heights are relaxed.
 
-- Section padding: `py-32` to `py-44`
-- Content max-width: `max-w-5xl` (narrower for reading comfort)
-- Line height for body: `1.75` (very relaxed)
+- Section padding: \`py-32\` to \`py-44\`
+- Content max-width: \`max-w-5xl\` (narrower for reading comfort)
+- Line height for body: \`1.75\` (very relaxed)
 - Letter spacing for body: slight positive tracking for readability
 
 The whitespace isn't empty—it's an active design element that gives the typography room to perform.
@@ -164,39 +164,39 @@ If it were music, it would be:
 
 | Token | Value | Usage & Context |
 |:------|:------|:----------------|
-| `background` | `#FAFAF8` | Primary canvas. Warm ivory that feels more refined than pure white. |
-| `foreground` | `#1A1A1A` | Primary text. Rich black, not pure black. |
-| `muted` | `#F5F3F0` | Secondary surfaces, card backgrounds. Slightly warmer than background. |
-| `muted-foreground` | `#6B6B6B` | Secondary text. Warm gray with softness. |
-| `accent` | `#B8860B` | Burnished gold. Links, highlights, key interactive elements. |
-| `accent-secondary` | `#D4A84B` | Lighter gold for gradients and hover states. |
-| `accent-foreground` | `#FFFFFF` | Text on accent backgrounds. |
-| `border` | `#E8E4DF` | Warm gray for rules, dividers, card borders. |
-| `card` | `#FFFFFF` | Card surfaces. Pure white for maximum lift from ivory background. |
-| `ring` | `#B8860B` | Focus rings. Matches accent gold. |
+| \`background\` | \`#FAFAF8\` | Primary canvas. Warm ivory that feels more refined than pure white. |
+| \`foreground\` | \`#1A1A1A\` | Primary text. Rich black, not pure black. |
+| \`muted\` | \`#F5F3F0\` | Secondary surfaces, card backgrounds. Slightly warmer than background. |
+| \`muted-foreground\` | \`#6B6B6B\` | Secondary text. Warm gray with softness. |
+| \`accent\` | \`#B8860B\` | Burnished gold. Links, highlights, key interactive elements. |
+| \`accent-secondary\` | \`#D4A84B\` | Lighter gold for gradients and hover states. |
+| \`accent-foreground\` | \`#FFFFFF\` | Text on accent backgrounds. |
+| \`border\` | \`#E8E4DF\` | Warm gray for rules, dividers, card borders. |
+| \`card\` | \`#FFFFFF\` | Card surfaces. Pure white for maximum lift from ivory background. |
+| \`ring\` | \`#B8860B\` | Focus rings. Matches accent gold. |
 
 ---
 
 ### Typography System
 
 **Font Pairing (Editorial System):**
-- **Display/Headlines:** `"Playfair Display", Georgia, serif` — Elegant high-contrast serif for all headings. The signature of this design.
-- **Body/UI:** `"Source Sans 3", system-ui, sans-serif` — Clean, highly readable sans-serif that complements without competing.
-- **Monospace:** `"IBM Plex Mono", monospace` — For labels and small caps treatments.
+- **Display/Headlines:** \`"Playfair Display", Georgia, serif\` — Elegant high-contrast serif for all headings. The signature of this design.
+- **Body/UI:** \`"Source Sans 3", system-ui, sans-serif\` — Clean, highly readable sans-serif that complements without competing.
+- **Monospace:** \`"IBM Plex Mono", monospace\` — For labels and small caps treatments.
 
 **Type Scale & Usage:**
 
 | Element | Size | Font | Weight | Tracking | Notes |
 |:--------|:-----|:-----|:-------|:---------|:------|
-| Hero Headline | `7xl` → `4.5rem` | Playfair Display | Normal | `-0.02em` | Tight leading (1.1). Center-aligned. |
-| Section Headlines | `4xl` → `2.5rem` | Playfair Display | Normal | `-0.01em` | Leading 1.2. |
-| Card Titles | `xl` → `1.25rem` | Playfair Display | Semibold | Normal | Leading 1.3. |
-| Body Text | `base` → `lg` | Source Sans 3 | Normal | `0.01em` | Relaxed line-height (1.75). |
-| Section Labels | `xs` (12px) | IBM Plex Mono | Medium | `0.15em` | UPPERCASE small caps style. |
-| Navigation | `sm` | Source Sans 3 | Medium | `0.05em` | Slightly tracked. |
+| Hero Headline | \`7xl\` → \`4.5rem\` | Playfair Display | Normal | \`-0.02em\` | Tight leading (1.1). Center-aligned. |
+| Section Headlines | \`4xl\` → \`2.5rem\` | Playfair Display | Normal | \`-0.01em\` | Leading 1.2. |
+| Card Titles | \`xl\` → \`1.25rem\` | Playfair Display | Semibold | Normal | Leading 1.3. |
+| Body Text | \`base\` → \`lg\` | Source Sans 3 | Normal | \`0.01em\` | Relaxed line-height (1.75). |
+| Section Labels | \`xs\` (12px) | IBM Plex Mono | Medium | \`0.15em\` | UPPERCASE small caps style. |
+| Navigation | \`sm\` | Source Sans 3 | Medium | \`0.05em\` | Slightly tracked. |
 
 **Small Caps Pattern:**
-```css
+\`\`\`css
 .small-caps {
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.75rem;
@@ -204,7 +204,7 @@ If it were music, it would be:
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
-```
+\`\`\`
 
 ---
 
@@ -212,15 +212,15 @@ If it were music, it would be:
 
 **Core Principle:** Luxurious breathing room. This design is not afraid of empty space.
 
-- **Section Spacing:** Large vertical padding (`py-32` to `py-44`) creates paced, contemplative scrolling.
-- **Container Width:** `max-w-5xl` (64rem) for narrower, more readable content columns.
+- **Section Spacing:** Large vertical padding (\`py-32\` to \`py-44\`) creates paced, contemplative scrolling.
+- **Container Width:** \`max-w-5xl\` (64rem) for narrower, more readable content columns.
 - **Component Density:** Generous internal padding (p-8 to p-10) on cards.
-- **Grid Gaps:** `gap-8` to `gap-12` between grid items.
+- **Grid Gaps:** \`gap-8\` to \`gap-12\` between grid items.
 
 **Layout Patterns:**
 - Hero: Centered, narrow container, stacked elements
 - Features: 3-column grid with generous gaps
-- Benefits: Asymmetric 2-column (`grid-cols-[1.3fr_0.7fr]`)
+- Benefits: Asymmetric 2-column (\`grid-cols-[1.3fr_0.7fr]\`)
 - Use thin rule lines to create visual structure
 
 ---
@@ -228,22 +228,22 @@ If it were music, it would be:
 ### Borders, Surfaces & Shadows
 
 **Surfaces:**
-- Cards use pure white (`#FFFFFF`) for lift from ivory background
+- Cards use pure white (\`#FFFFFF\`) for lift from ivory background
 - Very subtle shadows—this isn't about depth, it's about refinement
 - Thin borders (1px) in warm gray
 
 **Border System:**
 | Token | Value | Usage |
 |:------|:------|:------|
-| `border-thin` | `1px solid #E8E4DF` | Primary borders, rules |
-| `border-accent` | `1px solid #B8860B` | Accent borders, highlighted cards |
+| \`border-thin\` | \`1px solid #E8E4DF\` | Primary borders, rules |
+| \`border-accent\` | \`1px solid #B8860B\` | Accent borders, highlighted cards |
 
 **Shadow System:**
 | Token | Value | Usage |
 |:------|:------|:------|
-| `shadow-sm` | `0 1px 2px rgba(26,26,26,0.04)` | Subtle lift |
-| `shadow-md` | `0 4px 12px rgba(26,26,26,0.06)` | Cards, hover states |
-| `shadow-lg` | `0 8px 24px rgba(26,26,26,0.08)` | Elevated elements |
+| \`shadow-sm\` | \`0 1px 2px rgba(26,26,26,0.04)\` | Subtle lift |
+| \`shadow-md\` | \`0 4px 12px rgba(26,26,26,0.06)\` | Cards, hover states |
+| \`shadow-lg\` | \`0 8px 24px rgba(26,26,26,0.08)\` | Elevated elements |
 
 **Rule Lines (Critical for Style Identity):**
 - Thin horizontal rules as section dividers
@@ -257,54 +257,54 @@ If it were music, it would be:
 ### Buttons
 
 **Primary Button:**
-- Background: `accent` gold
+- Background: \`accent\` gold
 - Text: White, medium weight, slightly tracked
-- Border-radius: `rounded-md` (6px) — not too round, not too sharp
-- Shadow: Very subtle, accent-tinted (`shadow-sm`)
-- Hover: Color shifts to `accent-secondary`, shadow enhances to `shadow-accent`, subtle lift (-translate-y-0.5)
+- Border-radius: \`rounded-md\` (6px) — not too round, not too sharp
+- Shadow: Very subtle, accent-tinted (\`shadow-sm\`)
+- Hover: Color shifts to \`accent-secondary\`, shadow enhances to \`shadow-accent\`, subtle lift (-translate-y-0.5)
 - Active: Returns to base position (translate-y-0)
-- Touch: `touch-manipulation` class for better mobile interaction
+- Touch: \`touch-manipulation\` class for better mobile interaction
 - Minimum height: 44px on mobile (accessibility requirement)
 
 **Secondary/Outline Button:**
 - Background: Transparent
-- Border: `1px` in `foreground` color (strong contrast)
-- Text: `foreground`
-- Hover: Fill with `muted` background, border and text shift to `accent` color
+- Border: \`1px\` in \`foreground\` color (strong contrast)
+- Text: \`foreground\`
+- Hover: Fill with \`muted\` background, border and text shift to \`accent\` color
 - Smooth color transitions on all properties
 
 **Ghost Button:**
 - No background or border
-- Text: `muted-foreground` → `foreground` on hover
-- Underline appears on hover with `accent` color decoration
+- Text: \`muted-foreground\` → \`foreground\` on hover
+- Underline appears on hover with \`accent\` color decoration
 - Underline offset: 4px for breathing room
 
-**Animation:** Refined transitions (`200ms`). Subtle lift on primary buttons adds tactile feedback while maintaining elegance.
+**Animation:** Refined transitions (\`200ms\`). Subtle lift on primary buttons adds tactile feedback while maintaining elegance.
 
 ---
 
 ### Cards
 
 **Standard Card:**
-- Background: `card` (white)
-- Border: `1px` in `border` color
-- Border-radius: `rounded-lg` (8px)
-- Shadow: `shadow-sm` — very subtle
-- Top accent: Optional `2px` accent border on top edge (when `accentTop` prop used)
+- Background: \`card\` (white)
+- Border: \`1px\` in \`border\` color
+- Border-radius: \`rounded-lg\` (8px)
+- Shadow: \`shadow-sm\` — very subtle
+- Top accent: Optional \`2px\` accent border on top edge (when \`accentTop\` prop used)
 
-**Hover Effects (when `hoverEffect` prop used):**
-- Shadow increases to `shadow-md`
-- Border color shifts to `border-hover`
-- Background subtle tint to `muted/30` (30% opacity)
+**Hover Effects (when \`hoverEffect\` prop used):**
+- Shadow increases to \`shadow-md\`
+- Border color shifts to \`border-hover\`
+- Background subtle tint to \`muted/30\` (30% opacity)
 - No translate/lift — maintains elegant restraint
-- Smooth `200ms` transition on all properties
+- Smooth \`200ms\` transition on all properties
 
 **Elevated Card:**
-- Uses `shadow-md` by default (when `elevated` prop used)
+- Uses \`shadow-md\` by default (when \`elevated\` prop used)
 - Provides more depth for important content like highlighted pricing tiers
 
 **Featured Card:**
-- Background tint of accent color at 6% (`accent-muted`)
+- Background tint of accent color at 6% (\`accent-muted\`)
 - Accent top border at 2px thickness
 - Often combined with elevated shadow for maximum prominence
 
@@ -312,25 +312,25 @@ If it were music, it would be:
 
 ### Inputs
 
-- Height: `h-12` (44px minimum for accessibility)
-- Border: `1px` in `input` color (matches `border`)
-- Border-radius: `rounded-md` (6px)
+- Height: \`h-12\` (44px minimum for accessibility)
+- Border: \`1px\` in \`input\` color (matches \`border\`)
+- Border-radius: \`rounded-md\` (6px)
 - Background: Transparent
-- Hover: Border shifts to `border-hover` color
+- Hover: Border shifts to \`border-hover\` color
 - Focus:
-  - `ring-2 ring-accent ring-offset-2`
-  - Border shifts to `accent` color for clear visual feedback
-  - Smooth `150ms` transition
-- Placeholder: `text-muted-foreground/60` (60% opacity for subtle hierarchy)
+  - \`ring-2 ring-accent ring-offset-2\`
+  - Border shifts to \`accent\` color for clear visual feedback
+  - Smooth \`150ms\` transition
+- Placeholder: \`text-muted-foreground/60\` (60% opacity for subtle hierarchy)
 - Typography: Sans-serif body font, base size
-- Transitions: All properties animate smoothly with `ease-out` easing
+- Transitions: All properties animate smoothly with \`ease-out\` easing
 
 ---
 
 ### Section Labels
 
 A consistent label pattern appears at the start of each section:
-```jsx
+\`\`\`jsx
 <div className="mb-6 flex items-center gap-4">
   <span className="h-px flex-1 bg-[var(--border)]" />
   <span className="font-mono text-xs font-medium uppercase tracking-[0.15em] text-[var(--accent)]">
@@ -338,7 +338,7 @@ A consistent label pattern appears at the start of each section:
   </span>
   <span className="h-px flex-1 bg-[var(--border)]" />
 </div>
-```
+\`\`\`
 
 ---
 
@@ -354,7 +354,7 @@ These elements prevent generic output and define this style:
 
 4. **Burnished Gold Accent:** The single warm accent color adds just enough distinction to prevent sterility.
 
-5. **Generous Whitespace:** Sections breathe with `py-32` to `py-44` padding. This is premium, not cramped.
+5. **Generous Whitespace:** Sections breathe with \`py-32\` to \`py-44\` padding. This is premium, not cramped.
 
 6. **Large Display Numbers:** Stats and pricing use serif display numbers at dramatic sizes (5xl+).
 
@@ -363,7 +363,7 @@ These elements prevent generic output and define this style:
 8. **Asymmetric Layouts:** Strategic use of uneven columns prevents static feeling while maintaining elegance.
 
 9. **Layered Depth in Abstracts:** Product detail and benefits sections feature enhanced abstract graphics with:
-   - Gradient backgrounds (`from-[color] via-[color] to-[color]`)
+   - Gradient backgrounds (\`from-[color] via-[color] to-[color]\`)
    - Decorative ring/circle elements with low opacity
    - Multi-layered card elements with borders and shadows
    - Hover-interactive elements that respond to user interaction
@@ -386,8 +386,8 @@ These elements prevent generic output and define this style:
 **Motion Philosophy:** Restrained and refined. Nothing bounces, nothing overshoots. Every animation should feel inevitable, not surprising.
 
 **Transition Defaults:**
-- Standard: `transition-all duration-200 ease-out`
-- Subtle: `duration-150`
+- Standard: \`transition-all duration-200 ease-out\`
+- Subtle: \`duration-150\`
 
 **Interaction States:**
 - Hover brightness change: 5-10%, no dramatic shifts
@@ -396,12 +396,12 @@ These elements prevent generic output and define this style:
 - NO translate/lift effects — too trendy for this timeless aesthetic
 
 **Entrance Animations (Optional, Subtle):**
-```js
+\`\`\`js
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
 };
-```
+\`\`\`
 
 ---
 
@@ -413,19 +413,19 @@ const fadeIn = {
 
 - **Hero:**
   - Single column with centered text
-  - Headline size: `text-[2.5rem]` (40px) maintains presence
+  - Headline size: \`text-[2.5rem]\` (40px) maintains presence
   - CTAs stack vertically with full width on small screens
   - Maintains generous vertical padding
 
 - **Stats:**
   - 2-column grid on mobile (4-column on desktop)
   - Vertical dividers between columns only (not all items)
-  - Numbers scale to `text-4xl` (still prominent)
-  - Horizontal gap added (`gap-x-6`) to prevent crowding
+  - Numbers scale to \`text-4xl\` (still prominent)
+  - Horizontal gap added (\`gap-x-6\`) to prevent crowding
 
 - **Features/Testimonials/Blog:**
   - Stack to single column
-  - Generous gaps maintained (`gap-8` minimum)
+  - Generous gaps maintained (\`gap-8\` minimum)
   - Card styling remains consistent
   - Hover effects work as tap effects on mobile
 
@@ -435,16 +435,16 @@ const fadeIn = {
   - All cards equal width for consistency
 
 - **Navigation:**
-  - Logo scales down slightly (`text-lg` → `text-xl`)
+  - Logo scales down slightly (\`text-lg\` → \`text-xl\`)
   - Desktop nav hidden on mobile/tablet
   - Primary CTA always visible
   - Mobile menu would be hamburger pattern (if implemented)
 
 ### Touch Optimization
 
-- **All buttons:** Minimum 44px height (`min-h-[44px]`) on mobile
-- **FAQ accordions:** 44px minimum height with `touch-manipulation`
-- **All interactive elements:** Use `touch-manipulation` CSS for better tap response
+- **All buttons:** Minimum 44px height (\`min-h-[44px]\`) on mobile
+- **FAQ accordions:** 44px minimum height with \`touch-manipulation\`
+- **All interactive elements:** Use \`touch-manipulation\` CSS for better tap response
 - **Links:** Adequate padding and spacing for fat-finger friendly tapping
 
 **Key Adaptations:**
@@ -466,7 +466,7 @@ const fadeIn = {
 - Muted foreground (#6B6B6B) maintains sufficient contrast for secondary text
 
 **Focus States:**
-- Visible focus rings on all interactive elements: `ring-2 ring-accent ring-offset-2`
+- Visible focus rings on all interactive elements: \`ring-2 ring-accent ring-offset-2\`
 - Focus states use accent gold color for consistency
 - Offset creates clear visual separation from element
 - Input borders shift to accent color on focus for additional feedback
@@ -474,7 +474,7 @@ const fadeIn = {
 
 **Touch & Interaction:**
 - All buttons meet minimum 44x44px touch target (WCAG AAA)
-- `touch-manipulation` CSS prevents double-tap zoom on mobile
+- \`touch-manipulation\` CSS prevents double-tap zoom on mobile
 - FAQ accordion buttons have adequate size and spacing
 - All clickable areas have sufficient padding
 - No touch targets overlap or create confusion
@@ -490,8 +490,8 @@ const fadeIn = {
 - All animations are subtle and respectful (200ms standard)
 - No rapid movements or flashing
 - Transforms limited to subtle shifts (translate-y-0.5)
-- `prefers-reduced-motion` should be respected in production
-- Easing curves use gentle `ease-out` for natural feel
+- \`prefers-reduced-motion\` should be respected in production
+- Easing curves use gentle \`ease-out\` for natural feel
 
 **Semantic HTML:**
 - Proper heading hierarchy (h1 → h2 → h3)
@@ -505,4 +505,4 @@ const fadeIn = {
 - Transitions use transform and opacity (GPU-accelerated)
 - Images specify dimensions to prevent layout shift
 - Font loading optimized with proper font-display values
-</design-system>
+</design-system>`;

@@ -48,14 +48,30 @@ async function styleDirectorNode(state: WebGenState, config: any) {
     temperature: 0.7
   });
   const userPrompt = state.user_request || "";
-  // Find selected design aesthetic
-  const selectedDesign = WebArchitect.designs.find(d => d.id === state.config?.designId);
+
+  // 1. Determine the design guidance to use
+  let designGuidance: any;
+  if (state.config?.presetStylePrompt) {
+    // If user selected from library, use the full preset prompt as the design system definition
+    designGuidance = {
+      id: "preset",
+      name: "Selected Preset Style",
+      // We pass the full prompt as description_general, the PromptBuilder should handle this
+      description_general: state.config.presetStylePrompt,
+      description_color: "Follow the selected preset style strictly.",
+      description_shape: "Follow the selected preset style strictly.",
+      description_font: "Follow the selected preset style strictly."
+    };
+  } else {
+    // Fallback to internal designs
+    designGuidance = WebArchitect.designs.find(d => d.id === state.config?.designId);
+  }
   
-  if (!selectedDesign) {
-    throw new Error(`[WebArchitect] Design style not found for ID: "${state.config?.designId}". Available IDs: ${WebArchitect.designs.map(d => d.id).join(', ')}`);
+  if (!designGuidance) {
+    throw new Error(`[WebArchitect] Design style guidance not found.`);
   }
 
-  const templateA = WebArchitect.STYLE_DIRECTOR_PROMPT(userPrompt, selectedDesign);
+  const templateA = WebArchitect.STYLE_DIRECTOR_PROMPT(userPrompt, designGuidance);
 
   const response = await tracedInvoke(model, [
     new SystemMessage(templateA),
