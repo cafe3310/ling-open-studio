@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon, Code, Layers } from 'lucide-react';
+import { LayoutTemplate, Sparkles, Zap, Moon, Palette, Wind, LayoutGrid, LucideIcon, Code, Layers, MoreHorizontal } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useModelStore } from "@/lib/store";
 import { WebArchitect } from "@/lib/prompts";
 import { MODEL_CONFIG } from "@/lib/model";
+import { StyleLibraryDialog } from './style-library-dialog';
 const { designs, techStacks } = WebArchitect;
 
 export const WebConfig: React.FC = () => {
@@ -68,6 +69,22 @@ export const WebConfig: React.FC = () => {
                   </button>
                 );
               })}
+              
+              <StyleLibraryDialog 
+                trigger={
+                  <button
+                    className={cn(
+                      "flex flex-col items-center justify-center p-3 rounded-lg border transition-all duration-200 gap-2 group",
+                      designId === 'preset'
+                        ? "border-brand-blue bg-brand-blue/5 text-brand-blue ring-1 ring-brand-blue/20"
+                        : "border-slate-100 hover:border-slate-200 text-brand-gray hover:text-brand-dark bg-slate-50/50 border-dashed"
+                    )}
+                  >
+                    <MoreHorizontal className={cn("w-4 h-4", designId === 'preset' ? "text-brand-blue" : "text-slate-400 group-hover:text-brand-dark")} />
+                    <span className="text-[10px] font-medium">Select More</span>
+                  </button>
+                }
+              />
             </div>
           </section>
 

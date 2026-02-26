@@ -45,14 +45,5 @@ export const designs: DesignOption[] = [
     description_color: "Use off-white backgrounds (#FDFBF7), charcoal text, and muted earthy accents (like Sage or Sand).",
     description_shape: "Large border radius (rounded-3xl). Subtle, soft shadows. Generous padding.",
     description_font: "Use a mix of an elegant Serif font for headings (like Playfair Display) and a clean Sans-serif for body."
-  },
-  {
-    id: "skeuomorphic",
-    name: "Retro Skeuomorphic",
-    icon: "Layers",
-    description_general: "Hyper-realistic retro-futuristic skeuomorphic interface. Focus on extreme tactile details, physical depth, and analog technology metaphors. Incorporate WebGL animated noises, film grain textures, and interactive elements like infinite marquees. Each component should feel like a piece of heavy, high-end industrial equipment.",
-    description_color: "High-contrast dark mode palette. Use deep charcoal or '1-tone darker' backgrounds to enhance depth. STRICTLY NO generic purple gradients. Use realistic material colors: brushed aluminum, matte industrial plastics, and vintage leather. Add subtle radial glows, CRT scanlines, and neon-flicker status lights.",
-    description_shape: "Extreme details with multi-layered bevels, embossed surfaces, and 1px precision borders. Tastefully high-end long shadows (ensure no clipping). Interactive cards must feel draggable with 'spring overshoots' on release. Hover states should make cards float higher with dynamically adjusting shadows and increased brightness. Add animated dots, lights, and scanline overlays in a loop.",
-    description_font: "Retro-tech and industrial typography. Mix monospaced fonts (like Space Mono or JetBrains Mono) for data with bold, impactful sans-serif for headings. Apply subtle CSS glows to text to simulate CRT phosphor persistence and screen etching effects."
   }
 ];
