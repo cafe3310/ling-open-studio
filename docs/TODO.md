@@ -104,6 +104,9 @@
     - [x] 实现 `Selection Tools` (选中文字后的 Rewrite/Expand/Refine) <!-- id: 46 -->
     - [x] 优化 `WriteStatusViewer` 支持全局 Log 预览与全量状态对接 <!-- id: 47 -->
 
+## 持续集成与构建修复 (CI & Build Fixes) <!-- id: 48 -->
+- [x] **修复 apps/studio 编译错误**：移除 import 语句中的 `.ts` 扩展名以规范化 Prompt 资源导入 <!-- id: 49 -->
+
 ## 核心功能 (ModelWeb) <!-- id: 17 -->
 - [x] **多模型配置支持** (设计模型 vs 代码模型，修复了 API 透传与类型错误)
 - [ ] **性能优化**：针对移动端进行适配，优化代码生成产物的渲染速度 <!-- id: 18 -->
