@@ -48,15 +48,18 @@
 - [ ] **Model Web (网页生成) 内容填充**： <!-- id: 15 -->
     - [x] **静态 UI 框架**：实现 Chat/Preview/Config 三栏布局与交互
     - [x] **Agent Tooling**：封装 VFS 操作为 LangChain Tools (`vfs_write_file` 等)
-    - [ ] **上下文工程与 Boilerplates**：
-        - [ ] 创建 `lib/boilerplates/index.ts` 定义 HTML/React 模板
-        - [ ] 定义 `Aesthetic Definitions` 美学风格库
-        - [x] **新增视觉风格扩展与优化** (Glassmorphism, Flat VTuber, Bento Modern) <!-- id: 30 -->
-            - [x] 在 `designs.ts` 中添加风格定义 (含 Flat VTuber 饱和度与装饰优化) <!-- id: 31 -->
-            - [x] 在 `WebConfig` 中集成新图标并适配 UI (修复了 Code 图标导入错误) <!-- id: 32 -->
-    - [ ] **Graph 逻辑实现 (双 Graph 架构)**：
-        - [ ] 实现 `InitialGenGraph` (Idea Expander -> Style Director -> Code Generator)
-        - [ ] 实现 `RefineGraph` (Editor Node)
+            - [x] **上下文工程与 Boilerplates**：
+                - [ ] 创建 `lib/boilerplates/index.ts` 定义 HTML/React 模板
+                - [ ] 定义 `Aesthetic Definitions` 美学风格库
+                - [x] **新增视觉风格扩展与优化** (Glassmorphism, Flat VTuber, Bento Modern, 29+ Preset Styles) <!-- id: 30 -->
+                    - [x] 在 `designs.ts` 中添加风格定义 (含 Flat VTuber 饱和度与装饰优化) <!-- id: 31 -->
+                    - [x] 在 `WebConfig` 中集成新图标并适配 UI (修复了 Code 图标导入错误) <!-- id: 32 -->
+                    - [x] **集成 29+ 预设风格库 (Select More)**: 实现从 `designprompts.dev` 批量导入并支持跨模型 Prompt 适配。
+        - [x] **Graph 逻辑实现 (双 Graph 架构)**：
+            - [x] 实现 `InitialGenGraph` (Idea Expander -> Style Director -> Code Generator)
+            - [x] 支持预设风格注入逻辑 (Style Director 解释执行模式)
+            - [ ] 实现 `RefineGraph` (Editor Node)
+    
     - [ ] **全链路集成**：
         - [ ] 在 `WebPreview` 中实现基于 `useVFS` 的 `iframe` 实时渲染
         - [ ] 实现 Graph 路由逻辑 (Initial vs Refine)

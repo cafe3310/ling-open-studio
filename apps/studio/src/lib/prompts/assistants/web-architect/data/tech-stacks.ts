@@ -3,9 +3,9 @@ import { TechStackOption } from "./types";
 export const techStacks: TechStackOption[] = [
   {
     id: "html-tailwind",
-    name: "HTML + Tailwind",
-    description_style: "Strictly use Tailwind CSS utility classes. Do not write custom CSS in <style> tags unless for font loading.",
-    description_expander: "Structure the site as a single-page semantic HTML5 document. Use semantic sections like <header>, <main>, and <footer>.",
+    name: "HTML + Tailwind + Lucide",
+    description_style: "Strictly use Tailwind CSS utility classes. Use Lucide icons for all visual metaphors (via data-lucide attributes).",
+    description_expander: "Structure the site as a single-page semantic HTML5 document. Use semantic sections like <header>, <main>, and <footer>. Ensure Lucide icons are appropriately sized (w-4, w-5, h-4, h-5) and colored.",
     boilerplate_code: `
 <!DOCTYPE html>
 <html lang="en">
@@ -14,14 +14,17 @@ export const techStacks: TechStackOption[] = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="bg-white text-slate-900">
+    <!-- Lucide Icon Usage Example: <i data-lucide="menu"></i> -->
     <!-- Content injected here -->
+    
     <script>
+        // Initialize Lucide Icons after content is rendered
         lucide.createIcons();
     </script>
 </body>
